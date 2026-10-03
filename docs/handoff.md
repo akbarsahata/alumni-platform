@@ -45,3 +45,13 @@ Ticket 0 compatibility checks pass locally:
 Ticket 0 remains incomplete against the recovered acceptance criteria: authentication and D1 are currently exercised through a separate compatibility worker rather than the main app; environment templates, the email abstraction/local capture, and complete development/deployment documentation remain to be implemented or verified. Dependencies have a package lock, but package.json version ranges are not exact pins. No login UI exists yet.
 
 The recovered ticket list is historical planning input. Future specification and task generation will use the GitHub plugin per the user request; no GitHub generation or external action was performed during this document import.
+
+## Ticket 1 specification and skill setup — 2026-10-03
+
+Aligned Ticket 1 with the accepted interview, including mandatory house selection, same-house references, individual manual eligibility review, email-code login, and deferred MFA. The user accepted the browser/HTTP integration seam. Published the full specification through the GitHub plugin as https://github.com/akbarsahata/alumni-platform/issues/1 with ready-for-agent. The local copy is docs/ticket-1-spec.md.
+
+Created AGENTS.md and docs/agents configuration for GitHub Issues through the plugin, the five default triage labels, and single-context domain documentation. No application implementation, deployment, live email, or task decomposition was performed in this step. Next: decompose issue #1 into implementation tickets when requested, retaining the outstanding Ticket 0 prerequisites.
+
+## Ticket 1 decomposition — 2026-10-03
+
+The user approved eight vertical slices. Published GitHub issues #2–#9 through the GitHub plugin, each with ready-for-agent, a parent-spec reference, and explicit blocking issue links. Native dependency operations were unavailable in the plugin; parent issue #1 was not modified. See docs/ticket-1-implementation.md for the index. The first available implementation issue is #2 (main-app email-code login). No implementation was started in this step.

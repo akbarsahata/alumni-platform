@@ -21,7 +21,7 @@ D1 is SQLite-based, replacing the earlier provisional PostgreSQL recommendation.
 
 Email ownership, account status, and alumni membership are separate concepts. A school representative may have an active account without alumni membership. Membership approval never grants administration rights.
 
-Use a maintained auth library and secure cookie sessions. Verify token expiry, single use, email-scanner handling, CSRF/origin checks, sign-out, revocation, and protection against account enumeration. Add a supported MFA method for administrators before the live pilot. If the candidate library cannot meet Workers requirements, document and select a supported replacement before ticket 1.
+Use a maintained auth library and secure cookie sessions. Verify token expiry, single use, email-scanner handling, CSRF/origin checks, sign-out, revocation, and protection against account enumeration. Ticket 1 uses Better Auth email-code login for all accounts, including administrators. Administrator MFA is deferred to a later improvement by the agreed Ticket 1 scope. If the candidate library cannot meet Workers requirements, document and select a supported replacement before ticket 1.
 
 Authorization combines role, ownership, and workflow state. Finance can review payment evidence; directory coordinators can discover willing alumni; staff can review school content. Do not give these permissions to every administrator or school user implicitly. Keep a permission matrix in code and test denials.
 

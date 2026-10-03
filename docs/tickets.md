@@ -1,6 +1,6 @@
 # Implementation tickets
 
-All tickets are pending. Work sequentially: 0 → 1 → 2 → 3 → 4 → 5. Keep each change reviewable and update the session handoff.
+Ticket 0 is partially implemented and locally verified; see the handoff for remaining work. Tickets 1–5 are pending. Work sequentially: 0 → 1 → 2 → 3 → 4 → 5. Keep each change reviewable and update the session handoff.
 
 ## 0 — Cloudflare foundation and authentication compatibility
 
@@ -10,9 +10,32 @@ Acceptance: pinned dependencies build and type-check; a local Worker serves a pa
 
 ## 1 — Membership, references, and permissions
 
-Implement email verification, applications, authenticated reference endorsement, manual review, administrator decisions, and role checks. Establish initial trusted members through a documented bootstrap process, never a public role-selection form.
+Implement the complete Bahasa Indonesia workflow for Better Auth email-code login, membership applications, authenticated reference responses, manual review, administrator decisions, and server-side permissions. All accounts, including administrators, use email-code login. Follow the installed Better Auth Email OTP behavior rather than inventing expiry/resend rules; validate it in the Workers runtime. Administrator MFA is deferred to a later improvement and is not a Ticket 1 or pilot completion requirement.
 
-Acceptance: references can endorse/decline/cannot-confirm; no self-endorsement; stale or replayed requests cannot change decisions; manual review is available; decision and role changes are audited; pending applicants and students cannot access private directory or financial records; staff accounts do not require false alumni profiles. Verify token expiry/reuse and server-side access denial. Configure supported administrator MFA before live use.
+### Applications and references
+
+- Require name while attending school, graduation year, and exactly one house: Komodo, Lion, Rhino, Hornbill, Dove, Eagle, Dolphin, Shark, or Mantaray. Do not offer an unknown-house choice or a manual-review bypass for missing house information.
+- Former students who did not graduate provide attendance years instead of a false graduation year and use manual review. Eligibility, including expelled former students, is decided individually.
+- Applicants enter a reference email; responses must not disclose whether the address has an account. An eligible reference is an approved alumnus from the same house who personally knew the applicant at school. Matching graduation year is not required.
+- Require one endorsement followed by an administrator decision. References can endorse, decline, or cannot-confirm; no self-endorsement. Decline/cannot-confirm triggers manual review rather than automatic rejection.
+- Reference requests expire after seven days. Applicants can replace the reference or request manual review; replacements invalidate earlier requests. House corrections before approval invalidate outstanding endorsements and require fresh review; after approval, only administrators change house, with a fresh review.
+- Manual review uses an applicant explanation and independent checks with trusted alumni or school staff, without identity-document uploads. Rejected applicants may correct and resubmit; preserve every review's history. Allow only one active application per account.
+
+### Permissions and administration
+
+- Bootstrap the organization-appointed primary administrator and initial trusted alumni through a documented private, audited process; never expose public role selection.
+- Membership administrators approve/reject applications. Only the primary administrator grants/revokes privileged roles. Administrators cannot decide their own applications or applications they endorsed; another administrator decides.
+- Invite staff/student representatives through primary-administrator invitations: bound to one email and role, single use, seven-day expiry. Email verification is required; no alumni application/profile is required for school roles.
+- Pending applicants can view published initiatives, edit their own application, and see status. They cannot access private directory or financial records. School roles do not automatically grant directory or finance permissions.
+- Application details and house are visible only to the applicant, membership administrators, and chosen reference as needed for review. Reference comments and response details stay private to reviewers; applicants see only that manual review is needed.
+- Administrators may suspend/reinstate membership with an audited reason. Suspension immediately removes alumni permissions and endorsement privileges, including in existing sessions. Suspended users may sign in to view status and have one outstanding review request.
+- Defer self-service email changes. Administrator-assisted changes verify the new email and perform an audited identity check.
+
+### Notifications and acceptance
+
+Capture email locally: send codes, endorsement requests, applicant action requests, decisions, and school-role invitations. Administrators review a pending queue instead of receiving an email for each application. No live email or credentials are required.
+
+Acceptance: the login/application/endorsement/review screens support an end-to-end synthetic local workflow; OTP expiry/reuse and server rate limits are exercised; stale/replayed/replaced requests cannot change decisions; same-house and personal-knowledge requirements are enforced; denied requests cannot disclose private fields; house corrections trigger fresh review; rejection/resubmission and suspension/reinstatement preserve history; conflicts of interest are denied; invitations cannot grant extra roles; decision, identity and role changes retain actor/reason/history. Build and type checks pass. Staging, deployment, live Resend delivery, and MFA are out of scope.
 
 ## 2 — Profiles, expertise search, and contact requests
 
@@ -36,7 +59,7 @@ Acceptance: only confirmed receipts affect progress; concurrent/repeated confirm
 
 Implement initiative follows, notification preferences, progress/outcome reports, optional digest scheduling and staff approval of student updates. Finish outbox retries and delivery handling. Add aggregate pilot metrics and cohort invitations.
 
-Acceptance: optional updates respect preferences; account mail remains separate; retried jobs do not ordinarily duplicate email; closures show outcomes and finances; operators can inspect aggregate participation and outstanding reviews. Verify data recovery, administrator MFA, retention settings, and an end-to-end synthetic pilot covering membership, funding and expertise outreach. Document account owners and deployment configuration. Coordinate the actual pilot invitation/send separately with the user.
+Acceptance: optional updates respect preferences; account mail remains separate; retried jobs do not ordinarily duplicate email; closures show outcomes and finances; operators can inspect aggregate participation and outstanding reviews. Verify data recovery, retention settings, and an end-to-end synthetic pilot covering membership, funding and expertise outreach. Document account owners and deployment configuration. Coordinate the actual pilot invitation/send separately with the user.
 
 ## Definition of done for each session
 
