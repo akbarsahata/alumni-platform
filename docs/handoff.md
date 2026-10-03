@@ -104,3 +104,11 @@ VS Code/Cursor workspace settings enable formatting on save with the recommended
 `npm ci` installs hooks through Husky's `prepare` script. The pre-commit hook formats staged files, runs warning-only lint, then runs typechecking and the existing full integration suite. Allow approximately five minutes and keep port 5173 available. Node requirements are recorded in package.json and local-development.md.
 
 Setup checks: format/check, lint and build; a stdin lint probe confirms warnings exit successfully. The setup commit exercises lint-staged and the actual pre-commit typecheck/full-test workflow. No runtime behavior, remote resources or live email are changed.
+
+## Push test workflow and README badge — 2026-10-03
+
+Added `.github/workflows/tests.yml` (`Tests`) with push events for branches and a job condition covering `master` plus refs protected by branch protection/rulesets. Public GitHub branch metadata verified that only `master` currently exists and has no protection/rulesets, so it is included explicitly. No protection settings were changed. Tag pushes and other unprotected branches do not run tests; matching pushes are not cancelled by newer runs.
+
+The workflow uses commit-pinned official checkout/setup-node actions, Ubuntu 24.04, Node 24, npm's lockfile/cache and Playwright Chromium/system dependency installation. It creates synthetic local configuration, then runs formatting checks, advisory lint, typecheck, build and the complete HTTP/browser suite with a 15-minute timeout. Read-only repository permissions and disabled persisted checkout credentials are sufficient. No remote credentials, provisioning, live mail or deployment are used. README links a native workflow badge filtered to `master` and `event=push`.
+
+Workflow syntax/expression validation uses checksum-verified actionlint 1.7.12, and Prettier checks cover the new files. Local commit hooks exercise typechecking and the full test suite. Hosted execution starts when these commits are pushed; a local run does not establish a passing GitHub Actions result.

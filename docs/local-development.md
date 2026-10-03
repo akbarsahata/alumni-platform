@@ -46,6 +46,14 @@ The HTTP suite runs independent journeys concurrently and takes approximately fi
 
 To run one journey against an already running server, use `node --test --test-name-pattern='journey name' tests/auth.test.mjs` or run `node scripts/test.mjs tests/roles.test.mjs roles.spec.ts` for role HTTP/browser checks. The role browser fixture is created by the harness; `npm run test:browser` alone remains suitable for the login journey (`-- login.spec.ts`). Use `TEST_BASE_URL` for HTTP checks against a different local origin, and update BETTER_AUTH_URL to match. The browser suite uses the standard port 5173.
 
+## GitHub Actions
+
+The `Tests` workflow runs on every push to `master` and any branch protected by GitHub branch protection or a ruleset. `master` is included explicitly because the repository currently has no protected branches. Other unprotected branch pushes are skipped, and tag pushes do not trigger the workflow. Every matching push gets its own run; newer pushes do not cancel earlier runs.
+
+CI uses an Ubuntu runner and Node 24, installs locked dependencies and Chromium system dependencies, then checks formatting, runs advisory lint, typechecks, builds and runs `npm test`. The test harness applies migrations and uses disposable local D1/KV state. Local setup generates temporary synthetic keys; no repository secrets, Cloudflare credentials, live email or deployment are needed. Husky is disabled in CI because no commit is created by the workflow. The job has a 15-minute timeout to accommodate the real five-minute OTP expiry check.
+
+The README badge is scoped to the latest `push` run for `master`; clicking it opens that branch's push workflow history. It starts reporting after this workflow reaches GitHub and the first push run completes. If the default branch is renamed, update the explicit branch condition and badge URLs together.
+
 ## Installed auth behavior
 
 Better Auth Email OTP defaults: six digits, 300-second expiry, three allowed failed guesses, replacement on resend, and three requests per endpoint per IP per 60 seconds. The plugin's rate limiter is explicitly enabled even in development and stored in D1, so recreating the auth object does not reset counters. The Worker trusts only Cloudflare's `CF-Connecting-IP` for IP tracking; local integration clients supply synthetic addresses. Production Cloudflare overwrites that header at the edge. OTP values are hashed in the auth verification table. Database transactions are disabled for the D1 adapter; the installed adapter supplies atomic verification consumption and rate-limit updates.
