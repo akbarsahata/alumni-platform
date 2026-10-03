@@ -112,3 +112,7 @@ Added `.github/workflows/tests.yml` (`Tests`) with push events for branches and 
 The workflow uses commit-pinned official checkout/setup-node actions, Ubuntu 24.04, Node 24, npm's lockfile/cache and Playwright Chromium/system dependency installation. It creates synthetic local configuration, then runs formatting checks, advisory lint, typecheck, build and the complete HTTP/browser suite with a 15-minute timeout. Read-only repository permissions and disabled persisted checkout credentials are sufficient. No remote credentials, provisioning, live mail or deployment are used. README links a native workflow badge filtered to `master` and `event=push`.
 
 Workflow syntax/expression validation uses checksum-verified actionlint 1.7.12, and Prettier checks cover the new files. Local commit hooks exercise typechecking and the full test suite. Hosted execution starts when these commits are pushed; a local run does not establish a passing GitHub Actions result.
+
+## Faster commit hook — 2026-10-03
+
+Updated the pre-commit hook per the user's revised preference: staged-file formatting, advisory lint, and typechecking remain; the full test suite no longer runs on commit. GitHub Actions retains formatting, lint, typecheck, build, and full HTTP/browser testing as the CI quality gate. README and local-development.md describe the current behavior; earlier hook descriptions above are historical.

@@ -23,7 +23,7 @@ The repository's VS Code/Cursor settings enable formatting on every save with th
 
 `npm run lint` runs ESLint on JavaScript and TypeScript. Recommended checks and the 100-column code-length rule are warnings, with no strict type-aware rules; explicit `any`, non-null assertions and empty catch blocks are allowed. Warnings do not block commits. `npm run lint:fix` applies available fixes when desired. Syntax/configuration errors still fail the lint command.
 
-`npm ci` installs Husky hooks through the `prepare` script. Every commit formats supported staged files with lint-staged, runs advisory lint, then typechecks and runs the existing integration suite. This takes about five minutes because OTP expiry uses the real clock; keep port 5173 available. lint-staged automatically stages its formatting changes and preserves unstaged edits. Editor formatting and the commit hook use the same config.
+`npm ci` installs Husky hooks through the `prepare` script. Every commit formats supported staged files with lint-staged, runs advisory lint, then typechecks. Tests and build checks run in GitHub Actions; commits do not run the integration suite or need port 5173. lint-staged automatically stages its formatting changes and preserves unstaged edits. Editor formatting and the commit hook use the same config.
 
 ## Local mailbox
 
