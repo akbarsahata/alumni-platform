@@ -1,0 +1,15 @@
+node_modules/
+build/
+.react-router/
+.wrangler/
+.mf/
+test-results/
+playwright-report/
+worker-configuration.d.ts
+*.tsbuildinfo
+package-lock.json
+skills-lock.json
+.agents/
+AGENTS.md
+.dev.vars*
+.env*

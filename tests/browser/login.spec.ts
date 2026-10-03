@@ -3,9 +3,14 @@ import { readFile } from "node:fs/promises";
 
 test("Bahasa Indonesia email-code login, returning login and logout", async ({ page, request }) => {
   const vars = await readFile(".dev.vars", "utf8");
-  const key = vars.split("\n").find(line => line.startsWith("LOCAL_MAIL_KEY="))!.slice("LOCAL_MAIL_KEY=".length);
+  const key = vars
+    .split("\n")
+    .find((line) => line.startsWith("LOCAL_MAIL_KEY="))!
+    .slice("LOCAL_MAIL_KEY=".length);
   const email = `browser-${Date.now()}@example.test`;
-  await page.setExtraHTTPHeaders({ "CF-Connecting-IP": `2001:db8:beef:${Date.now().toString(16).slice(-4)}::1` });
+  await page.setExtraHTTPHeaders({
+    "CF-Connecting-IP": `2001:db8:beef:${Date.now().toString(16).slice(-4)}::1`,
+  });
   await page.goto("/");
   await page.getByRole("link", { name: "Masuk dengan kode email" }).click();
   await expect(page).toHaveURL(/\/login$/);
@@ -15,7 +20,9 @@ test("Bahasa Indonesia email-code login, returning login and logout", async ({ p
     await page.getByLabel("Email", { exact: true }).fill(email);
     await page.getByRole("button", { name: "Kirim kode", exact: true }).click();
     await expect(page.getByRole("status")).toContainText("Kode telah dikirim");
-    const capture = await request.get(`/__local/mail?email=${encodeURIComponent(email)}`, { headers: { Authorization: `Bearer ${key}` } });
+    const capture = await request.get(`/__local/mail?email=${encodeURIComponent(email)}`, {
+      headers: { Authorization: `Bearer ${key}` },
+    });
     expect(capture.status()).toBe(200);
     const mail = await capture.json();
     const code = mail.text.match(/\b\d{6}\b/)[0];

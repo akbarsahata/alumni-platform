@@ -1,10 +1,22 @@
 import { test, expect } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 
-test("primary administrator grants and revokes roles in Bahasa Indonesia and inspects history", async ({ page }) => {
-  const fixture = JSON.parse(await readFile(`${process.env.ALUMNI_TEST_STATE}/accounts.json`, "utf8"));
+test("primary administrator grants and revokes roles in Bahasa Indonesia and inspects history", async ({
+  page,
+}) => {
+  const fixture = JSON.parse(
+    await readFile(`${process.env.ALUMNI_TEST_STATE}/accounts.json`, "utf8")
+  );
   const [name, ...value] = fixture.primary.cookie.split("=");
-  await page.context().addCookies([{ name, value: value.join("="), url: "http://127.0.0.1:5173", httpOnly: true, sameSite: "Lax" }]);
+  await page.context().addCookies([
+    {
+      name,
+      value: value.join("="),
+      url: "http://127.0.0.1:5173",
+      httpOnly: true,
+      sameSite: "Lax",
+    },
+  ]);
   await page.goto("/");
   await page.getByRole("link", { name: "Kelola peran" }).click();
   await expect(page.getByRole("heading", { name: "Kelola peran" })).toBeVisible();

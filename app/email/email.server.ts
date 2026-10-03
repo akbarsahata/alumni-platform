@@ -19,10 +19,16 @@ export async function readLocalMail(request: Request, env: Env) {
   if (!import.meta.env.DEV || !["127.0.0.1", "localhost", "[::1]"].includes(url.hostname)) {
     return new Response(null, { status: 404 });
   }
-  if (!env.LOCAL_MAIL_KEY || request.headers.get("Authorization") !== `Bearer ${env.LOCAL_MAIL_KEY}`) {
+  if (
+    !env.LOCAL_MAIL_KEY ||
+    request.headers.get("Authorization") !== `Bearer ${env.LOCAL_MAIL_KEY}`
+  ) {
     return new Response(null, { status: 404 });
   }
   if (request.method !== "GET") return new Response(null, { status: 405 });
-  const message = await env.LOCAL_MAIL.get(url.searchParams.get("email")?.toLowerCase() || "", "json");
+  const message = await env.LOCAL_MAIL.get(
+    url.searchParams.get("email")?.toLowerCase() || "",
+    "json"
+  );
   return Response.json(message, { headers: { "Cache-Control": "no-store" } });
 }

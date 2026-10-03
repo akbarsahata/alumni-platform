@@ -5,7 +5,7 @@ import { handleAuthorization } from "../app/authorization/administration.server"
 
 const requestHandler = createRequestHandler(
   () => import("virtual:react-router/server-build"),
-  import.meta.env.MODE,
+  import.meta.env.MODE
 );
 
 export default {
@@ -15,7 +15,8 @@ export default {
       return new Response("Permintaan tidak diizinkan.", { status: 403 });
     }
     if (path.startsWith("/api/auth/")) return handleAuth(request, env);
-    if (path === "/api/access" || path.startsWith("/api/admin/")) return handleAuthorization(request, env);
+    if (path === "/api/access" || path.startsWith("/api/admin/"))
+      return handleAuthorization(request, env);
     if (path === "/__local/mail") return readLocalMail(request, env);
     const response = await requestHandler(request);
     response.headers.set("Cache-Control", "no-store");

@@ -4,7 +4,7 @@ Issue #2 integrates Better Auth 1.7.7 Email OTP with the main React Router Worke
 
 ## Setup
 
-Use Node.js 22.12+ (or a supported newer Node release) and npm. Dependencies are exactly pinned and package-lock.json is committed.
+Use Node.js 22.22.1+ on the Node 22 line, or Node 24+, and npm (matching the pinned lint tooling requirements). Dependencies are exactly pinned and package-lock.json is committed.
 
 ```sh
 npm ci
@@ -14,6 +14,16 @@ npm run dev -- --host 127.0.0.1
 ```
 
 Open http://127.0.0.1:5173/login. `local:setup` creates a private `.dev.vars` with separate random authentication and local mailbox keys, preserving any existing file. `.dev.vars.example` documents the names without credentials. Keep BETTER_AUTH_URL equal to the development origin, including its port. The committed D1 and KV IDs are local placeholders; no remote provisioning is needed. Wrangler persists synthetic D1/KV state under ignored `.wrangler/`.
+
+## Formatting and linting
+
+Prettier owns formatting: two spaces, double quotes, semicolons and a 100-column target. Run `npm run format` to format supported project files, or `npm run format:check` to check them. Generated files, local state, secrets, lockfiles and installed agent skills are excluded. SQL is left unchanged because no SQL formatter is configured.
+
+The repository's VS Code/Cursor settings enable formatting on every save with the Prettier extension. Install the recommended `esbenp.prettier-vscode` extension when prompted. The optional recommended ESLint extension shows diagnostics in the editor. Other editors can use the same Prettier config and `.editorconfig`; they need their own format-on-save integration.
+
+`npm run lint` runs ESLint on JavaScript and TypeScript. Recommended checks and the 100-column code-length rule are warnings, with no strict type-aware rules; explicit `any`, non-null assertions and empty catch blocks are allowed. Warnings do not block commits. `npm run lint:fix` applies available fixes when desired. Syntax/configuration errors still fail the lint command.
+
+`npm ci` installs Husky hooks through the `prepare` script. Every commit formats supported staged files with lint-staged, runs advisory lint, then typechecks and runs the existing integration suite. This takes about five minutes because OTP expiry uses the real clock; keep port 5173 available. lint-staged automatically stages its formatting changes and preserves unstaged edits. Editor formatting and the commit hook use the same config.
 
 ## Local mailbox
 

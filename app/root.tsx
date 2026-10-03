@@ -52,10 +52,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
 
   if (isRouteErrorResponse(error)) {
     message = error.status === 404 ? "404" : "Kesalahan";
-    details =
-      error.status === 404
-        ? "Halaman tidak ditemukan."
-        : error.statusText || details;
+    details = error.status === 404 ? "Halaman tidak ditemukan." : error.statusText || details;
   } else if (import.meta.env.DEV && error && error instanceof Error) {
     details = error.message;
     stack = error.stack;

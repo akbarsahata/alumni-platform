@@ -14,9 +14,7 @@ Issue [#3](https://github.com/akbarsahata/alumni-platform/issues/3) establishes 
   "primaryUserId": "verified-primary-account-id",
   "operator": "Organization-appointed operator name",
   "reason": "Organization appointment; independent school identity and house checks completed",
-  "trustedAlumni": [
-    { "userId": "verified-trusted-alumnus-account-id", "house": "Komodo" }
-  ]
+  "trustedAlumni": [{ "userId": "verified-trusted-alumnus-account-id", "house": "Komodo" }]
 }
 ```
 
@@ -31,13 +29,13 @@ Bootstrap is one database statement. SQLite triggers validate accounts and atomi
 
 Only the primary can open `/admin/roles` and grant/revoke roles on verified accounts, with a required reason of up to 1,000 characters:
 
-| Role | Permission |
-| --- | --- |
-| membership-administrator | Review membership |
-| finance-coordinator | Access finance |
-| directory-coordinator | Access the private directory |
-| staff | Validate school content |
-| student | Propose student content |
+| Role                     | Permission                   |
+| ------------------------ | ---------------------------- |
+| membership-administrator | Review membership            |
+| finance-coordinator      | Access finance               |
+| directory-coordinator    | Access the private directory |
+| staff                    | Validate school content      |
+| student                  | Propose student content      |
 
 The primary appointment grants role management and authorization audit access only. Assign membership-administrator separately for membership review, and finance/directory separately as needed. Staff/student assignments here are explicit primary actions on verified accounts; email-bound invitations remain issue #7. The primary role cannot be assigned/revoked through the screen/API.
 

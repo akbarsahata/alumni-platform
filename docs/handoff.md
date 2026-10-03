@@ -73,7 +73,6 @@ Validation:
 
 Next: issue #3 (administrator bootstrap and role management slice); confirm its current tracker specification before implementing. It must use current database-backed identity and keep membership approval separate from email verification. Bootstrap and administrator role assignment remain their own later slices. MFA, staging/deployment, live email and membership features are outside issue #2.
 
-
 ## Issue #3 — administrator bootstrap and role management — 2026-10-03
 
 Implemented Ticket 1.2 from GitHub issue #3 against starting commit `8b90757d1a0c0b2d3f5002db33df1f02025d3073` on the current `master` branch.
@@ -95,3 +94,13 @@ Validation:
 No remote provisioning, deployment, live email or real appointments were performed. Bootstrap was exercised only in disposable synthetic databases; the ordinary local development database has not been bootstrapped. Run `npm run db:migrate` before normal development with the new routes. School-role invitations remain issue #7; membership applications/review, suspension and identity changes remain their later slices. Directory/finance capabilities are established here; their product records and workflows remain outside Ticket 1.
 
 Next: issue #4 (membership application/status slice); read the current tracker specification before implementing.
+
+## Formatting and relaxed linting — 2026-10-03
+
+Added pinned Prettier, ESLint/typescript-eslint, Husky and lint-staged tooling. Prettier uses two spaces, double quotes, semicolons and the user's 100-column target. Existing supported project files have been formatted; generated files, local secrets/state, lockfiles and installed agent skills are excluded. SQL remains unchanged.
+
+VS Code/Cursor workspace settings enable formatting on save with the recommended Prettier extension; other editors need their own save integration. `.editorconfig` provides common whitespace settings. ESLint recommended diagnostics and the 100-column code-length rule are advisory warnings; explicit `any`, non-null assertions and empty catch blocks are allowed. Formatting is separate from lint.
+
+`npm ci` installs hooks through Husky's `prepare` script. The pre-commit hook formats staged files, runs warning-only lint, then runs typechecking and the existing full integration suite. Allow approximately five minutes and keep port 5173 available. Node requirements are recorded in package.json and local-development.md.
+
+Setup checks: format/check, lint and build; a stdin lint probe confirms warnings exit successfully. The setup commit exercises lint-staged and the actual pre-commit typecheck/full-test workflow. No runtime behavior, remote resources or live email are changed.

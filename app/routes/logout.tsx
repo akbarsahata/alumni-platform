@@ -5,7 +5,10 @@ import { authFormRequest, handleAuth } from "../auth/auth.server";
 
 export async function action({ request }: Route.ActionArgs) {
   const response = await handleAuth(authFormRequest(request, "/api/auth/sign-out", {}), env);
-  if (!response.ok) throw new Response("Tidak dapat keluar. Silakan coba lagi.", { status: response.status });
+  if (!response.ok)
+    throw new Response("Tidak dapat keluar. Silakan coba lagi.", {
+      status: response.status,
+    });
   return redirect("/login", { headers: response.headers });
 }
 export function loader() {

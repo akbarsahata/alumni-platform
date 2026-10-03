@@ -4,16 +4,16 @@
 
 The user selected Cloudflare and Resend. Specific libraries below are recommendations pending ticket 0 validation, not installed or verified dependencies.
 
-| Component | Choice | Purpose |
-| --- | --- | --- |
-| Application | TypeScript, React Router framework mode, Cloudflare Workers | One full-stack application with server-enforced workflows |
-| Database | Cloudflare D1 | Relational member, initiative, and financial records |
-| Queries/migrations | Drizzle ORM with its D1 adapter | Typed queries and versioned migrations |
-| File storage | Private Cloudflare R2 bucket | Payment evidence and permitted initiative assets |
-| Email | Existing Resend account | Verification, references, opportunity requests, updates |
-| Authentication | Candidate: Better Auth with supported D1/Drizzle integration | Email-based sign-in and session management; validate before selection |
-| Abuse controls | Server rate limits; Turnstile for exposed forms as needed | Reduce registration and email abuse |
-| Background work | D1 outbox plus scheduled Worker processing | Reliable email retries without a separate application server |
+| Component          | Choice                                                       | Purpose                                                               |
+| ------------------ | ------------------------------------------------------------ | --------------------------------------------------------------------- |
+| Application        | TypeScript, React Router framework mode, Cloudflare Workers  | One full-stack application with server-enforced workflows             |
+| Database           | Cloudflare D1                                                | Relational member, initiative, and financial records                  |
+| Queries/migrations | Drizzle ORM with its D1 adapter                              | Typed queries and versioned migrations                                |
+| File storage       | Private Cloudflare R2 bucket                                 | Payment evidence and permitted initiative assets                      |
+| Email              | Existing Resend account                                      | Verification, references, opportunity requests, updates               |
+| Authentication     | Candidate: Better Auth with supported D1/Drizzle integration | Email-based sign-in and session management; validate before selection |
+| Abuse controls     | Server rate limits; Turnstile for exposed forms as needed    | Reduce registration and email abuse                                   |
+| Background work    | D1 outbox plus scheduled Worker processing                   | Reliable email retries without a separate application server          |
 
 D1 is SQLite-based, replacing the earlier provisional PostgreSQL recommendation. It fits the anticipated pilot's relational requirements without another database provider. Reassess limits and query patterns against measured community usage before expansion. Do not assume PostgreSQL features or arbitrary multi-statement transaction APIs; verify D1 batch atomicity and adapter behavior for the chosen workflows.
 
@@ -27,15 +27,15 @@ Authorization combines role, ownership, and workflow state. Finance can review p
 
 ## Conceptual tables
 
-| Group | Entities and relationships |
-| --- | --- |
-| Identity | Auth-managed users/sessions/tokens; users have role assignments; optional alumni profiles belong to users |
-| Verification | Membership applications belong to users/cohorts; reference requests link applicants to endorsers; reviews retain decisions and timestamps |
-| Directory | Profiles link to expertise tags, availability, visibility/contact settings; outreach requests link coordinators, members, and optional initiatives |
-| Initiatives | Initiatives have owners, requested support, budgets and lifecycle status; approvals and updates retain authors/reviewers; follows link members to initiatives |
-| Receiving accounts | Versioned receiving-account records belong to initiatives; transfer claims retain the account version shown at submission |
-| Finance | Claims and optional evidence link to receipts after reconciliation; receipt corrections, expenses, refunds and adjustments retain actor/reason/history |
-| Operations | Audit events; email outbox/delivery attempts; notification preferences; attachments with ownership/access metadata |
+| Group              | Entities and relationships                                                                                                                                    |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Identity           | Auth-managed users/sessions/tokens; users have role assignments; optional alumni profiles belong to users                                                     |
+| Verification       | Membership applications belong to users/cohorts; reference requests link applicants to endorsers; reviews retain decisions and timestamps                     |
+| Directory          | Profiles link to expertise tags, availability, visibility/contact settings; outreach requests link coordinators, members, and optional initiatives            |
+| Initiatives        | Initiatives have owners, requested support, budgets and lifecycle status; approvals and updates retain authors/reviewers; follows link members to initiatives |
+| Receiving accounts | Versioned receiving-account records belong to initiatives; transfer claims retain the account version shown at submission                                     |
+| Finance            | Claims and optional evidence link to receipts after reconciliation; receipt corrections, expenses, refunds and adjustments retain actor/reason/history        |
+| Operations         | Audit events; email outbox/delivery attempts; notification preferences; attachments with ownership/access metadata                                            |
 
 Use stable IDs, foreign keys, uniqueness constraints and timestamps. Store whole rupiah in integer fields, with explicit currency and bounds. Define whether funding progress is net of refunds and show gross receipts/refunds separately in reports. Never derive money received from claims. Validate lifecycle transitions on the server.
 
