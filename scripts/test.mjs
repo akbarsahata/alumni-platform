@@ -1,5 +1,6 @@
 import { spawn } from "node:child_process";
-import { mkdir, open } from "node:fs/promises";
+import { mkdir, open, mkdtemp, rm } from "node:fs/promises";
+import { resolve } from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
 
 function run(command, args) {
@@ -10,8 +11,11 @@ function run(command, args) {
   });
 }
 
+await mkdir("test-results", { recursive: true });
+await mkdir(".wrangler", { recursive: true });
+process.env.ALUMNI_TEST_STATE = resolve(await mkdtemp(".wrangler/integration-state-"));
 await run(process.execPath, ["scripts/local-setup.mjs"]);
-await run("node_modules/.bin/wrangler", ["d1", "migrations", "apply", "alumni_local", "--local"]);
+await run("node_modules/.bin/wrangler", ["d1", "migrations", "apply", "alumni_local", "--local", "--persist-to", process.env.ALUMNI_TEST_STATE]);
 await mkdir("test-results", { recursive: true });
 const log = await open("test-results/worker.log", "w", 0o600);
 const server = spawn("node_modules/.bin/react-router", ["dev", "--host", "127.0.0.1", "--port", "5173", "--strictPort"], {
@@ -34,13 +38,19 @@ try {
   }
   if (!ready) throw new Error("Worker did not become ready; see test-results/worker.log.");
   // AllSettled keeps the Worker alive until both suites have finished, even if one fails.
-  const results = await Promise.allSettled([
+  if (!process.argv[2]) await run(process.execPath, ["--test", "tests/roles.test.mjs"]);
+  const results = await Promise.allSettled(process.argv[2] ? [
+    run(process.execPath, ["--test", process.argv[2]]),
+  ] : [
     run(process.execPath, ["--test", "tests/auth.test.mjs"]),
     run("node_modules/.bin/playwright", ["test"]),
   ]);
   const failure = results.find(result => result.status === "rejected");
   if (failure) throw failure.reason;
+  if (process.argv[3]) await run("node_modules/.bin/playwright", ["test", process.argv[3]]);
 } finally {
   stop();
   await log.close();
+  // Remove only the disposable state created by this run.
+  await rm(process.env.ALUMNI_TEST_STATE, { recursive: true, force: true });
 }

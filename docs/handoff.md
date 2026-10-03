@@ -71,4 +71,27 @@ Validation:
 - Built Worker preview on port 4173 rejected `/__local/mail` with 404 even with the correct local operator key. Production builds disable capture and have no live email adapter.
 - Two-axis code review against starting commit `87ec6c2b7e51adba8965552e7f5b2b6e9b99cfc3` completed with independent Standards and Spec agents: zero findings on either axis. The corrected rate-limit rerun subsequently passed.
 
-Next: issue #3 (membership application slice); confirm its current tracker specification before implementing. It must use current database-backed identity and keep membership approval separate from email verification. Bootstrap and administrator role assignment remain their own later slices. MFA, staging/deployment, live email and membership features are outside issue #2.
+Next: issue #3 (administrator bootstrap and role management slice); confirm its current tracker specification before implementing. It must use current database-backed identity and keep membership approval separate from email verification. Bootstrap and administrator role assignment remain their own later slices. MFA, staging/deployment, live email and membership features are outside issue #2.
+
+
+## Issue #3 — administrator bootstrap and role management — 2026-10-03
+
+Implemented Ticket 1.2 from GitHub issue #3 against starting commit `8b90757d1a0c0b2d3f5002db33df1f02025d3073` on the current `master` branch.
+
+- Added migration `0003_roles_bootstrap.sql`: distinct privileged assignments, approved/suspended alumni membership with nine-house constraints, once-only primary appointment and UTC authorization audit history. SQLite triggers apply bootstrap and role changes atomically with their audit events; conditional role writes make identical concurrent/repeated requests no-ops.
+- Added a private, local-only `npm run bootstrap -- /private/path/appointment.json` command requiring verified accounts, operator identity, reason and one valid house per trusted alumnus. No bootstrap HTTP endpoint or public role selection exists. See `administrator-bootstrap.md` for the complete operator procedure, account-ID retrieval, private appointment evidence and recovery boundaries.
+- Added authenticated Bahasa Indonesia `/admin/roles` and `/admin/audit` interactions, primary-only account/audit APIs and a self-only `/api/access` permission response. The primary alone grants/revokes membership-administrator, finance-coordinator, directory-coordinator, staff and student roles. Primary succession is not exposed. The primary needs separately assigned roles for membership review, finance or directory access.
+- Current D1 roles and membership are checked per request, including existing session cookies. Approved alumni, school roles and membership-administrator do not implicitly receive private directory/finance permissions. The Worker rejects mutations from missing/untrusted origins, including React Router data requests, and protected data is not cached.
+- Extended the integration harness with disposable local D1/KV state under ignored `.wrangler/`, preserving ordinary development data and making a once-only bootstrap repeatably testable. Synthetic fixture files are private and removed with their run.
+
+Validation:
+
+- `node scripts/test.mjs tests/roles.test.mjs roles.spec.ts` passes all seven HTTP journeys plus the Chromium role/audit journey. Exercises invalid/partial/repeated bootstrap, all nine houses, all five role grants/revocations, same-session revocation, denied API/page/data-route disclosure, origin protection, forged actors and role escalation, concurrent retries, multiple-role isolation and older audit pagination.
+- `npm run typecheck` and `npm run build` pass.
+- Two-axis code review via independent Standards and Spec agents completed with zero findings on either axis.
+- `npm test` passed once at the end: seven role/bootstrap HTTP journeys, all eleven authentication HTTP journeys (including real five-minute OTP expiry and production-equivalent limiter reset), and both Chromium browser journeys. No failures.
+- `git diff --cached --check` passes.
+
+No remote provisioning, deployment, live email or real appointments were performed. Bootstrap was exercised only in disposable synthetic databases; the ordinary local development database has not been bootstrapped. Run `npm run db:migrate` before normal development with the new routes. School-role invitations remain issue #7; membership applications/review, suspension and identity changes remain their later slices. Directory/finance capabilities are established here; their product records and workflows remain outside Ticket 1.
+
+Next: issue #4 (membership application/status slice); read the current tracker specification before implementing.
