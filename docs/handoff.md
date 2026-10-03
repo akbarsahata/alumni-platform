@@ -55,3 +55,20 @@ Created AGENTS.md and docs/agents configuration for GitHub Issues through the pl
 ## Ticket 1 decomposition — 2026-10-03
 
 The user approved eight vertical slices. Published GitHub issues #2–#9 through the GitHub plugin, each with ready-for-agent, a parent-spec reference, and explicit blocking issue links. Native dependency operations were unavailable in the plugin; parent issue #1 was not modified. See docs/ticket-1-implementation.md for the index. The first available implementation issue is #2 (main-app email-code login). No implementation was started in this step.
+
+## Issue #2 — main-app email-code login — 2026-10-03
+
+Implemented Ticket 1.1 in the main React Router Worker: Better Auth 1.7.7 Email OTP with real D1/Drizzle, verified first and returning accounts, cookie sessions, logout revocation, and Bahasa Indonesia login/home/logout copy. Routes and identifiers use English (`/login`, `/logout`). Authentication proves email ownership only; membership and roles remain later slices. Password login and identity-changing auth routes are unavailable in the product Worker.
+
+Completed the outstanding foundation setup for this slice: main-app local D1/KV bindings, rate-limit migration, exact dependency pins and lockfile, private random `.dev.vars` setup and safe example, email abstraction and restricted ten-minute local capture, local mailbox command, and reproducible browser/HTTP integration harness. See local-development.md for commands and configuration. No remote provisioning, deployment, real credentials, or live email.
+
+Validation:
+
+- `npm run typecheck` passes, including the browser test and Playwright configuration.
+- `npm run build` passes. Local secret values were checked absent from emitted client/server code and source maps. The Vite plugin copies `.dev.vars` into ignored build/server for local preview; never distribute those local build secrets.
+- Local migrations applied successfully with `npm run db:migrate`.
+- `npm test` exercised the real Worker, D1, KV, and Chromium: browser journey passed; 10 of 11 HTTP journeys passed, including five-minute expiry, replay, concurrent consumption, returning login, logout invalidation, resend replacement, wrong-attempt exhaustion and origin/session/mailbox protections. One test assertion incorrectly expected `Retry-After`; the installed library emits `X-Retry-After`. Corrected that expectation; `node --test --test-name-pattern='production limiter' tests/auth.test.mjs` passes, including the fourth-send 429, `X-Retry-After`, and 61-second window reset. All 11 HTTP journeys and the browser journey have now passed. The full suite was run once; after correcting only the header assertion, the affected journey was rerun.
+- Built Worker preview on port 4173 rejected `/__local/mail` with 404 even with the correct local operator key. Production builds disable capture and have no live email adapter.
+- Two-axis code review against starting commit `87ec6c2b7e51adba8965552e7f5b2b6e9b99cfc3` completed with independent Standards and Spec agents: zero findings on either axis. The corrected rate-limit rerun subsequently passed.
+
+Next: issue #3 (membership application slice); confirm its current tracker specification before implementing. It must use current database-backed identity and keep membership approval separate from email verification. Bootstrap and administrator role assignment remain their own later slices. MFA, staging/deployment, live email and membership features are outside issue #2.

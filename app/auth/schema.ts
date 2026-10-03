@@ -51,4 +51,11 @@ export const compatProbe = sqliteTable("compat_probe", {
 	result: text("result").notNull(),
 });
 
-export const authSchema = { user, session, account, verification };
+export const rateLimit = sqliteTable("rate_limit", {
+  id: text("id").primaryKey(),
+  key: text("key").notNull().unique(),
+  count: integer("count").notNull(),
+  lastRequest: integer("last_request").notNull(),
+});
+
+export const authSchema = { user, session, account, verification, rateLimit };
