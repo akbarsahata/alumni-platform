@@ -1,5 +1,53 @@
 # Session handoff
 
+## Issue #5 — authenticated same-house references — 2026-10-05
+
+Implemented Ticket 1.4 against starting commit `fa9063596fc52e1b96999b6b67b81227476872cd`
+on `master`; implementation commit `437952a` is local, not pushed. Issue #4 is verified closed.
+
+- Added migration `0005_membership_references.sql` for revision-bound seven-day requests and
+  immutable single-use responses. Conditional writes plus SQLite triggers enforce intended
+  verified recipient, approved same-house alumni membership, no self-reference, current revision,
+  expiry, explicit personal-knowledge attestation for endorsement, and independent decisions.
+- Graduate applicants enter reference email at `/membership`; registered, unknown and ineligible
+  emails receive identical confirmations and request capture. There is no searchable directory.
+  Request emails contain only an authenticated link, with no applicant school identity.
+- Added Bahasa Indonesia `/references/:requestId` response screen. Eligible references see only
+  school-time name, graduation year, house, expiry and answered state. Different graduation years
+  are allowed. Endorsement enables review without granting membership; decline/cannot-confirm
+  sends a neutral manual-review-needed message and keeps comments/details private to reviewers.
+- Extended the reviewer queue/detail view with private reference history. Unanswered requests wait
+  until response/expiry. An administrator who endorsed cannot decide the application, including
+  later revisions. Existing independent-check notes and audited administrator decisions remain
+  required. Every application correction invalidates current reference/endorsement status while
+  retaining prior history. Direct replacement/manual-review switching remains issue #6.
+- Reference requests persist before capture; identical current unanswered-request retries can
+  retry failed capture. Negative-response mail uses the existing notification outbox. Capture is
+  local only, with latest-message ten-minute retention; scheduled/provider delivery remains later
+  work. See `membership-references.md` for manual testing and operator details.
+
+Focused validation: six HTTP journeys and the Chromium reference/administrator journey pass.
+Coverage includes neutral addresses, all responses, same/different house and graduation year,
+attestation, self/wrong/unapproved reference denial, API/page/data privacy, origin checks,
+expiry/replay, stale revisions/endorsements, request/response concurrency and reviewer conflict.
+Seven-day expiry is checked in HTTP data and exercised using a guarded time-boundary fixture in
+only disposable test D1; all outcome assertions go through public HTTP. The browser check exposed
+an ambiguous select label, fixed by explicit label association. Build, typecheck, lint and
+formatting pass. Independent Standards and Spec reviews against the starting commit both report
+zero actionable findings. The first full run passed all reference/role/membership/auth HTTP
+journeys and four browsers, but the logout fixture collided with another process's synthetic
+IPv6 /64 and hit 429 during setup. Confirmed the installed auth library normalizes IPv6 by
+/64; isolated synthetic account subnets across processes without changing product limits.
+The focused logout rerun passes. Incremental review covers the test helper fix.
+Final `npm test` rerun passes all 31 HTTP journeys (seven roles, six membership, six references,
+one logout, eleven authentication) and four Chromium journeys, including actual OTP expiry and
+limiter reset. No failures. Test-helper fix is committed locally as `0d22a22`.
+
+Applied the migration to ordinary local D1. Verified `localhost:5173/login` returns 200;
+unauthenticated membership/reference/admin pages return 401. Existing localhost server/origin
+and normal data remain intact. No real appointments, live email, staging/production provisioning,
+deployment, push, PR or hosted CI result. Next: issue #6.
+
 ## Direct logout navigation fix — 2026-10-05
 
 Opening `/logout` directly previously hit a loader that deliberately returned 405; the home-page
