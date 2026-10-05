@@ -1,5 +1,21 @@
 # Session handoff
 
+## Remote seeding workflow — 2026-10-05
+
+Added `seeds/seed.sql`, `scripts/seed.mjs` and `.github/workflows/seed.yml`.
+Seed/runner/workflow changes trigger branch push runs. `master` selects the GitHub
+`production` environment; other branches select `default`. `SEEDING_ENABLED` is false
+in the workflow: validation and target reporting run, dependency installation and
+remote execution are skipped. See `seeding.md` for isolated remote database secrets,
+migration prerequisites and verified-account administrator appointment. The seed is
+currently a harmless SELECT; no remote provisioning, seeding or deployment performed.
+
+Validation: actionlint 1.7.12, formatting, advisory lint and typecheck pass; disabled
+production/default paths succeed without credentials, mismatched branch targets and
+enabled execution without credentials fail. Standards and Spec reviews: zero findings.
+Full integration tests were attempted but failed with a pre-existing development server
+listening on port 5173; the server was left running. No hosted workflow result claimed.
+
 ## Current state
 
 Planning documents created on 2026-10-02. Application implementation has not started. No dependencies installed, remote resources provisioned, email sent, or deployment performed. Files are local workspace artifacts; a remote Git repository has not been created.

@@ -1,5 +1,8 @@
 # Project documents
 
+- [Remote D1 seeding](seeding.md): branch-selected GitHub Actions, disabled write flag,
+  environment secrets and administrator appointment prerequisites.
+
 Recovered planning documents from the “Move attach session results” chat, with current local verification recorded in the handoff.
 
 - [Pilot specification](pilot.md): accepted context, workflows, and proposed defaults.

@@ -1,0 +1,57 @@
+name: Seed D1
+
+on:
+  push:
+    branches:
+      - "**"
+    paths:
+      - seeds/seed.sql
+      - scripts/seed.mjs
+      - .github/workflows/seed.yml
+
+permissions:
+  contents: read
+
+env:
+  # Enable only after remote databases, migrations and environment secrets are configured.
+  SEEDING_ENABLED: "false"
+  HUSKY: "0"
+  CLOUDFLARE_SEND_METRICS: "false"
+
+jobs:
+  seed:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    environment: ${{ github.ref_name == 'master' && 'production' || 'default' }}
+    concurrency:
+      group: d1-seed-${{ github.ref_name == 'master' && 'production' || 'default' }}
+      cancel-in-progress: false
+    steps:
+      - name: Check out the pushed commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Validate seed and report target
+        env:
+          SEED_ENVIRONMENT: ${{ github.ref_name == 'master' && 'production' || 'default' }}
+        run: node scripts/seed.mjs --check
+
+      - name: Install locked dependencies
+        if: env.SEEDING_ENABLED == 'true'
+        run: npm ci
+
+      - name: Seed selected remote D1 database
+        if: env.SEEDING_ENABLED == 'true'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          D1_DATABASE_ID: ${{ secrets.D1_DATABASE_ID }}
+          SEED_ENVIRONMENT: ${{ github.ref_name == 'master' && 'production' || 'default' }}
+        run: node scripts/seed.mjs

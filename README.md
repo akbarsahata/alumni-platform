@@ -147,3 +147,10 @@ The [recovered overview](docs/recovered-readme.md) and
 [recovered instructions](docs/recovered-project-instructions.md) preserve initial planning context.
 Current specifications, code, and the latest handoff entries supersede historical implementation
 statuses.
+
+## Remote database seeding
+
+Changing [seeds/seed.sql](seeds/seed.sql) triggers the seeding workflow: `master` targets
+production and other branches target the default environment. Database writes are
+currently disabled through the workflow feature flag. See the [seeding guide](docs/seeding.md)
+for environment secrets, prerequisites, retries and administrator appointment.
