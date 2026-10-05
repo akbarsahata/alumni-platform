@@ -1,5 +1,14 @@
 # Session handoff
 
+## Direct logout navigation fix — 2026-10-05
+
+Opening `/logout` directly previously hit a loader that deliberately returned 405; the home-page
+POST form worked. Added a Bahasa Indonesia confirmation page for GET, with logout still performed
+through the origin-protected POST action. A focused HTTP regression verifies GET preserves the
+session and confirmation clears the cookie/revokes that session. The Chromium login journey now
+exercises direct navigation/confirmation plus the existing home-page logout. Both focused checks
+pass; verified the running `localhost:5173/logout` now responds 200. Typechecking passes.
+
 ## Issue #4 — membership applications and independent manual review — 2026-10-05
 
 Implemented Ticket 1.3 against starting commit `57198bad0122b6bf176d0e9c3aada8c9bc557649`

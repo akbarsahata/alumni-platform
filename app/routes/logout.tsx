@@ -1,5 +1,5 @@
 import { env } from "cloudflare:workers";
-import { redirect } from "react-router";
+import { Form, Link, redirect, useNavigation } from "react-router";
 import type { Route } from "./+types/logout";
 import { authFormRequest, handleAuth } from "../auth/auth.server";
 
@@ -12,5 +12,23 @@ export async function action({ request }: Route.ActionArgs) {
   return redirect("/login", { headers: response.headers });
 }
 export function loader() {
-  return new Response(null, { status: 405 });
+  return null;
+}
+
+export default function Logout() {
+  const busy = useNavigation().state !== "idle";
+  return (
+    <main className="mx-auto max-w-xl p-8 space-y-6">
+      <h1 className="text-2xl font-semibold">Keluar dari akun</h1>
+      <p>Konfirmasi untuk mengakhiri sesi akun di perangkat ini.</p>
+      <Form method="post">
+        <button disabled={busy} className="border rounded px-4 py-2">
+          Keluar
+        </button>
+      </Form>
+      <Link to="/" className="underline">
+        Kembali ke beranda
+      </Link>
+    </main>
+  );
 }

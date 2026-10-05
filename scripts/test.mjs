@@ -90,6 +90,7 @@ try {
       ? [run(process.execPath, ["--test", process.argv[2]])]
       : [
           run(process.execPath, ["--test", "tests/auth.test.mjs"]),
+          run(process.execPath, ["--test", "tests/logout.test.mjs"]),
           run("node_modules/.bin/playwright", ["test"]),
         ]
   );
