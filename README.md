@@ -8,7 +8,7 @@ reconciliation, and reporting outcomes. Product screens use Bahasa Indonesia; co
 English.
 
 **Currently implemented:** the local Cloudflare application, email-code login, private administrator
-bootstrap, role management, and audit history. Applications/references, school invitations, profiles,
+bootstrap, role management, membership applications/manual review, and audit history. References, school invitations, profiles,
 initiatives, finance, and engagement workflows remain planned. The latest entries in the
 [session handoff](docs/handoff.md) describe implementation and verification; earlier planning statuses
 are historical.
@@ -26,10 +26,10 @@ nvm use
 npm ci
 npm run local:setup
 npm run db:migrate
-npm run dev -- --host 127.0.0.1
+npm run dev
 ```
 
-Open [http://127.0.0.1:5173/login](http://127.0.0.1:5173/login). Request a code with a synthetic address,
+Open [localhost:5173/login](http://localhost:5173/login). Request a code with a synthetic address,
 then read its captured email in another terminal:
 
 ```sh
@@ -43,7 +43,7 @@ the development origin. See the [environment example](.dev.vars.example) and
 
 ## Accounts and administration
 
-The main pages are `/`, `/login`, `/logout`, `/admin/roles`, and `/admin/audit`. All accounts use emailed
+The main pages are `/`, `/login`, `/logout`, `/membership`, `/admin/membership`, `/admin/roles`, and `/admin/audit`. All accounts use emailed
 login codes. Email ownership, alumni membership, and privileged roles are separate; role revocation
 applies to existing sessions. Membership or school roles do not automatically grant directory/finance
 access.
@@ -58,6 +58,10 @@ npm run bootstrap -- /private/path/appointment.json
 
 Follow the [administrator bootstrap guide](docs/administrator-bootstrap.md) for the input format,
 identity checks, role permissions, and audit behavior. There is no public bootstrap endpoint.
+
+Applicants submit school identity and a required house, track status, and correct/resubmit for manual
+review. Membership administrators independently check applications, record decisions, and inspect
+retained versions/history. See the [membership review guide](docs/membership-review.md).
 
 ## Development and verification
 
@@ -91,13 +95,15 @@ without live credentials. The badge above shows the latest `master` push result.
 
 TypeScript, React 19, React Router 8 with server rendering, Cloudflare Workers/D1, Better Auth Email OTP,
 and Drizzle's D1 auth adapter. Vite, Wrangler, and Tailwind CSS support development/builds; local email
-capture uses KV. Private R2 storage, live Resend delivery, and an email outbox are planned.
+capture uses KV; membership notifications have a D1 outbox. Private R2 storage, live Resend delivery,
+and scheduled outbox processing are planned.
 
 | Location                                                                                        | Responsibility                                                                     |
 | ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
 | [Worker entry](workers/app.ts) / [routes](app/routes.ts) / [pages](app/routes/)                 | Origin checks, API dispatch, and Indonesian application screens.                   |
 | [Authentication](app/auth/)                                                                     | Email-code login, cookie sessions, restricted auth endpoints, and schema mappings. |
 | [Authorization](app/authorization/)                                                             | Current permissions, role management, and audit access.                            |
+| [Membership](app/membership/)                                                                   | Versioned applications, independent manual decisions, and notification capture.    |
 | [Email capture](app/email/email.server.ts)                                                      | Development-only email delivery and restricted mailbox access.                     |
 | [Migrations](migrations/)                                                                       | Auth, rate limits, memberships, roles, bootstrap, and atomic audit triggers.       |
 | [Scripts](scripts/) / [tests](tests/)                                                           | Operator commands, integration harness, HTTP tests, and browser journeys.          |
@@ -109,21 +115,22 @@ current product workflows.
 
 ## Documentation and roadmap
 
-| Document                                                          | Read it for                                                                            |
-| ----------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| [Pilot specification](docs/pilot.md)                              | Audience, workflows, operating defaults, evaluation, and exclusions.                   |
-| [Architecture and data model](docs/architecture.md)               | Design direction, authorization, storage, email reliability, and recovery.             |
-| [Local development](docs/local-development.md)                    | Setup, mailbox, testing, formatting, CI, and deployment boundaries.                    |
-| [Administrator bootstrap](docs/administrator-bootstrap.md)        | Private appointments, role isolation, and audit procedure.                             |
-| [Ticket 1 specification](docs/ticket-1-spec.md)                   | Agreed membership/reference scope and browser/HTTP testing seam.                       |
-| [Ticket 1 implementation issues](docs/ticket-1-implementation.md) | Published vertical slices and their dependencies.                                      |
-| [Pilot implementation tickets](docs/tickets.md)                   | Broader foundation → membership → directory → initiatives → finance → engagement plan. |
-| [Session handoff](docs/handoff.md)                                | Implementation history, validation, limitations, and next work.                        |
-| [Document index](docs/README.md)                                  | Planning-document provenance and historical references.                                |
+| Document                                                          | Read it for                                                                               |
+| ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| [Pilot specification](docs/pilot.md)                              | Audience, workflows, operating defaults, evaluation, and exclusions.                      |
+| [Architecture and data model](docs/architecture.md)               | Design direction, authorization, storage, email reliability, and recovery.                |
+| [Local development](docs/local-development.md)                    | Setup, mailbox, testing, formatting, CI, and deployment boundaries.                       |
+| [Administrator bootstrap](docs/administrator-bootstrap.md)        | Private appointments, role isolation, and audit procedure.                                |
+| [Membership manual review](docs/membership-review.md)             | Application/status screens, independent checks, decision history, and local verification. |
+| [Ticket 1 specification](docs/ticket-1-spec.md)                   | Agreed membership/reference scope and browser/HTTP testing seam.                          |
+| [Ticket 1 implementation issues](docs/ticket-1-implementation.md) | Published vertical slices and their dependencies.                                         |
+| [Pilot implementation tickets](docs/tickets.md)                   | Broader foundation → membership → directory → initiatives → finance → engagement plan.    |
+| [Session handoff](docs/handoff.md)                                | Implementation history, validation, limitations, and next work.                           |
+| [Document index](docs/README.md)                                  | Planning-document provenance and historical references.                                   |
 
 The membership parent specification is [issue #1](https://github.com/akbarsahata/alumni-platform/issues/1).
-Login and administrator bootstrap/roles are implemented locally; the next main slice is
-[membership applications and manual review (#4)](https://github.com/akbarsahata/alumni-platform/issues/4).
+Login, administrator bootstrap/roles, and membership applications/manual review are implemented locally;
+the next main slice is [same-house references (#5)](https://github.com/akbarsahata/alumni-platform/issues/5).
 References, house corrections, invitations, suspension/reinstatement, and assisted email changes
 follow the [issue dependency index](docs/ticket-1-implementation.md). The broader pilot then adds
 expertise discovery, approved initiatives, manual bank-transfer reconciliation, and outcome reporting.

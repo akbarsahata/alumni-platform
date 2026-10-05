@@ -1,5 +1,49 @@
 # Session handoff
 
+## Issue #4 — membership applications and independent manual review — 2026-10-05
+
+Implemented Ticket 1.3 against starting commit `57198bad0122b6bf176d0e9c3aada8c9bc557649`
+on the current `master` branch. Issue #3 is verified closed; the current issue #4 and parent
+specification define this slice.
+
+- Added migration `0004_membership_applications.sql` with one application per verified account,
+  immutable school-identity revisions, private decision history, and a membership-notification
+  outbox. Conditional writes and SQLite triggers apply current status, decision, alumni membership,
+  and notification atomically; stale/concurrent/repeated transitions return 409.
+- Added Bahasa Indonesia `/membership`, `/admin/membership`, and `/admin/membership/:userId`
+  pages plus matching APIs. Graduates provide graduation year; former students provide attendance
+  years and receive individual manual review. Exactly one valid house and a manual-review explanation
+  are required. Pending/action-required/rejected applications can be corrected/resubmitted; prior
+  versions and decisions remain retained. Approved/suspended members cannot overwrite membership
+  through this application flow.
+- Membership administrators record independent trusted-alumni or school-staff checks and audited
+  reasons for approval/rejection, or request corrections. Self-review is denied. Applicants see only
+  explicitly addressed messages/status; internal reasons, reviewer identities, and check notes stay
+  private to authorized reviewers. Membership approval grants no privileged roles.
+- Captured submission/action/decision email uses the existing local adapter. Notifications persist
+  before capture, and capture failures retain pending messages without rolling back decisions.
+  Live delivery and scheduled/provider retries remain future work. No administrator email per
+  application. See `membership-review.md` for the operator workflow and local testing.
+- Preserved the user's `localhost` development origin and running server. Fresh local setup defaults
+  to localhost. Automated tests use separate synthetic keys and their own temporary configuration
+  at `127.0.0.1:5173`, along with disposable D1/KV data.
+
+Focused validation passes six membership HTTP journeys and the Chromium application/review journey,
+covering all nine houses, former-student checks, action/rejection/resubmission/approval, privacy in
+API/page/data routes, same-session role revocation, self-review denial, captured email, forged actors,
+and stale/concurrent transitions. Typechecking, build, formatting, and advisory lint pass. Independent
+Standards and Spec reviews both completed with zero findings. `npm test` passed once at the end:
+24 HTTP journeys (seven roles/bootstrap, six membership, eleven authentication including real OTP
+expiry/rate-limit resets) and all three Chromium journeys. No failures. Changes are committed locally
+on `master`; no push, pull request, or hosted CI result is claimed.
+Applied the new migration to the ordinary local database. Verified `localhost:5173/login` responds
+200 and unauthenticated membership applicant/reviewer pages respond 401; `.dev.vars` remains set to
+`http://localhost:5173` and the existing development server remains running.
+
+No staging/production provisioning, deployment, real appointments, credentials, or live email.
+Next: issue #5, same-house reference requests/responses. References, post-approval house corrections,
+invitations, suspensions, and identity changes remain their separate slices.
+
 ## Remote seeding workflow — 2026-10-05
 
 Added `seeds/seed.sql`, `scripts/seed.mjs` and `.github/workflows/seed.yml`.

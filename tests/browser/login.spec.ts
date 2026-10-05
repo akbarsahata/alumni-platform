@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 
 test("Bahasa Indonesia email-code login, returning login and logout", async ({ page, request }) => {
-  const vars = await readFile(".dev.vars", "utf8");
+  const vars = await readFile(process.env.ALUMNI_TEST_VARS || ".dev.vars", "utf8");
   const key = vars
     .split("\n")
     .find((line) => line.startsWith("LOCAL_MAIL_KEY="))!

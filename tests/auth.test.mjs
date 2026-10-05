@@ -2,7 +2,7 @@ import { test, describe } from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 const vars = Object.fromEntries(
-  (await readFile(".dev.vars", "utf8"))
+  (await readFile(process.env.ALUMNI_TEST_VARS || ".dev.vars", "utf8"))
     .split("\n")
     .filter((line) => line.includes("="))
     .map((line) => {

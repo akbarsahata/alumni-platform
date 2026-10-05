@@ -4,7 +4,7 @@ const secret = () => randomBytes(32).toString("hex");
 try {
   await writeFile(
     ".dev.vars",
-    `BETTER_AUTH_SECRET=${secret()}\nBETTER_AUTH_URL=http://127.0.0.1:5173\nLOCAL_MAIL_KEY=${secret()}\n`,
+    `BETTER_AUTH_SECRET=${secret()}\nBETTER_AUTH_URL=http://localhost:5173\nLOCAL_MAIL_KEY=${secret()}\n`,
     { flag: "wx", mode: 0o600 }
   );
   console.log("Created private local .dev.vars. Run npm run db:migrate next.");

@@ -2,6 +2,7 @@ import { createRequestHandler } from "react-router";
 import { handleAuth, hasTrustedOrigin } from "../app/auth/auth.server";
 import { readLocalMail } from "../app/email/email.server";
 import { handleAuthorization } from "../app/authorization/administration.server";
+import { handleMembership } from "../app/membership/applications.server";
 
 const requestHandler = createRequestHandler(
   () => import("virtual:react-router/server-build"),
@@ -15,6 +16,7 @@ export default {
       return new Response("Permintaan tidak diizinkan.", { status: 403 });
     }
     if (path.startsWith("/api/auth/")) return handleAuth(request, env);
+    if (path.startsWith("/api/membership/")) return handleMembership(request, env);
     if (path === "/api/access" || path.startsWith("/api/admin/"))
       return handleAuthorization(request, env);
     if (path === "/__local/mail") return readLocalMail(request, env);

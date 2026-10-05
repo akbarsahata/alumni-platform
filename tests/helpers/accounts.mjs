@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 export const base = process.env.TEST_BASE_URL || "http://127.0.0.1:5173";
-const vars = await readFile(".dev.vars", "utf8");
+const vars = await readFile(process.env.ALUMNI_TEST_VARS || ".dev.vars", "utf8");
 const key = vars
   .split("\n")
   .find((line) => line.startsWith("LOCAL_MAIL_KEY="))
@@ -44,4 +44,11 @@ export function call(account, path, body, extra = {}) {
     ...(body ? { body: JSON.stringify(body) } : {}),
     redirect: "manual",
   });
+}
+export async function capturedMail(email) {
+  return await (
+    await fetch(`${base}/__local/mail?email=${encodeURIComponent(email)}`, {
+      headers: { Authorization: `Bearer ${key}` },
+    })
+  ).json();
 }

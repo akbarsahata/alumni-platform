@@ -19,6 +19,14 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         <>
           <p>Anda masuk sebagai {loaderData.account.email}.</p>
           <p>Email Anda telah diverifikasi. Status keanggotaan ditinjau secara terpisah.</p>
+          <Link className="underline block" to="/membership">
+            Pengajuan keanggotaan
+          </Link>
+          {loaderData.access?.permissions.reviewMembership && (
+            <Link className="underline block" to="/admin/membership">
+              Tinjau keanggotaan
+            </Link>
+          )}
           {loaderData.access?.permissions.manageRoles && (
             <Link className="underline" to="/admin/roles">
               Kelola peran

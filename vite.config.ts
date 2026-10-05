@@ -6,6 +6,7 @@ import { defineConfig } from "vite";
 export default defineConfig({
   plugins: [
     cloudflare({
+      ...(process.env.ALUMNI_TEST_CONFIG ? { configPath: process.env.ALUMNI_TEST_CONFIG } : {}),
       viteEnvironment: { name: "ssr" },
       ...(process.env.ALUMNI_TEST_STATE
         ? { persistState: { path: process.env.ALUMNI_TEST_STATE } }

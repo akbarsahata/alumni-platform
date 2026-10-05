@@ -10,10 +10,10 @@ Use Node.js 22.22.1+ on the Node 22 line, or Node 24+, and npm (matching the pin
 npm ci
 npm run local:setup
 npm run db:migrate
-npm run dev -- --host 127.0.0.1
+npm run dev
 ```
 
-Open http://127.0.0.1:5173/login. `local:setup` creates a private `.dev.vars` with separate random authentication and local mailbox keys, preserving any existing file. `.dev.vars.example` documents the names without credentials. Keep BETTER_AUTH_URL equal to the development origin, including its port. The committed D1 and KV IDs are local placeholders; no remote provisioning is needed. Wrangler persists synthetic D1/KV state under ignored `.wrangler/`.
+Open http://localhost:5173/login. `local:setup` creates a private `.dev.vars` with separate random authentication and local mailbox keys, preserving any existing file. `.dev.vars.example` documents the names without credentials. Keep BETTER_AUTH_URL equal to the development origin, including its port. The committed D1 and KV IDs are local placeholders; no remote provisioning is needed. Wrangler persists synthetic D1/KV state under ignored `.wrangler/`.
 
 ## Formatting and linting
 
@@ -40,11 +40,14 @@ npm run build
 npm test
 ```
 
-Stop any development server using port 5173 before `npm test`. The harness starts the real local Workers application with D1 and KV bindings, runs browser and HTTP checks, and stops its Worker afterward. It applies local migrations and uses only fresh synthetic addresses. It uses a separate disposable D1/KV state directory under `.wrangler/`, removes that directory afterward, and preserves existing local data. Logs and generated test reports are ignored. Browser traces, videos and screenshots are disabled and generated test artifacts remain private and ignored.
+Keep `127.0.0.1:5173` free before `npm test`. A localhost development server bound only to IPv6 can stay running. The harness starts the real local Workers application with D1 and KV bindings and its own matching origin configuration, runs browser and HTTP checks, and stops its Worker afterward. It applies local migrations and uses only fresh synthetic addresses. It uses a separate disposable D1/KV state directory under `.wrangler/`, removes that directory afterward, and preserves existing local data and `.dev.vars`. Logs and generated test reports are ignored. Browser traces, videos and screenshots are disabled and generated test artifacts remain private and ignored.
 
 The HTTP suite runs independent journeys concurrently and takes approximately five minutes: expiry is verified with the real five-minute clock, not by altering private database records. It verifies resend replacement, replay denial, verified account creation, returning login, cookie flags, logout invalidation, forged sessions, origin denials, local mailbox protection, disabled identity endpoints, three failed attempts and fourth-request rate limiting with window reset. Browser checks exercise Indonesian copy, English routes, login, returning login, logout, role assignment/revocation and audit navigation. The HTTP role suite exercises private bootstrap, all nine houses, role isolation, denied disclosure, origin protection, immediate revocation and concurrent retries.
 
 To run one journey against an already running server, use `node --test --test-name-pattern='journey name' tests/auth.test.mjs` or run `node scripts/test.mjs tests/roles.test.mjs roles.spec.ts` for role HTTP/browser checks. The role browser fixture is created by the harness; `npm run test:browser` alone remains suitable for the login journey (`-- login.spec.ts`). Use `TEST_BASE_URL` for HTTP checks against a different local origin, and update BETTER_AUTH_URL to match. The browser suite uses the standard port 5173.
+
+For membership HTTP/browser checks, run `node scripts/test.mjs tests/membership.test.mjs membership.spec.ts`.
+See [membership-review.md](membership-review.md) for manual testing, decision history, and coverage.
 
 ## GitHub Actions
 

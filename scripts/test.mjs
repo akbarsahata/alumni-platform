@@ -1,5 +1,6 @@
 import { spawn } from "node:child_process";
-import { mkdir, open, mkdtemp, rm } from "node:fs/promises";
+import { randomBytes } from "node:crypto";
+import { mkdir, open, mkdtemp, rm, readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
 
@@ -16,7 +17,19 @@ function run(command, args) {
 await mkdir("test-results", { recursive: true });
 await mkdir(".wrangler", { recursive: true });
 process.env.ALUMNI_TEST_STATE = resolve(await mkdtemp(".wrangler/integration-state-"));
-await run(process.execPath, ["scripts/local-setup.mjs"]);
+process.env.ALUMNI_TEST_CONFIG = `${process.env.ALUMNI_TEST_STATE}/wrangler.jsonc`;
+process.env.ALUMNI_TEST_VARS = `${process.env.ALUMNI_TEST_STATE}/.dev.vars`;
+await writeFile(
+  process.env.ALUMNI_TEST_CONFIG,
+  (await readFile("wrangler.jsonc", "utf8"))
+    .replace('"./workers/app.ts"', JSON.stringify(resolve("workers/app.ts")))
+    .replace('"migrations"', JSON.stringify(resolve("migrations")))
+);
+await writeFile(
+  process.env.ALUMNI_TEST_VARS,
+  `BETTER_AUTH_SECRET=${randomBytes(32).toString("hex")}\nBETTER_AUTH_URL=http://127.0.0.1:5173\nLOCAL_MAIL_KEY=${randomBytes(32).toString("hex")}\n`,
+  { mode: 0o600 }
+);
 await run("node_modules/.bin/wrangler", [
   "d1",
   "migrations",
@@ -68,7 +81,10 @@ try {
   }
   if (!ready) throw new Error("Worker did not become ready; see test-results/worker.log.");
   // AllSettled keeps the Worker alive until both suites have finished, even if one fails.
-  if (!process.argv[2]) await run(process.execPath, ["--test", "tests/roles.test.mjs"]);
+  if (!process.argv[2]) {
+    await run(process.execPath, ["--test", "tests/roles.test.mjs"]);
+    await run(process.execPath, ["--test", "tests/membership.test.mjs"]);
+  }
   const results = await Promise.allSettled(
     process.argv[2]
       ? [run(process.execPath, ["--test", process.argv[2]])]
