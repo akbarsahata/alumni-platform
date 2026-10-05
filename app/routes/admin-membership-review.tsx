@@ -1,3 +1,6 @@
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Textarea } from "../components/ui/textarea";
 import { env } from "cloudflare:workers";
 import { useState } from "react";
 import { Form, Link, data, useNavigation } from "react-router";
@@ -39,7 +42,7 @@ function DecisionForm({ revision }: { revision: number }) {
   const busy = useNavigation().state !== "idle";
   return (
     <Form method="post" className="space-y-4">
-      <input type="hidden" name="expectedRevision" value={revision} />
+      <Input type="hidden" name="expectedRevision" value={revision} />
       <div>
         <label htmlFor="review-outcome">Keputusan</label>
         <select
@@ -73,7 +76,7 @@ function DecisionForm({ revision }: { revision: number }) {
           </label>
           <label className="block">
             Catatan pemeriksaan independen
-            <textarea
+            <Textarea
               name="checkNote"
               required
               maxLength={1000}
@@ -89,7 +92,7 @@ function DecisionForm({ revision }: { revision: number }) {
       )}
       <label className="block">
         Alasan internal
-        <textarea
+        <Textarea
           name="reason"
           required
           maxLength={1000}
@@ -98,7 +101,7 @@ function DecisionForm({ revision }: { revision: number }) {
       </label>
       <label className="block">
         Pesan untuk pemohon
-        <textarea
+        <Textarea
           name="applicantMessage"
           required
           maxLength={1000}
@@ -109,9 +112,9 @@ function DecisionForm({ revision }: { revision: number }) {
         Pesan untuk pemohon ditampilkan dalam status dan email. Jelaskan perbaikan yang diperlukan
         tanpa menyertakan catatan pemeriksaan privat.
       </p>
-      <button disabled={busy} className="border rounded px-4 py-2">
+      <Button type="submit" disabled={busy} className="border rounded px-4 py-2">
         Simpan keputusan
-      </button>
+      </Button>
     </Form>
   );
 }

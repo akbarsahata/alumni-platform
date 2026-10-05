@@ -1,3 +1,6 @@
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Textarea } from "../components/ui/textarea";
 import { env } from "cloudflare:workers";
 import { useState } from "react";
 import { Form, Link, data, useNavigation } from "react-router";
@@ -35,10 +38,10 @@ function ApplicationForm({ current, revision }: { current?: Revision; revision: 
   const year = new Date().getUTCFullYear();
   return (
     <Form method="post" className="space-y-4">
-      <input type="hidden" name="expectedRevision" value={revision} />
+      <Input type="hidden" name="expectedRevision" value={revision} />
       <label className="block">
         Nama semasa sekolah
-        <input
+        <Input
           name="schoolName"
           required
           maxLength={200}
@@ -61,7 +64,7 @@ function ApplicationForm({ current, revision }: { current?: Revision; revision: 
       {studentType === "graduate" ? (
         <label className="block">
           Tahun kelulusan
-          <input
+          <Input
             name="graduationYear"
             type="number"
             min={1900}
@@ -76,7 +79,7 @@ function ApplicationForm({ current, revision }: { current?: Revision; revision: 
           <p>Kelayakan mantan siswa dinilai secara individual melalui tinjauan manual.</p>
           <label className="block">
             Tahun mulai bersekolah
-            <input
+            <Input
               name="attendanceStart"
               type="number"
               min={1900}
@@ -88,7 +91,7 @@ function ApplicationForm({ current, revision }: { current?: Revision; revision: 
           </label>
           <label className="block">
             Tahun terakhir bersekolah
-            <input
+            <Input
               name="attendanceEnd"
               type="number"
               min={1900}
@@ -119,7 +122,7 @@ function ApplicationForm({ current, revision }: { current?: Revision; revision: 
       </div>
       <label className="block">
         Penjelasan untuk tinjauan manual
-        <textarea
+        <Textarea
           name="explanation"
           required
           maxLength={1000}
@@ -132,9 +135,9 @@ function ApplicationForm({ current, revision }: { current?: Revision; revision: 
         tepercaya atau staf sekolah. Jangan kirim dokumen identitas atau rincian riwayat disiplin.
       </p>
       <p>Setiap perbaikan disimpan sebagai versi baru dan memerlukan tinjauan baru.</p>
-      <button disabled={busy} className="border rounded px-4 py-2">
+      <Button type="submit" disabled={busy} className="border rounded px-4 py-2">
         {revision ? "Kirim perbaikan" : "Kirim pengajuan"}
-      </button>
+      </Button>
     </Form>
   );
 }

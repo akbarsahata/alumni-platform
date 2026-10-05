@@ -1,3 +1,4 @@
+import { Button } from "../components/ui/button";
 import { env } from "cloudflare:workers";
 import { Form, Link, redirect, useNavigation } from "react-router";
 import type { Route } from "./+types/logout";
@@ -22,9 +23,9 @@ export default function Logout() {
       <h1 className="text-2xl font-semibold">Keluar dari akun</h1>
       <p>Konfirmasi untuk mengakhiri sesi akun di perangkat ini.</p>
       <Form method="post">
-        <button disabled={busy} className="border rounded px-4 py-2">
+        <Button type="submit" disabled={busy} className="border rounded px-4 py-2">
           Keluar
-        </button>
+        </Button>
       </Form>
       <Link to="/" className="underline">
         Kembali ke beranda

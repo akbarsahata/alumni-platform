@@ -1,3 +1,5 @@
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
 import { env } from "cloudflare:workers";
 import { Form, data, redirect, useNavigation } from "react-router";
 import type { Route } from "./+types/login";
@@ -43,8 +45,9 @@ export default function Login({ actionData }: Route.ComponentProps) {
   const navigation = useNavigation();
   const busy = navigation.state !== "idle";
   return (
-    <main className="mx-auto max-w-md p-8 space-y-6">
-      <h1 className="text-2xl font-semibold">Masuk ke komunitas alumni</h1>
+    <main className="login-page mx-auto max-w-md p-8 space-y-6">
+      <p className="eyebrow">SELAMAT DATANG KEMBALI</p>
+      <h1 className="text-2xl font-semibold">Masuk ke keluarga alumni</h1>
       <p>Gunakan email Anda. Kami akan mengirim kode untuk masuk.</p>
       {actionData?.error && <p role="alert">{actionData.error}</p>}
       {actionData?.sent && (
@@ -53,7 +56,7 @@ export default function Login({ actionData }: Route.ComponentProps) {
       <Form method="post" className="space-y-4">
         <label className="block">
           Email
-          <input
+          <Input
             className="block border rounded p-2 w-full"
             type="email"
             name="email"
@@ -62,16 +65,22 @@ export default function Login({ actionData }: Route.ComponentProps) {
             required
           />
         </label>
-        <button disabled={busy} name="intent" value="send" className="border rounded px-4 py-2">
+        <Button
+          type="submit"
+          disabled={busy}
+          name="intent"
+          value="send"
+          className="border rounded px-4 py-2"
+        >
           {actionData?.sent ? "Kirim ulang kode" : "Kirim kode"}
-        </button>
+        </Button>
       </Form>
       {actionData?.sent && (
         <Form method="post" className="space-y-4">
-          <input type="hidden" name="email" value={actionData.email} />
+          <Input type="hidden" name="email" value={actionData.email} />
           <label className="block">
             Kode masuk
-            <input
+            <Input
               className="block border rounded p-2 w-full"
               type="text"
               name="otp"
@@ -82,11 +91,21 @@ export default function Login({ actionData }: Route.ComponentProps) {
               required
             />
           </label>
-          <button disabled={busy} name="intent" value="verify" className="border rounded px-4 py-2">
+          <Button
+            type="submit"
+            disabled={busy}
+            name="intent"
+            value="verify"
+            className="border rounded px-4 py-2"
+          >
             Masuk
-          </button>
+          </Button>
         </Form>
       )}
+      <p className="quiet-copy login-note">
+        Email menghubungkan Anda dengan keluarga alumni. Keanggotaan alumni ditinjau secara
+        terpisah.
+      </p>
     </main>
   );
 }

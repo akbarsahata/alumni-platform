@@ -1,16 +1,451 @@
 @import "tailwindcss" source(".");
-
-@theme {
-  --font-sans:
-    "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
-    "Segoe UI Symbol", "Noto Color Emoji";
+@theme inline {
+  --color-background: var(--paper);
+  --color-foreground: var(--ink);
+  --color-card: #fffefa;
+  --color-card-foreground: var(--ink);
+  --color-primary: var(--red);
+  --color-primary-foreground: #ffffff;
+  --color-secondary: var(--teal);
+  --color-secondary-foreground: #ffffff;
+  --color-muted: #f1f3ed;
+  --color-muted-foreground: var(--muted-ink);
+  --color-accent: #f5ead0;
+  --color-accent-foreground: var(--teal);
+  --color-destructive: var(--red);
+  --color-border: var(--line);
+  --color-input: #ccd3ce;
+  --color-ring: var(--gold);
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+:root {
+  color-scheme: light;
+  --ink: #183b45;
+  --muted-ink: #647173;
+  --red: #a9222a;
+  --red-hover: #871923;
+  --teal: #073e50;
+  --gold: #dcae48;
+  --paper: #f7f5ef;
+  --line: #e3e5df;
+  font-family: var(--font-sans);
+  color: var(--ink);
+  background: var(--paper);
+}
+body {
+  margin: 0;
+  min-width: 320px;
+}
+a,
+button,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+a,
+button {
+  transition:
+    color 160ms,
+    background 160ms,
+    border-color 160ms;
+}
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 5px;
+}
+.skip-link {
+  position: fixed;
+  top: -100px;
+  left: 1rem;
+  z-index: 20;
+  padding: 0.7rem 1rem;
+  background: white;
+}
+.skip-link:focus {
+  top: 1rem;
+}
+.site-header {
+  border-top: 4px solid var(--red);
+  border-bottom: 1px solid var(--line);
+  padding: 1.4rem max(1.25rem, calc((100vw - 1120px) / 2));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: #fffdf8;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  text-decoration: none;
+}
+.brand-mark {
+  display: grid;
+  place-content: center;
+  position: relative;
+  width: 48px;
+  height: 54px;
+  background: var(--teal);
+  color: white;
+  font-family: Georgia, serif;
+  font-size: 22px;
+  border-radius: 4px 4px 18px 18px;
+}
+.brand-mark span {
+  position: absolute;
+  bottom: 10px;
+  width: 20px;
+  height: 2px;
+  left: 14px;
+  background: var(--gold);
+}
+.brand-kicker {
+  display: block;
+  color: var(--red);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+.brand-name {
+  display: block;
+  font-family: Georgia, serif;
+  font-weight: 600;
+  font-size: 20px;
+  letter-spacing: -0.025em;
+}
+.school-link {
+  font-size: 12px;
+  color: var(--muted-ink);
+  white-space: nowrap;
+}
+.school-link span {
+  margin-left: 0.5rem;
+  color: var(--red);
+}
+.app-shell {
+  min-height: calc(100vh - 196px);
+  padding: 1px 1.25rem 3rem;
+}
+.app-shell > main {
+  width: 100%;
+  margin: 3rem auto 1rem;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--gold);
+  border-radius: 5px 5px 18px 18px;
+  background: #fffefa;
+  box-shadow: 0 8px 30px #173a4405;
+}
+main h1 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.75rem, 3vw, 2.4rem);
+  line-height: 1.16;
+  font-weight: 500;
+  letter-spacing: -0.035em;
+  color: var(--teal);
+}
+main h2 {
+  color: var(--teal);
+}
+main p {
+  line-height: 1.75;
+}
+main > p,
+main form > p {
+  color: var(--muted-ink);
+  font-size: 0.9rem;
+}
+main a:not(.primary-link):not(.action-link) {
+  color: var(--red);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+main a:hover {
+  color: var(--red-hover);
+}
+main nav {
+  flex-wrap: wrap;
+}
+main label,
+main form > div > label {
+  font-size: 0.8rem;
+  color: var(--ink);
+  font-weight: 600;
+}
+main :is(input:not([type="hidden"]), select, textarea) {
+  color: var(--ink);
+  background: white;
+  border: 1px solid #ccd3ce;
+  border-radius: 8px;
+  padding: 0.75rem 0.85rem;
+  margin-top: 0.45rem;
+  font-size: 0.9rem;
+  font-weight: 400;
+  min-height: 46px;
+  width: 100%;
+}
+main :is(input, select, textarea):focus {
+  outline: 2px solid #dcae4870;
+  outline-offset: 2px;
+  border-color: var(--gold);
+}
+main textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+main button:not([data-slot="button"]),
+.primary-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  background: var(--red);
+  border: 1px solid var(--red);
+  color: white;
+  padding: 0.75rem 1.25rem;
+  min-height: 46px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  border-radius: 8px;
+  text-decoration: none;
+  cursor: pointer;
+}
+main button:not([data-slot="button"]):hover,
+.primary-link:hover {
+  background: var(--red-hover);
+  color: white;
+  border-color: var(--red-hover);
+}
+main button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+main button[value="revoke"] {
+  background: white;
+  color: var(--red);
+}
+main [role="status"] {
+  background: #edf5ef;
+  border: 1px solid #cce0d0;
+  color: #27563a;
+  padding: 0.9rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+main [role="alert"] {
+  background: #fff0ec;
+  border: 1px solid #f0ccc4;
+  color: #a9222a;
+  padding: 0.9rem 1rem;
+  border-radius: 8px;
+}
+main table {
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+}
+main caption {
+  padding: 0.5rem 0 1rem;
+}
+main th {
+  background: #f1f3ed;
+  color: var(--muted-ink);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  padding: 0.9rem;
+  text-align: left;
+}
+main td {
+  padding: 1rem 0.9rem;
+  border-bottom: 1px solid var(--line);
+  overflow-wrap: anywhere;
+}
+main article {
+  border-color: var(--line);
+  border-radius: 10px;
+  background: white;
+}
+main dt {
+  font-size: 0.7rem;
+  color: var(--muted-ink);
+  margin-top: 0.9rem;
+}
+main dd {
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+.eyebrow {
+  font-size: 0.65rem !important;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: var(--red) !important;
+  line-height: 1.5;
+}
+.quiet-copy {
+  color: var(--muted-ink);
+  font-size: 0.75rem;
+}
+.app-shell > .home-page {
+  max-width: 1120px;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding: 3rem 0;
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  align-items: center;
+  gap: clamp(2rem, 7vw, 6rem);
+}
+.home-intro h1 {
+  font-size: clamp(2.6rem, 5vw, 4.3rem);
+  margin: 1.4rem 0;
+  line-height: 1.08;
+  letter-spacing: -0.05em;
+}
+.home-intro h1 em {
+  color: var(--red);
+  font-weight: 400;
+}
+.intro-copy {
+  max-width: 380px;
+  font-size: 0.95rem;
+  color: var(--muted-ink);
+}
+.school-ribbon {
+  display: inline-flex;
+  gap: 0.7rem;
+  align-items: center;
+  border-top: 1px solid #d8ddd5;
+  padding-top: 1.3rem;
+  margin-top: 2rem;
+  font-size: 0.7rem;
+  color: var(--muted-ink);
+  letter-spacing: 0.02em;
+}
+.school-ribbon span {
+  color: #9c7728;
+  font-size: 20px;
+}
+.home-account {
+  background: #fffefa;
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--gold);
+  border-radius: 5px 5px 18px 18px;
+  padding: clamp(1.5rem, 4vw, 2.7rem);
+  box-shadow: 0 10px 40px #183b4507;
+}
+.home-account > * + * {
+  margin-top: 1.4rem;
+}
+.home-account h2 {
+  font-family: Georgia, serif;
+  font-size: 1.8rem;
+  letter-spacing: -0.035em;
+  font-weight: 400;
+  line-height: 1.2;
+}
+.home-account p {
+  font-size: 0.85rem;
+  color: var(--muted-ink);
+  overflow-wrap: anywhere;
+}
+.home-account .quiet-copy {
+  font-size: 0.7rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--line);
+}
+.action-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+.action-link span {
+  color: var(--red);
+}
+.login-note {
+  border-top: 1px solid var(--line);
+  padding-top: 1.2rem;
+}
+.site-footer {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem;
+  border-top: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--muted-ink);
+  font-size: 0.65rem;
+}
+.site-footer span:first-child {
+  color: var(--ink);
+  font-weight: 600;
+}
+@media (max-width: 700px) {
+  .site-header {
+    flex-wrap: wrap;
+    padding: 1rem 1.25rem;
+  }
+  .brand-name {
+    font-size: 16px;
+  }
+  .brand-mark {
+    width: 38px;
+    height: 46px;
+    font-size: 18px;
+  }
+  .brand-mark span {
+    left: 10px;
+    width: 18px;
+    bottom: 8px;
+  }
+  .school-link {
+    font-size: 10px;
+  }
+  .app-shell > main {
+    margin-top: 1.75rem;
+  }
+  .app-shell > .home-page {
+    grid-template-columns: 1fr;
+    padding: 1rem 0;
+    gap: 2rem;
+  }
+  .home-intro h1 {
+    font-size: clamp(2.6rem, 9vw, 3.8rem);
+  }
+  .site-footer {
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  a,
+  button {
+    transition: none;
+  }
 }
 
-html,
-body {
-  @apply bg-white dark:bg-gray-950;
-
-  @media (prefers-color-scheme: dark) {
-    color-scheme: dark;
-  }
+main [data-slot="button"] {
+  min-height: 46px;
+  white-space: normal;
+  height: auto;
+  padding-block: 0.75rem;
+  cursor: pointer;
+}
+main [data-slot="input"][type="hidden"] {
+  display: none;
 }

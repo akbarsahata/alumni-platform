@@ -1,3 +1,5 @@
+import { Button } from "../components/ui/button";
+import { Textarea } from "../components/ui/textarea";
 import { env } from "cloudflare:workers";
 import { Form, Link, data, useNavigation } from "react-router";
 import type { Route } from "./+types/admin-roles";
@@ -79,20 +81,32 @@ export default function AdminRoles({ loaderData, actionData }: Route.ComponentPr
         </div>
         <label className="block">
           Alasan
-          <textarea
+          <Textarea
             name="reason"
             required
             maxLength={1000}
             className="block border rounded p-2 w-full"
           />
         </label>
-        <div className="flex gap-4">
-          <button name="action" value="grant" disabled={busy} className="border rounded px-4 py-2">
+        <div className="flex flex-wrap gap-4">
+          <Button
+            type="submit"
+            name="action"
+            value="grant"
+            disabled={busy}
+            className="border rounded px-4 py-2"
+          >
             Berikan peran
-          </button>
-          <button name="action" value="revoke" disabled={busy} className="border rounded px-4 py-2">
+          </Button>
+          <Button
+            type="submit"
+            name="action"
+            value="revoke"
+            disabled={busy}
+            className="border rounded px-4 py-2"
+          >
             Cabut peran
-          </button>
+          </Button>
         </div>
       </Form>
       <table className="w-full text-left">

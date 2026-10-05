@@ -22,7 +22,7 @@ export function createAuth(env: Env) {
         async sendVerificationOTP({ email, otp }) {
           await sendEmail(env, {
             to: email,
-            subject: "Kode masuk komunitas alumni",
+            subject: "Kode masuk keluarga alumni",
             text: `Kode masuk Anda: ${otp}. Kode berlaku selama 5 menit. Jangan bagikan kode ini.`,
           });
         },

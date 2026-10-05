@@ -1,6 +1,7 @@
 import {
   isRouteErrorResponse,
   Links,
+  Link,
   Meta,
   Outlet,
   Scripts,
@@ -33,7 +34,36 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        {children}
+        <a className="skip-link" href="#page-content">
+          Langsung ke konten
+        </a>
+        <header className="site-header">
+          <Link className="brand" to="/" aria-label="Alumni SMAN Sumsel — beranda">
+            <span className="brand-mark" aria-hidden="true">
+              SS
+              <span />
+            </span>
+            <span>
+              <span className="brand-kicker">KELUARGA ALUMNI</span>
+              <span className="brand-name">SMAN Sumatera Selatan</span>
+            </span>
+          </Link>
+          <a
+            className="school-link"
+            href="https://www.smansumsel.sch.id/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Tentang sekolah <span aria-hidden="true">↗</span>
+          </a>
+        </header>
+        <div id="page-content" className="app-shell" tabIndex={-1}>
+          {children}
+        </div>
+        <footer className="site-footer">
+          <span>SMAN Sumatera Selatan</span>
+          <span>Dari sekolah yang sama. Untuk masa depan bersama.</span>
+        </footer>
         <ScrollRestoration />
         <Scripts />
       </body>

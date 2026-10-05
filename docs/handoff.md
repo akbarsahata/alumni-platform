@@ -185,3 +185,11 @@ Workflow syntax/expression validation uses checksum-verified actionlint 1.7.12, 
 ## Faster commit hook — 2026-10-03
 
 Updated the pre-commit hook per the user's revised preference: staged-file formatting, advisory lint, and typechecking remain; the full test suite no longer runs on commit. GitHub Actions retains formatting, lint, typecheck, build, and full HTTP/browser testing as the CI quality gate. README and local-development.md describe the current behavior; earlier hook descriptions above are historical.
+
+## School-inspired family identity — 2026-10-05
+
+The interface now uses “Keluarga Alumni” at the user's request. The school website (https://www.smansumsel.sch.id/) informed the deep teal, restrained red and gold palette; the alumni interface retains its own layout and SS monogram. Shared header/footer, warm ivory surfaces, serif headings, responsive home layout, focus indicators and form/table styling apply across existing routes.
+
+Added local shadcn/ui Button, Input, Textarea and Card components with pinned supporting dependencies and a shared class utility. The form components preserve native submission, labels and validation. TypeScript's shared path configuration and components.json support the component directory. The login email subject also uses the family identity.
+
+Validation: typecheck, build, formatting and lint pass. Full local suite passes 25 HTTP tests and three Chromium browser journeys, including real OTP expiry. The login preview was visually inspected in Edge; localhost home returns HTTP 200. Standards review found zero material findings; Spec review caught the remaining email identity and duplicate login footnote, both corrected. Changes are local; no deployment or push performed.
