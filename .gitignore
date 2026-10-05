@@ -19,3 +19,5 @@ worker-configuration.d.ts
 # Integration outputs can contain captured mail or session data
 /test-results/
 /playwright-report/
+
+appointment.json
