@@ -388,13 +388,16 @@ after(async () => {
   );
 });
 
-test("bootstrapped approved alumni without an application receive audited repeatable house corrections", async () => {
+test("bootstrapped approved alumni without an application receive audited repeatable house corrections", async (t) => {
   const { reviewer } = await membershipReviewers();
   let fixture;
   try {
     fixture = JSON.parse(await readFile(`${process.env.ALUMNI_TEST_STATE}/accounts.json`, "utf8"));
   } catch (error) {
-    if (error.code === "ENOENT") return;
+    if (error.code === "ENOENT") {
+      t.skip("Bootstrap fixture is supplied by the full suite roles journey.");
+      return;
+    }
     throw error;
   }
   const member = fixture.alumnus;

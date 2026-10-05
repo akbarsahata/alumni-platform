@@ -74,3 +74,17 @@ export const membershipNotification = sqliteTable("membership_notification", {
   message: text("message").notNull(),
   deliveredAt: text("delivered_at"),
 });
+
+export const membershipHouseCorrection = sqliteTable("membership_house_correction", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull(),
+  revision: integer("revision").notNull(),
+  actorUserId: text("actor_user_id").notNull(),
+  oldHouse: text("old_house", { enum: houses }).notNull(),
+  house: text("house", { enum: houses }).notNull(),
+  reason: text("reason").notNull(),
+  applicantMessage: text("applicant_message").notNull(),
+  checkSource: text("check_source", { enum: ["trusted-alumnus", "school-staff"] }).notNull(),
+  checkNote: text("check_note").notNull(),
+  occurredAt: text("occurred_at").notNull(),
+});

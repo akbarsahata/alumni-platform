@@ -1,15 +1,23 @@
 import { eq, desc, sql } from "drizzle-orm";
 import { database } from "./database.server";
-import { membershipApplication, membershipRevision, membershipDecision } from "./schema";
+import {
+  membershipApplication,
+  membershipRevision,
+  membershipDecision,
+  alumniMembership,
+  membershipHouseCorrection,
+} from "./schema";
 import type { Application, Decision } from "../membership/model";
 
 export function membershipRepository(binding: D1Database) {
   const db = database(binding);
   return {
     async membership(userId: string) {
-      return db.get<{ status: "approved" | "suspended"; house: string }>(
-        sql`SELECT status,house FROM alumni_membership WHERE user_id=${userId}`
-      );
+      return db
+        .select({ status: alumniMembership.status, house: alumniMembership.house })
+        .from(alumniMembership)
+        .where(eq(alumniMembership.userId, userId))
+        .get();
     },
     async correctHouse(input: {
       id: string;
@@ -36,18 +44,21 @@ export function membershipRepository(binding: D1Database) {
       return result.meta.changes > 0;
     },
     async correctionHistory(userId: string) {
-      return db.all<{
-        revision: number;
-        actorUserId: string;
-        oldHouse: string;
-        house: string;
-        reason: string;
-        checkSource: string;
-        checkNote: string;
-        occurredAt: string;
-      }>(
-        sql`SELECT revision,actor_user_id AS actorUserId,old_house AS oldHouse,house,reason,check_source AS checkSource,check_note AS checkNote,occurred_at AS occurredAt FROM membership_house_correction WHERE user_id=${userId} ORDER BY revision DESC`
-      );
+      return db
+        .select({
+          revision: membershipHouseCorrection.revision,
+          actorUserId: membershipHouseCorrection.actorUserId,
+          oldHouse: membershipHouseCorrection.oldHouse,
+          house: membershipHouseCorrection.house,
+          reason: membershipHouseCorrection.reason,
+          checkSource: membershipHouseCorrection.checkSource,
+          checkNote: membershipHouseCorrection.checkNote,
+          occurredAt: membershipHouseCorrection.occurredAt,
+        })
+        .from(membershipHouseCorrection)
+        .where(eq(membershipHouseCorrection.userId, userId))
+        .orderBy(desc(membershipHouseCorrection.revision))
+        .all();
     },
     async applicantDetails(userId: string) {
       const [applications, revisions, decisions] = await db.batch([
