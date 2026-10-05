@@ -21,7 +21,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         <p className="eyebrow" lang="en">
           {alumniMessages.home.eyebrow}
         </p>
-        <h1>
+        <h1 lang="en">
           {alumniMessages.home.headline[0]}
           <br />
           {alumniMessages.home.headline[1]}
@@ -35,7 +35,9 @@ export default function Home({ loaderData }: Route.ComponentProps) {
       </div>
       <Card className="home-account gap-0">
         <p className="eyebrow">KELUARGA ALUMNI</p>
-        <h2>{loaderData.account ? "Selamat datang kembali." : alumniMessages.home.welcome}</h2>
+        <h2 lang={loaderData.account ? "id" : "en"}>
+          {loaderData.account ? "Selamat datang kembali." : alumniMessages.home.welcome}
+        </h2>
         {loaderData.account ? (
           <>
             <p>Anda masuk sebagai {loaderData.account.email}.</p>
@@ -65,7 +67,9 @@ export default function Home({ loaderData }: Route.ComponentProps) {
             <Link className="primary-link" to="/login">
               Masuk dengan kode email
             </Link>
-            <p className="quiet-copy">{alumniMessages.home.family}</p>
+            <p className="quiet-copy" lang="en">
+              {alumniMessages.home.family}
+            </p>
           </>
         )}
       </Card>
