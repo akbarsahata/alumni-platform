@@ -10,8 +10,9 @@ import {
   requireReviewer,
   reviewDetails,
   decideApplication,
+  correctApprovedHouse,
 } from "../membership/applications.server";
-import { statusLabels } from "../membership/model";
+import { houses, statusLabels } from "../membership/model";
 import { RevisionView } from "../membership/revision-view";
 
 export function meta() {
@@ -30,7 +31,9 @@ export async function action({ request, params }: Route.ActionArgs) {
   await requireReviewer(request, env);
   const form = await request.formData();
   try {
-    const result = await decideApplication(request, env, params.userId, Object.fromEntries(form));
+    const result = await (
+      form.get("intent") === "house-correction" ? correctApprovedHouse : decideApplication
+    )(request, env, params.userId, Object.fromEntries(form));
     return {
       error: null,
       message: result.notificationPending
@@ -43,26 +46,52 @@ export async function action({ request, params }: Route.ActionArgs) {
   }
 }
 
-function DecisionForm({ revision }: { revision: number }) {
+function DecisionForm({
+  revision,
+  correction = false,
+}: {
+  revision: number;
+  correction?: boolean;
+}) {
   const [outcome, setOutcome] = useState("approved");
   const busy = useNavigation().state !== "idle";
   return (
     <Form method="post" className="space-y-4">
       <Input type="hidden" name="expectedRevision" value={revision} />
-      <div>
-        <label htmlFor="review-outcome">Keputusan</label>
-        <select
-          id="review-outcome"
-          name="outcome"
-          value={outcome}
-          onChange={(event) => setOutcome(event.target.value)}
-          className="block border rounded p-2 w-full"
-        >
-          <option value="approved">Setujui</option>
-          <option value="rejected">Tolak</option>
-          <option value="action-required">Minta perbaikan</option>
-        </select>
-      </div>
+      {correction && (
+        <>
+          <Input type="hidden" name="intent" value="house-correction" />
+          <label htmlFor="corrected-house">House yang benar</label>
+          <select id="corrected-house" name="house" required defaultValue="">
+            <option value="" disabled>
+              Pilih satu house
+            </option>
+            {houses.map((house) => (
+              <option key={house}>{house}</option>
+            ))}
+          </select>
+          <p>
+            Catat pemeriksaan baru terhadap house yang benar. Koreksi dan persetujuan baru disimpan
+            bersama; dukungan lama tidak dipakai.
+          </p>
+        </>
+      )}
+      {!correction && (
+        <div>
+          <label htmlFor="review-outcome">Keputusan</label>
+          <select
+            id="review-outcome"
+            name="outcome"
+            value={outcome}
+            onChange={(event) => setOutcome(event.target.value)}
+            className="block border rounded p-2 w-full"
+          >
+            <option value="approved">Setujui</option>
+            <option value="rejected">Tolak</option>
+            <option value="action-required">Minta perbaikan</option>
+          </select>
+        </div>
+      )}
       {outcome !== "action-required" && (
         <>
           <label className="block">
@@ -119,7 +148,7 @@ function DecisionForm({ revision }: { revision: number }) {
         tanpa menyertakan catatan pemeriksaan privat.
       </p>
       <Button type="submit" disabled={busy} className="border rounded px-4 py-2">
-        Simpan keputusan
+        {correction ? "Simpan koreksi house setelah tinjauan" : "Simpan keputusan"}
       </Button>
     </Form>
   );
@@ -140,7 +169,11 @@ export default function MembershipReview({ loaderData, actionData }: Route.Compo
       {actionData?.message && <p role="status">{actionData.message}</p>}
       {actionData?.error && <p role="alert">{actionData.error}</p>}
       <h2 className="text-xl font-semibold">Versi saat ini: {application.revision}</h2>
-      <RevisionView revision={revisions[0]} />
+      {revisions[0] ? (
+        <RevisionView revision={revisions[0]} />
+      ) : (
+        <p>Alumni awal terverifikasi. House: {loaderData.membership?.house}</p>
+      )}
       {self || conflict ? (
         <p>Administrator lain harus meninjau pengajuan ini.</p>
       ) : (
@@ -148,6 +181,33 @@ export default function MembershipReview({ loaderData, actionData }: Route.Compo
         referenceStatus !== "waiting" && (
           <DecisionForm key={application.revision} revision={application.revision} />
         )
+      )}
+      {!self && !conflict && application.status === "approved" && (
+        <section className="space-y-4">
+          <h2 className="text-xl font-semibold">Koreksi house setelah persetujuan</h2>
+          <DecisionForm
+            key={`correction:${application.revision}`}
+            revision={application.revision}
+            correction
+          />
+        </section>
+      )}
+      {loaderData.corrections.length > 0 && (
+        <section>
+          <h2>Riwayat koreksi house privat</h2>
+          {loaderData.corrections.map((correction) => (
+            <article key={correction.revision}>
+              <p>
+                Versi {correction.revision}: {correction.oldHouse} → {correction.house}
+              </p>
+              <p>Pemeriksa: {correction.actorUserId}</p>
+              <p>Alasan: {correction.reason}</p>
+              <p>Sumber: {correction.checkSource}</p>
+              <p>Catatan pemeriksaan baru: {correction.checkNote}</p>
+              <p>Waktu (UTC): {correction.occurredAt}</p>
+            </article>
+          ))}
+        </section>
       )}
       {referenceStatus === "waiting" && (
         <p>Menunggu respons referensi sebelum tinjauan administrator.</p>

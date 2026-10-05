@@ -5,6 +5,23 @@ import { membershipReference } from "./schema";
 export function referenceRepository(binding: D1Database) {
   const db = database(binding);
   return {
+    async recover(input: {
+      id: string;
+      userId: string;
+      revision: number;
+      email: string | null;
+      explanation: string | null;
+    }) {
+      const result =
+        await db.run(sql`INSERT INTO membership_recovery(id,user_id,revision,email,explanation)
+      SELECT ${input.id},r.user_id,r.revision,${input.email},COALESCE(${input.explanation},r.explanation)
+      FROM membership_application a JOIN membership_revision r ON r.user_id=a.user_id AND r.revision=a.revision
+      WHERE a.user_id=${input.userId} AND a.revision=${input.revision} AND a.status='pending'
+      AND r.student_type='graduate'
+      AND EXISTS(SELECT 1 FROM membership_reference WHERE user_id=a.user_id AND revision=a.revision)
+      AND NOT EXISTS(SELECT 1 FROM alumni_membership WHERE user_id=a.user_id)`);
+      return result.meta.changes > 0;
+    },
     async recipientView(input: { actorId: string; id: string }) {
       return (
         (await db.get<

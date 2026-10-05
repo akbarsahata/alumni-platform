@@ -1,4 +1,10 @@
-import { parseInput, applicationInput, decisionInput, queueCursor } from "../http/validation";
+import {
+  parseInput,
+  applicationInput,
+  decisionInput,
+  houseCorrectionInput,
+  queueCursor,
+} from "../http/validation";
 import { membershipRepository } from "../db/membership.repository.server";
 import { getAccess } from "../authorization/permissions.server";
 import { hasTrustedOrigin } from "../auth/auth.server";
@@ -70,13 +76,23 @@ export async function reviewQueue(request: Request, env: Env) {
 export async function reviewDetails(request: Request, env: Env, userId: string) {
   await requireReviewer(request, env);
   const details = await readApplication(env, userId);
-  if (!details.application) throw new Response("Pengajuan tidak ditemukan.", { status: 404 });
+  const membership = await membershipRepository(env.DB).membership(userId);
+  const corrections = await membershipRepository(env.DB).correctionHistory(userId);
+  if (!details.application && membership?.status !== "approved")
+    throw new Response("Pengajuan tidak ditemukan.", { status: 404 });
   const history = await membershipRepository(env.DB).decisionHistory({ userId: userId });
   return {
     ...details,
-    application: details.application,
+    application: details.application ?? {
+      userId,
+      revision: corrections.length,
+      status: "approved" as const,
+      updatedAt: "",
+    },
+    membership,
     decisions: history,
     references: await referenceHistory(env, userId),
+    corrections,
   };
 }
 
@@ -124,4 +140,40 @@ export async function decideApplication(
       status: 409,
     });
   return { changed: true, ...notification };
+}
+
+export async function correctApprovedHouse(
+  request: Request,
+  env: Env,
+  userId: string,
+  input: unknown
+) {
+  if (!hasTrustedOrigin(request, env))
+    throw new Response("Permintaan tidak diizinkan.", { status: 403 });
+  const { account } = await requireReviewer(request, env);
+  if (
+    account.id === userId ||
+    (await referenceHistory(env, userId)).some(
+      (r) => r.outcome === "endorse" && r.actorUserId === account.id
+    )
+  )
+    throw new Response("Administrator lain harus meninjau koreksi ini.", { status: 403 });
+  const body = parseInput(
+    houseCorrectionInput,
+    input,
+    "Pilih satu house dan catat tinjauan independen baru, alasan, serta pesan untuk pemohon."
+  );
+  const result = await membershipRepository(env.DB).correctHouse({
+    ...body,
+    id: crypto.randomUUID(),
+    userId,
+    actorId: account.id,
+    revision: body.expectedRevision,
+  });
+  if (!result)
+    throw new Response(
+      "Keanggotaan atau kewenangan telah berubah. Muat ulang sebelum mengoreksi.",
+      { status: 409 }
+    );
+  return { changed: true, ...(await captureNotifications(env, userId)) };
 }

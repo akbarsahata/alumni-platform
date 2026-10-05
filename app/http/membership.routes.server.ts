@@ -6,8 +6,14 @@ import {
   reviewQueue,
   reviewDetails,
   decideApplication,
+  correctApprovedHouse,
 } from "../membership/applications.server";
-import { requestReference, readReference, respondReference } from "../membership/references.server";
+import {
+  recoverReference,
+  requestReference,
+  readReference,
+  respondReference,
+} from "../membership/references.server";
 
 export const membershipRoutes = new Hono<{ Bindings: Env }>()
   .get("/application", async (c) => {
@@ -20,6 +26,17 @@ export const membershipRoutes = new Hono<{ Bindings: Env }>()
   .all("/application", () => new Response(null, { status: 405 }))
   .get("/reviews", async (c) => c.json(await reviewQueue(c.req.raw, c.env)))
   .all("/reviews", () => new Response(null, { status: 405 }))
+  .post("/reviews/:userId/house-correction", async (c) =>
+    c.json(
+      await correctApprovedHouse(
+        c.req.raw,
+        c.env,
+        c.req.param("userId"),
+        await c.req.json().catch(() => null)
+      )
+    )
+  )
+  .all("/reviews/:userId/house-correction", () => new Response(null, { status: 405 }))
   .get("/reviews/:userId", async (c) =>
     c.json(await reviewDetails(c.req.raw, c.env, c.req.param("userId")))
   )
@@ -34,6 +51,14 @@ export const membershipRoutes = new Hono<{ Bindings: Env }>()
     )
   )
   .all("/reviews/:userId", () => new Response(null, { status: 405 }))
+  .post("/reference-replacement", async (c) =>
+    c.json(await recoverReference(c.req.raw, c.env, await c.req.json().catch(() => null)))
+  )
+  .all("/reference-replacement", () => new Response(null, { status: 405 }))
+  .post("/manual-review", async (c) =>
+    c.json(await recoverReference(c.req.raw, c.env, await c.req.json().catch(() => null), true))
+  )
+  .all("/manual-review", () => new Response(null, { status: 405 }))
   .post("/references", async (c) =>
     c.json(await requestReference(c.req.raw, c.env, await c.req.json().catch(() => null)))
   )

@@ -93,3 +93,16 @@ export const responseInput = z
 export const queueCursor = z.string().max(200);
 export const auditCursor = z.string().regex(/^\d{4}-\d{2}-\d{2}T.*Z\|[a-f0-9]{32}$/);
 export const signInCodeInput = z.object({ type: z.literal("sign-in") });
+
+export const manualReviewInput = z.object({
+  expectedRevision: integer(1),
+  explanation: requiredText(1000),
+});
+
+export const houseCorrectionInput = z.object({
+  ...review,
+  expectedRevision: integer(0),
+  house: z.enum(houses),
+  checkSource: z.enum(["trusted-alumnus", "school-staff"]),
+  checkNote: requiredText(1000),
+});

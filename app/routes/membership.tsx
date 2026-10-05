@@ -10,7 +10,7 @@ import { getAccess } from "../authorization/permissions.server";
 import { readApplication, submitApplication } from "../membership/applications.server";
 import { houses, statusLabels, type Revision } from "../membership/model";
 import { RevisionView } from "../membership/revision-view";
-import { requestReference } from "../membership/references.server";
+import { recoverReference, requestReference } from "../membership/references.server";
 import { referenceStatusLabels } from "../membership/model";
 
 export function meta() {
@@ -26,6 +26,15 @@ export async function action({ request }: Route.ActionArgs) {
   await getAccess(request, env);
   const form = await request.formData();
   try {
+    if (["replacement", "manual-review"].includes(String(form.get("intent")))) {
+      const result = await recoverReference(
+        request,
+        env,
+        Object.fromEntries(form),
+        form.get("intent") === "manual-review"
+      );
+      return { error: null, message: result.message };
+    }
     if (form.get("intent") === "reference") {
       const result = await requestReference(request, env, Object.fromEntries(form));
       return { error: null, message: result.message };
@@ -218,6 +227,40 @@ export default function Membership({ loaderData, actionData }: Route.ComponentPr
             </Form>
           </section>
         )}
+      {canApply && application?.status === "pending" && referenceStatus && (
+        <section className="space-y-4">
+          <h2 className="text-xl font-semibold">Ganti referensi atau minta tinjauan manual</h2>
+          <p>
+            Permintaan berlaku tujuh hari. Anda dapat mengganti referensi atau meminta pemeriksaan
+            manual. Tindakan ini membuat versi baru dan membatalkan referensi sebelumnya.
+          </p>
+          <Form method="post" className="space-y-4">
+            <Input type="hidden" name="intent" value="replacement" />
+            <Input type="hidden" name="expectedRevision" value={application.revision} />
+            <label className="block">
+              Email referensi baru
+              <Input name="email" type="email" required maxLength={254} />
+            </label>
+            <Button type="submit">Ganti referensi</Button>
+          </Form>
+          <Form method="post" className="space-y-4">
+            <Input type="hidden" name="intent" value="manual-review" />
+            <Input type="hidden" name="expectedRevision" value={application.revision} />
+            <label className="block">
+              Alasan meminta tinjauan manual
+              <Textarea name="explanation" required maxLength={1000} />
+            </label>
+            <Button type="submit">Minta tinjauan manual</Button>
+          </Form>
+        </section>
+      )}
+      {membership.status === "approved" && <p>House terverifikasi: {membership.house}</p>}
+      {membership.status === "approved" && (
+        <p>
+          Koreksi house yang sudah diverifikasi harus ditinjau ulang oleh administrator. Hubungi
+          administrator keanggotaan.
+        </p>
+      )}
       {revisions.length > 0 && (
         <section className="space-y-4">
           <h2 className="text-xl font-semibold">Riwayat pengajuan</h2>

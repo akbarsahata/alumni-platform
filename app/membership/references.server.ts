@@ -1,4 +1,4 @@
-import { parseInput, responseInput, referenceInput } from "../http/validation";
+import { parseInput, responseInput, referenceInput, manualReviewInput } from "../http/validation";
 import { referenceRepository } from "../db/reference.repository.server";
 import { getAccess } from "../authorization/permissions.server";
 import { hasTrustedOrigin } from "../auth/auth.server";
@@ -119,5 +119,30 @@ export async function requestReference(request: Request, env: Env, input: unknow
   return {
     message:
       "Permintaan referensi tersimpan. Respons memerlukan autentikasi dan pemeriksaan kelayakan.",
+  };
+}
+
+export async function recoverReference(request: Request, env: Env, input: unknown, manual = false) {
+  if (!hasTrustedOrigin(request, env))
+    throw new Response("Permintaan tidak diizinkan.", { status: 403 });
+  const { account } = await getAccess(request, env);
+  const body = manual
+    ? parseInput(manualReviewInput, input, "Isi penjelasan tinjauan manual dan versi yang valid.")
+    : parseInput(referenceInput, input, "Isi email referensi dan versi yang valid.");
+  const result = await referenceRepository(env.DB).recover({
+    id: crypto.randomUUID(),
+    userId: account.id,
+    revision: body.expectedRevision,
+    email: "email" in body ? body.email : null,
+    explanation: "explanation" in body ? body.explanation : null,
+  });
+  if (!result)
+    throw new Response("Pengajuan telah berubah. Muat ulang status Anda.", { status: 409 });
+  await captureNotifications(env, account.id);
+  if (!manual) await captureRequest(env, account.id, body.expectedRevision + 1);
+  return {
+    message: manual
+      ? "Tinjauan manual diminta. Referensi sebelumnya tidak berlaku."
+      : "Referensi diganti. Permintaan sebelumnya tidak berlaku.",
   };
 }
