@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import { randomBytes } from "node:crypto";
 export const base = process.env.TEST_BASE_URL || "http://127.0.0.1:5173";
 const vars = await readFile(process.env.ALUMNI_TEST_VARS || ".dev.vars", "utf8");
 const key = vars
@@ -7,12 +8,15 @@ const key = vars
   .find((line) => line.startsWith("LOCAL_MAIL_KEY="))
   .slice("LOCAL_MAIL_KEY=".length);
 let clientNumber = 1;
+const clientSubnet = randomBytes(4).readUInt32BE();
 export async function login(label) {
   const email = `${label}-${crypto.randomUUID()}@example.test`;
+  // Better Auth groups IPv6 clients by /64. Isolate each fixture, including across processes.
+  const subnet = ((clientSubnet + clientNumber++) >>> 0).toString(16).padStart(8, "0");
   const headers = {
     Origin: base,
     "Content-Type": "application/json",
-    "CF-Connecting-IP": `2001:db8:abcd:${clientNumber++}::${Date.now().toString(16).slice(-4)}`,
+    "CF-Connecting-IP": `2001:db8:${subnet.slice(0, 4)}:${subnet.slice(4)}::1`,
   };
   const send = await fetch(`${base}/api/auth/email-otp/send-verification-otp`, {
     method: "POST",
