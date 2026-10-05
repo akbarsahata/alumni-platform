@@ -14,6 +14,7 @@ import type { Route } from "./+types/root";
 import "./app.css";
 
 export const links: Route.LinksFunction = () => [
+  { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
     rel: "preconnect",
@@ -41,10 +42,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
         </a>
         <header className="site-header">
           <Link className="brand" to="/" aria-label="Alumni SMAN Sumsel — beranda">
-            <span className="brand-mark" aria-hidden="true">
-              SS
-              <span />
-            </span>
+            <img
+              className="brand-logo"
+              src="/alumni-logo.png"
+              alt=""
+              width={787}
+              height={787}
+              decoding="async"
+            />
             <span>
               <span className="brand-kicker">KELUARGA ALUMNI</span>
               <span className="brand-name">SMAN Sumatera Selatan</span>
