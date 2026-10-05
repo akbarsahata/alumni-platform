@@ -1,5 +1,39 @@
 # Session handoff
 
+## Issue #11 — shared account identity and logout — 2026-10-05
+
+Implemented the user's selected option 1 against starting commit
+`565356766209ed7f555083c3d53546ce9e8a8bdf` on `master`; code commit `c43925d`
+is local, not pushed.
+
+- A root loader projects the current session email into a shared `AccountBar` below
+  the brand header. Every page displays the full email and a visible `Keluar`
+  button. The bar stays visible while scrolling; long emails wrap on narrow phones.
+  Signed-out visitors see `Anda belum masuk` and `Masuk`.
+- Logout posts to the existing origin-protected `/logout` action, revokes the
+  session and redirects to login. The home-specific duplicate identity/logout
+  controls were removed. The direct logout confirmation page remains available.
+- A wildcard page route returns 404 through the shared error layout so missing
+  pages retain the account bar; denied pages likewise retain only the current
+  viewer's identity. No account switching, role changes or broader navigation.
+- Added two HTTP journeys and a Chromium journey for two separate sessions,
+  navigation, denied/missing pages, guest state, logout revocation, scrolling and
+  320px mobile wrapping. Screenshots of desktop/mobile were visually inspected.
+  Updated the existing login journey to target shared logout or direct confirmation.
+
+Focused account-bar HTTP/browser checks and the six reference HTTP journeys plus
+reference browser journey pass. Build, typecheck, lint, formatting and commit hooks
+pass. The first full run exposed a privacy fixture whose own email contained
+`decline`; renamed that synthetic account and retained the original privacy
+assertions. Final full suite verification is pending the timed authentication checks.
+Independent Standards and Spec reviews report zero findings against the starting
+commit.
+
+The normal localhost server remains available: login 200 with guest bar/no-store,
+and missing pages 404. No migrations or normal local-data changes. No push, PR,
+deployment, live email, staging/production changes, or real account changes.
+Issue #11 tracks the agreed scope; completion is pending final suite verification.
+
 ## Issue #6 — reference recovery and reviewed house corrections — 2026-10-05
 
 Implemented Ticket 1.5 against starting commit
