@@ -43,3 +43,11 @@ export type Decision = {
   checkNote: string | null;
   occurredAt: string;
 };
+
+export const referenceStatusLabels = {
+  waiting: "Menunggu respons referensi",
+  endorsed: "Referensi diterima — menunggu keputusan administrator",
+  "manual-review": "Pengajuan memerlukan tinjauan manual",
+  expired: "Referensi kedaluwarsa — perlu tinjauan manual",
+};
+export type ReferenceStatus = keyof typeof referenceStatusLabels;

@@ -10,6 +10,8 @@ import { getAccess } from "../authorization/permissions.server";
 import { readApplication, submitApplication } from "../membership/applications.server";
 import { houses, statusLabels, type Revision } from "../membership/model";
 import { RevisionView } from "../membership/revision-view";
+import { requestReference } from "../membership/references.server";
+import { referenceStatusLabels } from "../membership/model";
 
 export function meta() {
   return [{ title: pageTitle("Pengajuan keanggotaan") }];
@@ -24,6 +26,10 @@ export async function action({ request }: Route.ActionArgs) {
   await getAccess(request, env);
   const form = await request.formData();
   try {
+    if (form.get("intent") === "reference") {
+      const result = await requestReference(request, env, Object.fromEntries(form));
+      return { error: null, message: result.message };
+    }
     const result = await submitApplication(request, env, Object.fromEntries(form));
     return {
       error: null,
@@ -148,7 +154,7 @@ function ApplicationForm({ current, revision }: { current?: Revision; revision: 
 }
 
 export default function Membership({ loaderData, actionData }: Route.ComponentProps) {
-  const { application, revisions, decisions, membership } = loaderData;
+  const { application, revisions, decisions, membership, referenceStatus } = loaderData;
   const canApply = membership.status === "none" && application?.status !== "approved";
   return (
     <main className="mx-auto max-w-2xl p-8 space-y-6">
@@ -158,7 +164,9 @@ export default function Membership({ loaderData, actionData }: Route.ComponentPr
       </Link>
       <p>
         {application
-          ? statusLabels[application.status]
+          ? application.status === "pending" && referenceStatus
+            ? referenceStatusLabels[referenceStatus]
+            : statusLabels[application.status]
           : membership.status === "approved"
             ? "Keanggotaan disetujui"
             : membership.status === "suspended"
@@ -188,6 +196,28 @@ export default function Membership({ loaderData, actionData }: Route.ComponentPr
           revision={application?.revision ?? 0}
         />
       )}
+      {canApply &&
+        application?.status === "pending" &&
+        revisions[0]?.studentType === "graduate" &&
+        !referenceStatus && (
+          <section className="space-y-4">
+            <h2 className="text-xl font-semibold">Minta referensi alumni</h2>
+            <p>
+              Masukkan email alumni dari house yang sama yang kenal pribadi dengan Anda semasa
+              sekolah. Tahun kelulusan boleh berbeda. Pemeriksa tetap menentukan keputusan
+              keanggotaan.
+            </p>
+            <Form method="post" className="space-y-4">
+              <Input type="hidden" name="intent" value="reference" />
+              <Input type="hidden" name="expectedRevision" value={application.revision} />
+              <label className="block">
+                Email referensi
+                <Input name="email" type="email" maxLength={254} required />
+              </label>
+              <Button type="submit">Kirim permintaan referensi</Button>
+            </Form>
+          </section>
+        )}
       {revisions.length > 0 && (
         <section className="space-y-4">
           <h2 className="text-xl font-semibold">Riwayat pengajuan</h2>

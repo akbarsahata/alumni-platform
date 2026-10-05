@@ -2,6 +2,7 @@ import { getAccess } from "../authorization/permissions.server";
 import { hasTrustedOrigin } from "../auth/auth.server";
 import { houses, type Application, type Revision, type Decision } from "./model";
 import { captureNotifications } from "./notifications.server";
+import { referenceStatus, referenceHistory, handleReferences } from "./references.server";
 
 function invalid(message = "Isi identitas sekolah, satu house, dan penjelasan yang valid."): never {
   throw new Response(message, { status: 400 });
@@ -39,6 +40,9 @@ export async function readApplication(env: Env, userId: string) {
     ).bind(userId),
   ]);
   return {
+    referenceStatus: results[0].results[0]
+      ? await referenceStatus(env, userId, (results[0].results[0] as Application).revision)
+      : null,
     application: (results[0].results[0] as Application | undefined) ?? null,
     revisions: results[1].results as Revision[],
     decisions: results[2].results as Pick<
@@ -113,7 +117,10 @@ export async function reviewQueue(request: Request, env: Env) {
     `SELECT a.user_id AS userId,a.revision,a.status,a.updated_at AS updatedAt,
     r.school_name AS schoolName,r.house FROM membership_application a JOIN membership_revision r
     ON a.user_id = r.user_id AND a.revision = r.revision
-    WHERE a.status = 'pending' AND a.user_id > ? ORDER BY a.user_id LIMIT 101`
+    WHERE a.status = 'pending' AND a.user_id > ?
+    AND NOT EXISTS(SELECT 1 FROM membership_reference q WHERE q.user_id = a.user_id AND q.revision = a.revision
+      AND q.expires_at > strftime('%Y-%m-%dT%H:%M:%fZ','now')
+      AND NOT EXISTS(SELECT 1 FROM membership_reference_response WHERE request_id = q.id)) ORDER BY a.user_id LIMIT 101`
   )
     .bind(after)
     .all<Application & { schoolName: string; house: string }>();
@@ -134,7 +141,12 @@ export async function reviewDetails(request: Request, env: Env, userId: string) 
   )
     .bind(userId)
     .all<Decision>();
-  return { ...details, application: details.application, decisions: history.results };
+  return {
+    ...details,
+    application: details.application,
+    decisions: history.results,
+    references: await referenceHistory(env, userId),
+  };
 }
 
 export async function decideApplication(
@@ -148,6 +160,15 @@ export async function decideApplication(
   const { account } = await requireReviewer(request, env);
   if (account.id === userId)
     throw new Response("Anda tidak dapat meninjau pengajuan sendiri.", { status: 403 });
+  const references = await referenceHistory(env, userId);
+  if (
+    references.some(
+      (reference) => reference.outcome === "endorse" && reference.actorUserId === account.id
+    )
+  )
+    throw new Response("Administrator lain harus meninjau pengajuan yang Anda dukung.", {
+      status: 403,
+    });
   const body = record(input);
   const expected = integer(body.expectedRevision, 1, Number.MAX_SAFE_INTEGER);
   const reason = text(body.reason, 1000);
@@ -170,7 +191,12 @@ export async function decideApplication(
     (id,user_id,revision,actor_user_id,outcome,reason,applicant_message,check_source,check_note)
     SELECT ?,?,?,?,?,?,?,?,? WHERE EXISTS (SELECT 1 FROM role_assignment WHERE user_id = ? AND role = 'membership-administrator')
     AND EXISTS (SELECT 1 FROM membership_application WHERE user_id = ? AND revision = ? AND status = 'pending')
-    AND NOT EXISTS (SELECT 1 FROM alumni_membership WHERE user_id = ?)`
+    AND NOT EXISTS (SELECT 1 FROM alumni_membership WHERE user_id = ?)
+    AND NOT EXISTS (SELECT 1 FROM membership_reference q JOIN membership_reference_response s ON s.request_id = q.id
+      WHERE q.user_id = ? AND s.actor_user_id = ? AND s.outcome = 'endorse')
+    AND NOT EXISTS (SELECT 1 FROM membership_reference q WHERE q.user_id = ? AND q.revision = ?
+      AND q.expires_at > strftime('%Y-%m-%dT%H:%M:%fZ','now')
+      AND NOT EXISTS (SELECT 1 FROM membership_reference_response WHERE request_id = q.id))`
   )
     .bind(
       crypto.randomUUID(),
@@ -185,7 +211,11 @@ export async function decideApplication(
       account.id,
       userId,
       expected,
-      userId
+      userId,
+      userId,
+      account.id,
+      userId,
+      expected
     )
     .run();
   const notification = await captureNotifications(env, userId);
@@ -198,6 +228,8 @@ export async function decideApplication(
 
 export async function handleMembership(request: Request, env: Env) {
   const path = new URL(request.url).pathname;
+  if (path === "/api/membership/references" || path.startsWith("/api/membership/references/"))
+    return handleReferences(request, env);
   const review = path.match(/^\/api\/membership\/reviews\/([^/]+)$/);
   if (path !== "/api/membership/application" && path !== "/api/membership/reviews" && !review)
     return new Response(null, { status: 404 });

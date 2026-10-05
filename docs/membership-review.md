@@ -67,5 +67,6 @@ former-student approval, all nine houses, private-field and self-review denials,
 revocation, forged actors, stale/repeated/concurrent transitions, and captured mail. Tests have a
 separate `127.0.0.1:5173` configuration and disposable D1/KV state, preserving `.dev.vars` and normal
 development data. Keep the test address free; a localhost server bound only to IPv6 can remain running.
-Reference requests/responses are issue #5. Directory, finance, and initiative products are not added
+Reference requests/responses are covered by [membership-references.md](membership-references.md).
+Directory, finance, and initiative products are not added
 by this slice.

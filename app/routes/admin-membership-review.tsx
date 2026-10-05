@@ -23,6 +23,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   return {
     ...(await reviewDetails(request, env, params.userId)),
     self: account.id === params.userId,
+    accountId: account.id,
   };
 }
 export async function action({ request, params }: Route.ActionArgs) {
@@ -125,7 +126,10 @@ function DecisionForm({ revision }: { revision: number }) {
 }
 
 export default function MembershipReview({ loaderData, actionData }: Route.ComponentProps) {
-  const { application, revisions, decisions, self } = loaderData;
+  const { application, revisions, decisions, self, references, referenceStatus } = loaderData;
+  const conflict = references.some(
+    (reference) => reference.outcome === "endorse" && reference.actorUserId === loaderData.accountId
+  );
   return (
     <main className="mx-auto max-w-3xl p-8 space-y-6">
       <h1 className="text-2xl font-semibold">Tinjauan pengajuan keanggotaan</h1>
@@ -137,13 +141,46 @@ export default function MembershipReview({ loaderData, actionData }: Route.Compo
       {actionData?.error && <p role="alert">{actionData.error}</p>}
       <h2 className="text-xl font-semibold">Versi saat ini: {application.revision}</h2>
       <RevisionView revision={revisions[0]} />
-      {self ? (
-        <p>Administrator lain harus meninjau pengajuan Anda.</p>
+      {self || conflict ? (
+        <p>Administrator lain harus meninjau pengajuan ini.</p>
       ) : (
-        application.status === "pending" && (
+        application.status === "pending" &&
+        referenceStatus !== "waiting" && (
           <DecisionForm key={application.revision} revision={application.revision} />
         )
       )}
+      {referenceStatus === "waiting" && (
+        <p>Menunggu respons referensi sebelum tinjauan administrator.</p>
+      )}
+      <section className="space-y-4">
+        <h2 className="text-xl font-semibold">Riwayat referensi privat</h2>
+        {references.map((reference) => (
+          <article key={reference.revision} className="border rounded p-4 space-y-2">
+            <p>
+              Versi {reference.revision}: {reference.email}
+            </p>
+            <p>Berlaku sampai (UTC): {reference.expiresAt}</p>
+            <p>
+              Respons:{" "}
+              {reference.outcome === "endorse"
+                ? "Dukung"
+                : reference.outcome === "decline"
+                  ? "Tolak dukungan"
+                  : reference.outcome === "cannot-confirm"
+                    ? "Tidak dapat memastikan"
+                    : "Belum dijawab"}
+            </p>
+            {reference.outcome && (
+              <>
+                <p>Akun referensi: {reference.actorUserId}</p>
+                <p>Kenal pribadi semasa sekolah: {reference.personallyKnown ? "Ya" : "Tidak"}</p>
+                <p>Komentar privat: {reference.comment}</p>
+                <p>Waktu respons (UTC): {reference.occurredAt}</p>
+              </>
+            )}
+          </article>
+        ))}
+      </section>
       <section className="space-y-4">
         <h2 className="text-xl font-semibold">Riwayat keputusan privat</h2>
         {decisions.map((decision) => (
