@@ -1,5 +1,34 @@
 # Session handoff
 
+## Issue #10 — Hono, Zod and Drizzle backend architecture — 2026-10-05
+
+Implemented against starting commit `79dfbfc50fe00563183c1e8bff6772be0ea6b79b` on
+`master`; implementation commit `59b52f6` is local, not pushed.
+
+- Hono declares API/authentication routes and shared request policies, with React Router
+  continuing to serve pages. Explicit method handling preserves existing 405 behavior,
+  including HEAD requests that Hono otherwise dispatches to GET handlers.
+- Shared Zod schemas validate JSON and form inputs in workflows after authorization.
+  Conditional application/reviewer rules and Bahasa Indonesia validation messages remain.
+- Operation-oriented Drizzle/D1 repositories encapsulate authorization, administration,
+  applications, references and notification persistence. Workflows contain no direct SQL.
+  Typed projections and parameterized conditional writes preserve private reads, current
+  permissions and existing atomic triggers. Existing schema and data need no migration.
+- See `backend-architecture.md` for module ownership and request flow. Issue #6 remains
+  separate; this refactor changes no membership policy or mail-delivery configuration.
+
+Final `npm test` passes all 33 HTTP journeys (seven roles, six membership, six references,
+two backend regressions, one logout and eleven authentication) and four Chromium journeys.
+Coverage includes malformed JSON/forms, method/status/origin/cache behavior, authorization
+before validation, forged actor fields, concurrent writes, privacy, real OTP expiry and
+rate-limit reset. Production build, typecheck, lint and formatting pass. Independent
+Standards and Spec reviews against the starting commit report zero actionable findings.
+
+The existing localhost server and normal local data remain intact; read-only checks confirm
+login 200, private routes 401 and unknown API routes 404 with no-store responses. Tests use
+synthetic accounts, captured mail and disposable D1. No deployment, production changes,
+live email, push or PR. Issue #10 is verified complete.
+
 ## Issue #5 — authenticated same-house references — 2026-10-05
 
 Implemented Ticket 1.4 against starting commit `fa9063596fc52e1b96999b6b67b81227476872cd`
