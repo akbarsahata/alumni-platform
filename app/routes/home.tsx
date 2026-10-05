@@ -1,3 +1,4 @@
+import { alumniMessages } from "../content/alumni-messages";
 import { Card } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { env } from "cloudflare:workers";
@@ -17,25 +18,24 @@ export default function Home({ loaderData }: Route.ComponentProps) {
   return (
     <main className="home-page mx-auto max-w-xl p-8 space-y-6">
       <div className="home-intro">
-        <p className="eyebrow">RUMAH UNTUK PARA ALUMNI</p>
-        <h1>
-          Satu sekolah.
-          <br />
-          Banyak cerita.
-          <br />
-          <em>Terus terhubung.</em>
-        </h1>
-        <p className="intro-copy">
-          Tempat kembali, saling mengenal, dan mengambil bagian dalam masa depan keluarga alumni
-          SMAN Sumatera Selatan.
+        <p className="eyebrow" lang="en">
+          {alumniMessages.home.eyebrow}
         </p>
+        <h1>
+          {alumniMessages.home.headline[0]}
+          <br />
+          {alumniMessages.home.headline[1]}
+          <br />
+          <em>{alumniMessages.home.headline[2]}</em>
+        </h1>
+        <p className="intro-copy">{alumniMessages.home.introduction}</p>
         <div className="school-ribbon">
           <span aria-hidden="true">✦</span> Palembang, Sumatera Selatan
         </div>
       </div>
       <Card className="home-account gap-0">
         <p className="eyebrow">KELUARGA ALUMNI</p>
-        <h2>{loaderData.account ? "Selamat datang kembali." : "Cerita kita berlanjut di sini."}</h2>
+        <h2>{loaderData.account ? "Selamat datang kembali." : alumniMessages.home.welcome}</h2>
         {loaderData.account ? (
           <>
             <p>Anda masuk sebagai {loaderData.account.email}.</p>
@@ -65,7 +65,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
             <Link className="primary-link" to="/login">
               Masuk dengan kode email
             </Link>
-            <p className="quiet-copy">Satu keluarga, sembilan house, ikatan yang terus tumbuh.</p>
+            <p className="quiet-copy">{alumniMessages.home.family}</p>
           </>
         )}
       </Card>

@@ -8,6 +8,8 @@ import {
   ScrollRestoration,
 } from "react-router";
 
+import { alumniMessages } from "./content/alumni-messages";
+
 import type { Route } from "./+types/root";
 import "./app.css";
 
@@ -62,7 +64,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         </div>
         <footer className="site-footer">
           <span>SMAN Sumatera Selatan</span>
-          <span>Dari sekolah yang sama. Untuk masa depan bersama.</span>
+          <span lang="en">{alumniMessages.footer}</span>
         </footer>
         <ScrollRestoration />
         <Scripts />
