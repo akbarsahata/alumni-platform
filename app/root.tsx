@@ -1,3 +1,6 @@
+import { env } from "cloudflare:workers";
+import { getAccount } from "./auth/auth.server";
+import { AccountBar } from "./components/account-bar";
 import { pageTitle } from "./content/page-title";
 import {
   isRouteErrorResponse,
@@ -7,12 +10,18 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useRouteLoaderData,
 } from "react-router";
 
 import { alumniMessages } from "./content/alumni-messages";
 
 import type { Route } from "./+types/root";
 import "./app.css";
+
+export async function loader({ request }: Route.LoaderArgs) {
+  const account = await getAccount(request, env);
+  return { account: account ? { email: account.email } : null };
+}
 
 export function meta() {
   return [{ title: pageTitle() }];
@@ -33,6 +42,7 @@ export const links: Route.LinksFunction = () => [
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  const rootData = useRouteLoaderData<typeof loader>("root");
   return (
     <html lang="id">
       <head>
@@ -69,6 +79,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             Tentang sekolah <span aria-hidden="true">↗</span>
           </a>
         </header>
+        {rootData && <AccountBar account={rootData.account} />}
         <div id="page-content" className="app-shell" tabIndex={-1}>
           {children}
         </div>

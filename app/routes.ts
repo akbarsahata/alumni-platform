@@ -9,4 +9,5 @@ export default [
   route("references/:requestId", "routes/reference-response.tsx"),
   route("admin/membership", "routes/admin-membership.tsx"),
   route("admin/membership/:userId", "routes/admin-membership-review.tsx"),
+  route("*", "routes/not-found.tsx"),
 ] satisfies RouteConfig;

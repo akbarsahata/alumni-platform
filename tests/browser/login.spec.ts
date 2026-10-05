@@ -29,12 +29,16 @@ test("Bahasa Indonesia email-code login, returning login and logout", async ({ p
     await page.getByLabel("Kode masuk", { exact: true }).fill(code);
     await page.getByRole("button", { name: "Masuk", exact: true }).click();
     await expect(page).toHaveURL("http://127.0.0.1:5173/");
-    await expect(page.getByText(`Anda masuk sebagai ${email}.`)).toBeVisible();
+    await expect(
+      page.getByRole("region", { name: "Akun aktif" }).getByText(email, { exact: true })
+    ).toBeVisible();
     if (attempt === 0) {
       await page.goto("/logout");
       await expect(page.getByRole("heading", { name: "Keluar dari akun" })).toBeVisible();
     }
-    await page.getByRole("button", { name: "Keluar", exact: true }).click();
+    const logout =
+      attempt === 0 ? page.getByRole("main") : page.getByRole("region", { name: "Akun aktif" });
+    await logout.getByRole("button", { name: "Keluar", exact: true }).click();
     await expect(page).toHaveURL(/\/login$/);
     await page.goto("/");
     await expect(page.getByRole("link", { name: "Masuk dengan kode email" })).toBeVisible();

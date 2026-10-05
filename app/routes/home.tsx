@@ -1,9 +1,8 @@
 import { pageTitle } from "../content/page-title";
 import { alumniMessages } from "../content/alumni-messages";
 import { Card } from "../components/ui/card";
-import { Button } from "../components/ui/button";
 import { env } from "cloudflare:workers";
-import { Form, Link } from "react-router";
+import { Link } from "react-router";
 import type { Route } from "./+types/home";
 import { getAccount } from "../auth/auth.server";
 import { getAccess } from "../authorization/permissions.server";
@@ -41,7 +40,6 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         </h2>
         {loaderData.account ? (
           <>
-            <p>Anda masuk sebagai {loaderData.account.email}.</p>
             <p>Email Anda telah diverifikasi. Status keanggotaan ditinjau secara terpisah.</p>
             <Link className="action-link" to="/membership">
               Pengajuan keanggotaan <span aria-hidden="true">→</span>
@@ -56,11 +54,6 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                 Kelola peran <span aria-hidden="true">→</span>
               </Link>
             )}
-            <Form method="post" action="/logout">
-              <Button type="submit" className="border rounded px-4 py-2">
-                Keluar
-              </Button>
-            </Form>
           </>
         ) : (
           <>

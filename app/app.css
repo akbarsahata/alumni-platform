@@ -430,3 +430,41 @@ main [data-slot="button"] {
 main [data-slot="input"][type="hidden"] {
   display: none;
 }
+
+.account-bar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem max(1.25rem, calc((100vw - 1120px) / 2));
+  border-bottom: 1px solid var(--line);
+  background: #fffdf8;
+  font-size: 0.8rem;
+}
+.account-identity {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.account-identity span {
+  display: block;
+  color: var(--muted-ink);
+  font-size: 0.7rem;
+}
+.account-identity strong {
+  display: block;
+  font-weight: 600;
+}
+.account-bar form {
+  flex-shrink: 0;
+}
+.account-bar button {
+  min-height: 44px;
+  cursor: pointer;
+}
+.account-bar a {
+  color: var(--red);
+  text-underline-offset: 4px;
+}

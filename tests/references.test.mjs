@@ -32,7 +32,7 @@ test("decline and cannot-confirm require manual review and disclose no private r
   const { reviewer } = await membershipReviewers();
   const reference = await approvedReference("negative-reference");
   for (const outcome of ["decline", "cannot-confirm"]) {
-    const applicant = await login(`response-${outcome}`);
+    const applicant = await login("negative-response-applicant");
     const id = await requestFor(applicant, reference);
     const path = `/api/membership/references/${id}`;
     assert.equal(
