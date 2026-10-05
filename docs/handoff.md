@@ -1,5 +1,49 @@
 # Session handoff
 
+## Issue #7 — school representative invitations — 2026-10-05
+
+Implemented Ticket 1.6 against starting commit
+`41e622520bcfc945950cbbdf567c1e5bc531e25a` on the current `master` branch.
+The implementation is committed locally; no push or PR.
+
+- Added primary-only Bahasa Indonesia `/admin/invitations`, linked from role
+  management. Invitations bind one normalized email to `staff` or `student`, with
+  a required appointment reason and seven-day UTC expiry. Recipients need no
+  existing account, alumni application or profile.
+- Captured invitation mail links to `/invitations/:id`. Guests verify the invited
+  email through existing email-code login and return to the invitation using a
+  restricted local return path. GET never consumes the invitation; acceptance
+  requires an explicit trusted-origin POST with no client-supplied role or actor.
+- Added migration `0007_school_invitations.sql` and a typed Drizzle repository.
+  Conditional acceptance rechecks verified email, expiry, unused state and issuer
+  authority. SQLite triggers atomically retain acceptance, assign only the stored
+  school role and audit any new grant. Concurrent/replayed requests lose with 409;
+  a consumed invitation cannot restore a subsequently revoked role.
+- Immutable invitation records retain issuer, recipient, role, reason and UTC
+  issue/acceptance history. The primary-only audit view includes both invitation
+  events alongside existing role history, with distinct stable pagination IDs.
+  Existing per-request permissions keep school roles separate from alumni,
+  endorsement, directory, finance, membership review and role-management access.
+- Added the operator guide `school-invitations.md` and updated README. Local mail
+  remains capture-only with its existing ten-minute latest-message retention;
+  capture failures are reported while retaining the invitation link. Scheduled
+  retries/live delivery remain future work.
+
+Validation: focused invitation run passes four HTTP journeys and the new-recipient
+Chromium journey. Final `npm test` passes all 46 HTTP journeys and seven Chromium
+journeys, including actual OTP expiry and limiter reset. New coverage includes
+issuance, no-alumni-application acceptance, wrong email, expiry, concurrency,
+replay after role revocation, role/actor tampering, origins, privacy, audited UTC
+history and staff/student permission isolation. All assertions use the agreed
+HTTP/browser seam; expiry uses a guarded past-time fixture only in disposable D1.
+Typecheck, production build, lint and formatting pass. Independent Standards and
+Spec reviews each report zero actionable findings against the starting commit.
+
+Applied the migration to ordinary local D1. The existing localhost server remains
+available: login returns 200 and signed-out invitation administration returns 401.
+Only synthetic test accounts and captured mail were used; no real appointments,
+live email, staging/production changes or deployment. Next: issue #8.
+
 ## Issue #11 — shared account identity and logout — 2026-10-05
 
 Implemented the user's selected option 1 against starting commit

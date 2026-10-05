@@ -8,8 +8,9 @@ reconciliation, and reporting outcomes. Product screens use Bahasa Indonesia; co
 English.
 
 **Currently implemented:** the local Cloudflare application, email-code login, private administrator
-bootstrap, role management, membership applications/manual review, and audit history. References, school invitations, profiles,
-initiatives, finance, and engagement workflows remain planned. The latest entries in the
+bootstrap, role management, membership applications/manual review, same-house references, reviewed
+house corrections, school invitations, and audit history. Profiles, initiatives, finance, and engagement
+workflows remain planned. The latest entries in the
 [session handoff](docs/handoff.md) describe implementation and verification; earlier planning statuses
 are historical.
 
@@ -62,6 +63,10 @@ identity checks, role permissions, and audit behavior. There is no public bootst
 Applicants submit school identity and a required house, track status, and correct/resubmit for manual
 review. Membership administrators independently check applications, record decisions, and inspect
 retained versions/history. See the [membership review guide](docs/membership-review.md).
+
+The primary administrator issues seven-day, single-use staff/student invitations at
+`/admin/invitations`. Recipients verify the invited email and accept without an alumni application.
+See the [school invitation guide](docs/school-invitations.md) for local capture and audit history.
 
 ## Development and verification
 
@@ -129,8 +134,9 @@ current product workflows.
 | [Document index](docs/README.md)                                  | Planning-document provenance and historical references.                                   |
 
 The membership parent specification is [issue #1](https://github.com/akbarsahata/alumni-platform/issues/1).
-Login, administrator bootstrap/roles, and membership applications/manual review are implemented locally;
-the next main slice is [same-house references (#5)](https://github.com/akbarsahata/alumni-platform/issues/5).
+Login, administrator bootstrap/roles, membership applications/manual review, references, house
+corrections, and school invitations are implemented locally. The next main slice is
+[suspension and review (#8)](https://github.com/akbarsahata/alumni-platform/issues/8).
 References, house corrections, invitations, suspension/reinstatement, and assisted email changes
 follow the [issue dependency index](docs/ticket-1-implementation.md). The broader pilot then adds
 expertise discovery, approved initiatives, manual bank-transfer reconciliation, and outcome reporting.

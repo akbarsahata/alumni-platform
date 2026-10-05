@@ -51,6 +51,9 @@ export default function AdminRoles({ loaderData, actionData }: Route.ComponentPr
         <Link className="underline" to="/admin/audit">
           Riwayat perubahan
         </Link>
+        <Link className="underline" to="/admin/invitations">
+          Undang perwakilan sekolah
+        </Link>
       </nav>
       {actionData?.message && <p role="status">{actionData.message}</p>}
       {actionData?.error && <p role="alert">{actionData.error}</p>}

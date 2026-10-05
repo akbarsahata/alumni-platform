@@ -4,6 +4,8 @@ export default [
   route("login", "routes/login.tsx"),
   route("logout", "routes/logout.tsx"),
   route("admin/roles", "routes/admin-roles.tsx"),
+  route("admin/invitations", "routes/admin-invitations.tsx"),
+  route("invitations/:invitationId", "routes/invitation.tsx"),
   route("admin/audit", "routes/admin-audit.tsx"),
   route("membership", "routes/membership.tsx"),
   route("references/:requestId", "routes/reference-response.tsx"),

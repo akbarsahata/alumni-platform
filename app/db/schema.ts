@@ -88,3 +88,15 @@ export const membershipHouseCorrection = sqliteTable("membership_house_correctio
   checkNote: text("check_note").notNull(),
   occurredAt: text("occurred_at").notNull(),
 });
+
+export const schoolInvitation = sqliteTable("school_invitation", {
+  id: text("id").primaryKey(),
+  email: text("email").notNull(),
+  role: text("role", { enum: ["staff", "student"] }).notNull(),
+  issuerId: text("issuer_id").notNull(),
+  reason: text("reason").notNull(),
+  issuedAt: text("issued_at").notNull(),
+  expiresAt: text("expires_at").notNull(),
+  acceptedBy: text("accepted_by"),
+  acceptedAt: text("accepted_at"),
+});

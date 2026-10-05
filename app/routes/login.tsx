@@ -10,8 +10,13 @@ export function meta() {
   return [{ title: pageTitle("Masuk") }];
 }
 
+function invitationReturn(request: Request) {
+  const next = new URL(request.url).searchParams.get("next");
+  return next && /^\/invitations\/[a-f0-9]{32}$/.test(next) ? next : "/";
+}
+
 export async function loader({ request }: Route.LoaderArgs) {
-  if (await getAccount(request, env)) throw redirect("/");
+  if (await getAccount(request, env)) throw redirect(invitationReturn(request));
   return null;
 }
 
@@ -42,7 +47,8 @@ export async function action({ request }: Route.ActionArgs) {
           : "Kode tidak valid atau sudah kedaluwarsa. Minta kode baru.";
     return data({ email, sent: intent === "verify", error }, { status: response.status });
   }
-  if (intent === "verify") return redirect("/", { headers: response.headers });
+  if (intent === "verify")
+    return redirect(invitationReturn(request), { headers: response.headers });
   return { email, sent: true, error: null };
 }
 

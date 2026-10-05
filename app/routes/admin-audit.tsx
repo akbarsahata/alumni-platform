@@ -17,6 +17,8 @@ export async function loader({ request }: Route.LoaderArgs) {
 const actionLabels: Record<string, string> = {
   "bootstrap-primary": "Penunjukan administrator utama",
   "bootstrap-alumnus": "Penetapan alumni tepercaya",
+  "invitation-issued": "Penerbitan undangan sekolah",
+  "invitation-accepted": "Penerimaan undangan sekolah",
   grant: "Pemberian peran",
   revoke: "Pencabutan peran",
 };
@@ -36,7 +38,7 @@ export default function AdminAudit({ loaderData }: Route.ComponentProps) {
               {event.role ? `: ${roleLabels[event.role as Role]}` : ""}
             </p>
             <p>Pelaku (ID akun): {event.actorUserId}</p>
-            <p>Akun tujuan (ID): {event.targetUserId}</p>
+            <p>Tujuan (ID akun atau email undangan): {event.targetUserId}</p>
             {event.operator && <p>Operator: {event.operator}</p>}
             {event.house && <p>House: {event.house}</p>}
             <p>Alasan: {event.reason}</p>

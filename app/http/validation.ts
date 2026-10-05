@@ -91,7 +91,7 @@ export const responseInput = z
   })
   .refine((value) => value.outcome !== "endorse" || value.personallyKnown);
 export const queueCursor = z.string().max(200);
-export const auditCursor = z.string().regex(/^\d{4}-\d{2}-\d{2}T.*Z\|[a-f0-9]{32}$/);
+export const auditCursor = z.string().regex(/^\d{4}-\d{2}-\d{2}T.*Z\|[a-f0-9]{32,33}$/);
 export const signInCodeInput = z.object({ type: z.literal("sign-in") });
 
 export const manualReviewInput = z.object({
@@ -106,3 +106,12 @@ export const houseCorrectionInput = z.object({
   checkSource: z.enum(["trusted-alumnus", "school-staff"]),
   checkNote: requiredText(1000),
 });
+
+export const invitationInput = z
+  .object({
+    email: referenceInput.shape.email,
+    role: z.enum(["staff", "student"]),
+    reason: requiredText(1000),
+  })
+  .strict();
+export const invitationAcceptanceInput = z.object({}).strict();

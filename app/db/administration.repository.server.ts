@@ -32,7 +32,11 @@ export function administrationRepository(binding: D1Database) {
         reason: string;
         occurredAt: string;
       }>(sql`SELECT id, actor_user_id AS actorUserId, target_user_id AS targetUserId,
-    action, role, house, operator, reason, occurred_at AS occurredAt FROM authorization_audit
+    action, role, house, operator, reason, occurred_at AS occurredAt FROM (
+      SELECT * FROM authorization_audit
+      UNION ALL SELECT id || '0', issuer_id, email, 'invitation-issued', role, NULL, NULL, reason, issued_at FROM school_invitation
+      UNION ALL SELECT id || '1', accepted_by, accepted_by, 'invitation-accepted', role, NULL, NULL, reason, accepted_at FROM school_invitation WHERE accepted_at IS NOT NULL
+    )
     WHERE ${input.time} IS NULL OR occurred_at < ${input.time} OR (occurred_at = ${input.time} AND id < ${input.id})
     ORDER BY occurred_at DESC, id DESC LIMIT 101`);
     },
