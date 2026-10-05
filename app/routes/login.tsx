@@ -1,9 +1,14 @@
+import { pageTitle } from "../content/page-title";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { env } from "cloudflare:workers";
 import { Form, data, redirect, useNavigation } from "react-router";
 import type { Route } from "./+types/login";
 import { authFormRequest, getAccount, handleAuth, hasTrustedOrigin } from "../auth/auth.server";
+
+export function meta() {
+  return [{ title: pageTitle("Masuk") }];
+}
 
 export async function loader({ request }: Route.LoaderArgs) {
   if (await getAccount(request, env)) throw redirect("/");

@@ -1,8 +1,13 @@
+import { pageTitle } from "../content/page-title";
 import { Button } from "../components/ui/button";
 import { env } from "cloudflare:workers";
 import { Form, Link, redirect, useNavigation } from "react-router";
 import type { Route } from "./+types/logout";
 import { authFormRequest, handleAuth } from "../auth/auth.server";
+
+export function meta() {
+  return [{ title: pageTitle("Keluar") }];
+}
 
 export async function action({ request }: Route.ActionArgs) {
   const response = await handleAuth(authFormRequest(request, "/api/auth/sign-out", {}), env);

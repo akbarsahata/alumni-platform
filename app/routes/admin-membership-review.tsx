@@ -1,3 +1,4 @@
+import { pageTitle } from "../content/page-title";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
@@ -12,6 +13,10 @@ import {
 } from "../membership/applications.server";
 import { statusLabels } from "../membership/model";
 import { RevisionView } from "../membership/revision-view";
+
+export function meta() {
+  return [{ title: pageTitle("Tinjauan pengajuan") }];
+}
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   const { account } = await requireReviewer(request, env);

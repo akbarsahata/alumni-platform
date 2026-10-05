@@ -1,9 +1,14 @@
+import { pageTitle } from "../content/page-title";
 import { env } from "cloudflare:workers";
 import { Link } from "react-router";
 import type { Route } from "./+types/admin-audit";
 import { requirePrimary } from "../authorization/permissions.server";
 import { readAudit } from "../authorization/administration.server";
 import { roleLabels, type Role } from "../authorization/roles";
+
+export function meta() {
+  return [{ title: pageTitle("Riwayat perubahan peran") }];
+}
 
 export async function loader({ request }: Route.LoaderArgs) {
   await requirePrimary(request, env);

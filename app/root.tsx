@@ -1,3 +1,4 @@
+import { pageTitle } from "./content/page-title";
 import {
   isRouteErrorResponse,
   Links,
@@ -12,6 +13,10 @@ import { alumniMessages } from "./content/alumni-messages";
 
 import type { Route } from "./+types/root";
 import "./app.css";
+
+export function meta() {
+  return [{ title: pageTitle() }];
+}
 
 export const links: Route.LinksFunction = () => [
   { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },

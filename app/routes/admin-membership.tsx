@@ -1,7 +1,12 @@
+import { pageTitle } from "../content/page-title";
 import { env } from "cloudflare:workers";
 import { Link } from "react-router";
 import type { Route } from "./+types/admin-membership";
 import { reviewQueue } from "../membership/applications.server";
+
+export function meta() {
+  return [{ title: pageTitle("Tinjau keanggotaan") }];
+}
 
 export async function loader({ request }: Route.LoaderArgs) {
   return await reviewQueue(request, env);

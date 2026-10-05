@@ -1,3 +1,4 @@
+import { pageTitle } from "../content/page-title";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
@@ -9,6 +10,10 @@ import { getAccess } from "../authorization/permissions.server";
 import { readApplication, submitApplication } from "../membership/applications.server";
 import { houses, statusLabels, type Revision } from "../membership/model";
 import { RevisionView } from "../membership/revision-view";
+
+export function meta() {
+  return [{ title: pageTitle("Pengajuan keanggotaan") }];
+}
 
 export async function loader({ request }: Route.LoaderArgs) {
   const { account, membership } = await getAccess(request, env);

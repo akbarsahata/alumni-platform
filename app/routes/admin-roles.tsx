@@ -1,3 +1,4 @@
+import { pageTitle } from "../content/page-title";
 import { Button } from "../components/ui/button";
 import { Textarea } from "../components/ui/textarea";
 import { env } from "cloudflare:workers";
@@ -6,6 +7,10 @@ import type { Route } from "./+types/admin-roles";
 import { requirePrimary } from "../authorization/permissions.server";
 import { changeRole, listAccounts } from "../authorization/administration.server";
 import { roles, roleLabels, type Role } from "../authorization/roles";
+
+export function meta() {
+  return [{ title: pageTitle("Kelola peran") }];
+}
 
 export async function loader({ request }: Route.LoaderArgs) {
   await requirePrimary(request, env);

@@ -1,3 +1,4 @@
+import { pageTitle } from "../content/page-title";
 import { alumniMessages } from "../content/alumni-messages";
 import { Card } from "../components/ui/card";
 import { Button } from "../components/ui/button";
@@ -8,7 +9,7 @@ import { getAccount } from "../auth/auth.server";
 import { getAccess } from "../authorization/permissions.server";
 
 export function meta() {
-  return [{ title: "Keluarga alumni" }];
+  return [{ title: pageTitle() }];
 }
 export async function loader({ request }: Route.LoaderArgs) {
   const account = await getAccount(request, env);
