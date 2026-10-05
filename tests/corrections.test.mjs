@@ -54,6 +54,9 @@ test("approved house correction requires fresh independent review, denies member
   const member = await login("house-correction-member");
   await call(member, "/api/membership/application", application);
   await call(reviewer, `/api/membership/reviews/${member.id}`, decision);
+  const awaiting = await login("reference-after-house-correction");
+  const outstanding = await requested(awaiting, member);
+  assert.equal((await call(member, `/api/membership/references/${outstanding}`)).status, 200);
   const path = `/api/membership/reviews/${member.id}/house-correction`;
   const correction = { ...decision, house: "Lion" };
   assert.equal((await call(member, path, correction)).status, 403);
@@ -80,6 +83,17 @@ test("approved house correction requires fresh independent review, denies member
   const access = await (await call(member, "/api/access")).json();
   assert.equal(access.membership.house, "Lion");
   assert.equal(access.membership.status, "approved");
+  assert.equal((await call(member, `/api/membership/references/${outstanding}`)).status, 403);
+  assert.equal(
+    (
+      await call(member, `/api/membership/references/${outstanding}`, {
+        outcome: "endorse",
+        personallyKnown: true,
+      })
+    ).status,
+    403
+  );
+
   const history = await (await call(reviewer, `/api/membership/reviews/${member.id}`)).json();
   assert.equal(history.revisions.length, 2);
   assert.equal(history.revisions[1].house, "Komodo");

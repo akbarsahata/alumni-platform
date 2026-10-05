@@ -1,5 +1,44 @@
 # Session handoff
 
+## Issue #6 — reference recovery and reviewed house corrections — 2026-10-05
+
+Implemented Ticket 1.5 against starting commit
+`2d56628a997ed13fb0f5e0ac9259b15542dcbbc2` on `master`. Implementation commits
+`9ea6631` and `5ec8be1` are local, not pushed.
+
+- Added explicit reference replacement/manual-review forms and APIs. Each recovery
+  atomically creates a new immutable application revision; replacement also creates
+  the new seven-day request. Old links, responses, endorsements and reviewer forms
+  cannot act on the new revision. Previous evidence remains private reviewer history.
+- Applicant house edits continue to invalidate prior evidence. New references must
+  satisfy current approved membership and the corrected house. Existing sessions
+  use the current verified house when checking endorsement eligibility.
+- Added administrator-only approved-house correction with a fresh independent check,
+  reason and applicant message. Correction plus new approval commit atomically;
+  self/previous-endorser reviews, stale forms and concurrent duplicate corrections
+  are denied. Bootstrap-only alumni use audited versioned corrections without
+  inventing school identities/applications. Members cannot edit verified house.
+- Added migration `0006_membership_corrections.sql`, typed Drizzle correction/history
+  projections and Bahasa Indonesia screens. Notifications remain local captured
+  email; internal check notes and reference feedback stay private. Operator workflow
+  and endpoints are documented in `membership-corrections.md`.
+
+Validation: `npm test` passes all 40 HTTP journeys and five Chromium journeys,
+including all seven correction journeys (bootstrap fixture supplied by the roles
+journey), actual OTP expiry and limiter reset. Focused correction/browser verification
+also passes; focused runs explicitly skip bootstrap-only coverage when that full-suite
+fixture is absent. Typecheck, production build, lint and formatting pass. Standards
+review initially flagged ordinary SQL reads; corrected them to typed Drizzle builders.
+Final independent Standards and Spec reviews report zero remaining findings against
+the starting commit. A focused rerun launched during the full suite connected to the
+shared test address with a different mailbox key and failed setup; it was rerun after
+the full suite finished. No product failure was involved.
+
+Applied the new migration to ordinary local D1; localhost login remains 200, private
+applicant/reviewer pages remain 401, and the new API rejects unsupported GET with 405.
+The existing localhost server and normal data remain available. No push, PR, deployment,
+live email, staging/production changes, or real appointments. Next: issue #7.
+
 ## Issue #10 — Hono, Zod and Drizzle backend architecture — 2026-10-05
 
 Implemented against starting commit `79dfbfc50fe00563183c1e8bff6772be0ea6b79b` on
