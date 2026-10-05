@@ -1,3 +1,6 @@
+import { apiMethodPolicy } from "../http/methods.server";
+import { Hono } from "hono";
+import { parseInput, signInCodeInput } from "../http/validation";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { emailOTP } from "better-auth/plugins";
@@ -31,34 +34,13 @@ export function createAuth(env: Env) {
   });
 }
 
-const endpoints = new Map([
-  ["/api/auth/email-otp/send-verification-otp", "POST"],
-  ["/api/auth/sign-in/email-otp", "POST"],
-  ["/api/auth/sign-out", "POST"],
-  ["/api/auth/get-session", "GET"],
-]);
-
 export function hasTrustedOrigin(request: Request, env: Env) {
   return request.headers.get("Origin") === new URL(env.BETTER_AUTH_URL).origin;
 }
 
 // Restrict the product surface: no password login, OTP retrieval, or identity edits.
-export async function handleAuth(request: Request, env: Env) {
+async function authResponse(request: Request, env: Env) {
   const path = new URL(request.url).pathname;
-  const method = endpoints.get(path);
-  if (!method) return new Response(null, { status: 404 });
-  if (method !== request.method) return new Response(null, { status: 405 });
-  if (method === "POST" && !hasTrustedOrigin(request, env)) {
-    return Response.json({ message: "Permintaan tidak diizinkan." }, { status: 403 });
-  }
-  if (path.endsWith("/send-verification-otp")) {
-    const body = await request
-      .clone()
-      .json()
-      .catch(() => null);
-    if (!body || typeof body !== "object" || !("type" in body) || body.type !== "sign-in")
-      return Response.json({ message: "Permintaan tidak valid." }, { status: 400 });
-  }
   const response = await createAuth(env).handler(request);
   const headers = new Headers(response.headers);
   headers.set("Cache-Control", "no-store");
@@ -81,6 +63,50 @@ export async function handleAuth(request: Request, env: Env) {
     );
   }
   return new Response(response.body, { status: response.status, headers });
+}
+
+const authRoutes = new Hono<{ Bindings: Env }>();
+authRoutes.use("*", apiMethodPolicy);
+authRoutes.use("*", async (c, next) => {
+  if (c.req.method !== "GET" && c.req.method !== "HEAD" && !hasTrustedOrigin(c.req.raw, c.env))
+    return Response.json({ message: "Permintaan tidak diizinkan." }, { status: 403 });
+  await next();
+});
+authRoutes.post("/api/auth/email-otp/send-verification-otp", async (c) => {
+  try {
+    parseInput(
+      signInCodeInput,
+      await c.req.raw
+        .clone()
+        .json()
+        .catch(() => null),
+      "Permintaan tidak valid."
+    );
+  } catch (error) {
+    if (!(error instanceof Response)) throw error;
+    return Response.json({ message: await error.text() }, { status: error.status });
+  }
+  return authResponse(c.req.raw, c.env);
+});
+authRoutes.post("/api/auth/sign-in/email-otp", (c) => authResponse(c.req.raw, c.env));
+authRoutes.post("/api/auth/sign-out", (c) => authResponse(c.req.raw, c.env));
+
+authRoutes.get("/api/auth/get-session", (c) => authResponse(c.req.raw, c.env));
+authRoutes.on(
+  "ALL",
+  [
+    "/api/auth/email-otp/send-verification-otp",
+    "/api/auth/sign-in/email-otp",
+    "/api/auth/sign-out",
+    "/api/auth/get-session",
+  ],
+  () => new Response(null, { status: 405 })
+);
+authRoutes.notFound(() => new Response(null, { status: 404 }));
+export async function handleAuth(request: Request, env: Env) {
+  const response = await authRoutes.fetch(request, env);
+  response.headers.set("Cache-Control", "no-store");
+  return response;
 }
 
 export async function getAccount(request: Request, env: Env) {

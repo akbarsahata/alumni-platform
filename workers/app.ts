@@ -1,27 +1,23 @@
+import { apiMethodPolicy } from "../app/http/methods.server";
 import { createRequestHandler } from "react-router";
-import { handleAuth, hasTrustedOrigin } from "../app/auth/auth.server";
+import { Hono } from "hono";
+import { handleAuth } from "../app/auth/auth.server";
 import { readLocalMail } from "../app/email/email.server";
-import { handleAuthorization } from "../app/authorization/administration.server";
-import { handleMembership } from "../app/membership/applications.server";
+import { requestPolicy } from "../app/http/middleware.server";
+import { administrationRoutes } from "../app/http/administration.routes.server";
+import { membershipRoutes } from "../app/http/membership.routes.server";
 
 const requestHandler = createRequestHandler(
   () => import("virtual:react-router/server-build"),
   import.meta.env.MODE
 );
-
-export default {
-  async fetch(request, env) {
-    const path = new URL(request.url).pathname;
-    if (request.method !== "GET" && request.method !== "HEAD" && !hasTrustedOrigin(request, env)) {
-      return new Response("Permintaan tidak diizinkan.", { status: 403 });
-    }
-    if (path.startsWith("/api/auth/")) return handleAuth(request, env);
-    if (path.startsWith("/api/membership/")) return handleMembership(request, env);
-    if (path === "/api/access" || path.startsWith("/api/admin/"))
-      return handleAuthorization(request, env);
-    if (path === "/__local/mail") return readLocalMail(request, env);
-    const response = await requestHandler(request);
-    response.headers.set("Cache-Control", "no-store");
-    return response;
-  },
-} satisfies ExportedHandler<Env>;
+const app = new Hono<{ Bindings: Env }>();
+app.use("*", requestPolicy);
+app.use("/api/*", apiMethodPolicy);
+app.all("/api/auth/*", (c) => handleAuth(c.req.raw, c.env));
+app.route("/api", administrationRoutes);
+app.route("/api/membership", membershipRoutes);
+app.all("/api/*", () => new Response(null, { status: 404 }));
+app.all("/__local/mail", (c) => readLocalMail(c.req.raw, c.env));
+app.all("*", (c) => requestHandler(c.req.raw));
+export default { fetch: app.fetch } satisfies ExportedHandler<Env>;

@@ -1,5 +1,13 @@
 # Architecture and data model
 
+## Current backend implementation
+
+Hono composes the Worker API routes; React Router serves pages and form actions.
+Shared Zod schemas validate workflow inputs. Operation-oriented Drizzle repositories
+own application persistence, preserving conditional writes and atomic SQLite triggers.
+See [backend-architecture.md](backend-architecture.md) for module ownership and verification.
+The proposal below describes broader pilot infrastructure and historical selection context.
+
 ## Stack proposal
 
 The user selected Cloudflare and Resend. Specific libraries below are recommendations pending ticket 0 validation, not installed or verified dependencies.
