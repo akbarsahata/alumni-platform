@@ -100,3 +100,22 @@ export const schoolInvitation = sqliteTable("school_invitation", {
   acceptedBy: text("accepted_by"),
   acceptedAt: text("accepted_at"),
 });
+
+export const membershipStatusDecision = sqliteTable("membership_status_decision", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull(),
+  version: integer("version").notNull(),
+  actorUserId: text("actor_user_id").notNull(),
+  outcome: text("outcome", { enum: ["approved", "suspended"] }).notNull(),
+  reason: text("reason").notNull(),
+  applicantMessage: text("applicant_message").notNull(),
+  occurredAt: text("occurred_at").notNull(),
+});
+export const membershipSuspensionRequest = sqliteTable("membership_suspension_request", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull(),
+  suspensionId: text("suspension_id").notNull(),
+  explanation: text("explanation").notNull(),
+  requestedAt: text("requested_at").notNull(),
+  resolvedBy: text("resolved_by"),
+});

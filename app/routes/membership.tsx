@@ -1,3 +1,4 @@
+import { requestSuspensionReview } from "../membership/suspensions.server";
 import { pageTitle } from "../content/page-title";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -26,6 +27,10 @@ export async function action({ request }: Route.ActionArgs) {
   await getAccess(request, env);
   const form = await request.formData();
   try {
+    if (form.get("intent") === "suspension-review") {
+      await requestSuspensionReview(request, env, Object.fromEntries(form));
+      return { error: null, message: "Permintaan tinjauan penangguhan tersimpan." };
+    }
     if (["replacement", "manual-review"].includes(String(form.get("intent")))) {
       const result = await recoverReference(
         request,
@@ -172,14 +177,14 @@ export default function Membership({ loaderData, actionData }: Route.ComponentPr
         Beranda
       </Link>
       <p>
-        {application
-          ? application.status === "pending" && referenceStatus
-            ? referenceStatusLabels[referenceStatus]
-            : statusLabels[application.status]
-          : membership.status === "approved"
-            ? "Keanggotaan disetujui"
-            : membership.status === "suspended"
-              ? "Keanggotaan ditangguhkan"
+        {membership.status === "suspended"
+          ? "Keanggotaan ditangguhkan"
+          : application
+            ? application.status === "pending" && referenceStatus
+              ? referenceStatusLabels[referenceStatus]
+              : statusLabels[application.status]
+            : membership.status === "approved"
+              ? "Keanggotaan disetujui"
               : "Belum ada pengajuan"}
       </p>
       {actionData?.message && <p role="status">{actionData.message}</p>}
@@ -198,6 +203,43 @@ export default function Membership({ loaderData, actionData }: Route.ComponentPr
           ))}
         </section>
       )}
+      <section className="space-y-4">
+        {loaderData.suspension.decisions.map((decision) => (
+          <article key={decision.id}>
+            <p>
+              {decision.outcome === "suspended"
+                ? "Keanggotaan ditangguhkan"
+                : "Keanggotaan dipulihkan"}
+            </p>
+            <p>{decision.applicantMessage}</p>
+            <p>Waktu (UTC): {decision.occurredAt}</p>
+          </article>
+        ))}
+        {loaderData.suspension.requests.map((review) => (
+          <article key={review.id}>
+            <p>
+              {review.resolved
+                ? "Tinjauan penangguhan selesai"
+                : "Permintaan tinjauan menunggu pemeriksa"}
+            </p>
+            <p>{review.explanation}</p>
+            <p>Waktu (UTC): {review.requestedAt}</p>
+          </article>
+        ))}
+        {membership.status === "suspended" &&
+          loaderData.suspension.suspensionId &&
+          !loaderData.suspension.requests.some((r) => !r.resolved) && (
+            <Form method="post" className="space-y-4">
+              <Input type="hidden" name="intent" value="suspension-review" />
+              <Input type="hidden" name="suspensionId" value={loaderData.suspension.suspensionId} />
+              <label>
+                Penjelasan tinjauan penangguhan
+                <Textarea name="explanation" required maxLength={1000} />
+              </label>
+              <Button type="submit">Minta tinjauan penangguhan</Button>
+            </Form>
+          )}
+      </section>
       {canApply && (
         <ApplicationForm
           key={`${application?.revision ?? 0}:${application?.status ?? "new"}`}

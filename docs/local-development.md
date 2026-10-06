@@ -66,3 +66,7 @@ References: [Better Auth Email OTP](https://better-auth.com/docs/plugins/email-o
 ## Build and deployment boundary
 
 `npm run build` builds the Worker; `npm run preview -- --host 127.0.0.1` previews it locally. The built Worker disables local capture and fails closed on sending email. Live mail, domain configuration, secrets, resource IDs and deployment are outside this slice. A future deployment must configure a live email adapter and separate environment bindings first; never publish `.dev.vars`, `.wrangler/`, build-local secrets, or test artifacts. Do not run the deployment command for this local verification.
+
+For suspension/reinstatement and controlled review requests, see
+[membership-suspensions.md](membership-suspensions.md). Focused verification:
+`node scripts/test.mjs tests/suspensions.test.mjs suspensions.spec.ts`.

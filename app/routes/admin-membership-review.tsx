@@ -1,3 +1,4 @@
+import { decideMembershipStatus } from "../membership/suspensions.server";
 import { pageTitle } from "../content/page-title";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -32,7 +33,11 @@ export async function action({ request, params }: Route.ActionArgs) {
   const form = await request.formData();
   try {
     const result = await (
-      form.get("intent") === "house-correction" ? correctApprovedHouse : decideApplication
+      form.get("intent") === "status"
+        ? decideMembershipStatus
+        : form.get("intent") === "house-correction"
+          ? correctApprovedHouse
+          : decideApplication
     )(request, env, params.userId, Object.fromEntries(form));
     return {
       error: null,
@@ -156,6 +161,7 @@ function DecisionForm({
 
 export default function MembershipReview({ loaderData, actionData }: Route.ComponentProps) {
   const { application, revisions, decisions, self, references, referenceStatus } = loaderData;
+  const busy = useNavigation().state !== "idle";
   const conflict = references.some(
     (reference) => reference.outcome === "endorse" && reference.actorUserId === loaderData.accountId
   );
@@ -182,7 +188,7 @@ export default function MembershipReview({ loaderData, actionData }: Route.Compo
           <DecisionForm key={application.revision} revision={application.revision} />
         )
       )}
-      {!self && !conflict && application.status === "approved" && (
+      {!self && !conflict && loaderData.membership?.status === "approved" && (
         <section className="space-y-4">
           <h2 className="text-xl font-semibold">Koreksi house setelah persetujuan</h2>
           <DecisionForm
@@ -190,6 +196,62 @@ export default function MembershipReview({ loaderData, actionData }: Route.Compo
             revision={application.revision}
             correction
           />
+        </section>
+      )}
+      {loaderData.membership && (
+        <section className="space-y-4">
+          <h2>Penangguhan dan pemulihan keanggotaan</h2>
+          <p>
+            {loaderData.membership.status === "suspended"
+              ? "Keanggotaan ditangguhkan"
+              : "Keanggotaan disetujui"}
+          </p>
+          {!self && !conflict && (
+            <Form method="post" className="space-y-4">
+              <Input type="hidden" name="intent" value="status" />
+              <Input type="hidden" name="expectedVersion" value={loaderData.statusVersion} />
+              <Input
+                type="hidden"
+                name="outcome"
+                value={loaderData.membership.status === "approved" ? "suspended" : "approved"}
+              />
+              <label>
+                Alasan perubahan status (privat)
+                <Textarea name="reason" required maxLength={1000} />
+              </label>
+              <label>
+                Pesan perubahan status untuk anggota
+                <Textarea name="applicantMessage" required maxLength={1000} />
+              </label>
+              <p>
+                Alasan internal hanya untuk pemeriksa. Perubahan ini tidak mengubah peran yang
+                ditetapkan secara terpisah.
+              </p>
+              <Button type="submit" disabled={busy}>
+                {loaderData.membership.status === "approved"
+                  ? "Tangguhkan keanggotaan"
+                  : "Pulihkan keanggotaan"}
+              </Button>
+            </Form>
+          )}
+          <h3>Riwayat tinjauan penangguhan privat</h3>
+          {loaderData.suspensionRequests.map((review) => (
+            <article key={review.id}>
+              <p>{review.resolvedBy ? "Tinjauan selesai" : "Menunggu tinjauan"}</p>
+              <p>{review.explanation}</p>
+              <p>Waktu (UTC): {review.requestedAt}</p>
+            </article>
+          ))}
+          <h3>Riwayat perubahan status privat</h3>
+          {loaderData.statusDecisions.map((decision) => (
+            <article key={decision.id}>
+              <p>{decision.outcome === "suspended" ? "Ditangguhkan" : "Dipulihkan"}</p>
+              <p>Pemeriksa: {decision.actorUserId}</p>
+              <p>Alasan: {decision.reason}</p>
+              <p>Pesan untuk anggota: {decision.applicantMessage}</p>
+              <p>Waktu (UTC): {decision.occurredAt}</p>
+            </article>
+          ))}
         </section>
       )}
       {loaderData.corrections.length > 0 && (

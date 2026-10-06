@@ -1,3 +1,46 @@
+## Issue #8 — membership suspension and review requests — 2026-10-06
+
+Implemented the suspension/reinstatement slice on the current `master` branch,
+against starting commit `936515d2297a754c29c9348fbe89e4b75459e5d1`.
+
+- Added versioned status decisions with actor, private reason, separate member message
+  and UTC timestamps. Conditional inserts and SQLite triggers atomically change
+  membership, resolve outstanding requests and persist notification capture work.
+- Membership reviewers can suspend/reinstate approved or initial trusted alumni from
+  the existing Bahasa Indonesia review screens. Self/endorser decisions remain denied.
+  The member list shows outstanding review requests; initial bootstrap alumni need no
+  application to participate in this workflow.
+- Current membership immediately controls endorsement reads/writes in existing sessions.
+  Suspension preserves separately assigned school/privileged roles and email-code login.
+  Members see status/messages and can request one review per suspension; uniqueness and
+  current-suspension checks reject repeated, concurrent and stale submissions.
+- Reviewer history retains prior application decisions and status/request history.
+  Member projections omit internal status reasons, actor IDs and private resolution IDs;
+  notification capture includes only member-facing text. See `membership-suspensions.md`.
+- Added five HTTP journeys and one Chromium journey to the full integration harness.
+  Focused execution omits the bootstrap-only journey; the full suite supplies that fixture.
+
+Validation:
+
+- Focused suspension HTTP/browser verification passed. The full suite initially found
+  an ambiguous browser locator because the new status-reason label included the existing
+  house-correction label. Distinguished the status label and verified both browser flows.
+  Reusing already-mutated fixtures was unsuitable for bootstrap assertions; final
+  verification uses fresh disposable fixtures.
+- Final `npm test` passes all 51 HTTP tests and eight Chromium journeys with zero
+  failures or skips, including initial trusted alumni, real five-minute OTP expiry,
+  and production-equivalent rate-limit reset.
+- Typecheck, build, formatting, advisory lint and staged whitespace checks pass.
+- Independent Standards review found one ordinary-query convention violation; fixed it
+  with typed Drizzle mappings/builders. Also removed the authorization import cycle and
+  repeated reviewer reads. Final Standards and Spec reviews have zero actionable findings.
+- Applied `0008_membership_suspensions.sql` to ordinary local D1 and confirmed
+  `http://localhost:5173/login` returns 200. Synthetic automated state is disposable;
+  normal data and the manual development server are preserved.
+
+Changes are committed locally on `master`; no push, deployment, remote provisioning or
+live email. Next: issue #9, administrator-assisted verified email changes.
+
 # Session handoff
 
 ## Issue #7 — school representative invitations — 2026-10-05

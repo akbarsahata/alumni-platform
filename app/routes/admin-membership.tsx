@@ -51,6 +51,25 @@ export default function MembershipQueue({ loaderData }: Route.ComponentProps) {
           </tbody>
         </table>
       )}
+      <section className="space-y-4">
+        <h2>Anggota dan tinjauan penangguhan</h2>
+        {loaderData.members.map((member) => (
+          <article key={member.userId}>
+            <Link to={`/admin/membership/${encodeURIComponent(member.userId)}`}>
+              Tinjau anggota {member.userId}
+            </Link>
+            <p>
+              {member.status === "suspended" ? "Ditangguhkan" : "Disetujui"} · {member.house}
+            </p>
+            {member.requestedAt && <p>Permintaan tinjauan menunggu pemeriksa</p>}
+          </article>
+        ))}
+        {loaderData.memberNextCursor && (
+          <Link to={`?after=${encodeURIComponent(loaderData.memberNextCursor)}`}>
+            Anggota berikutnya
+          </Link>
+        )}
+      </section>
       {loaderData.nextCursor && (
         <Link className="underline" to={`?after=${encodeURIComponent(loaderData.nextCursor)}`}>
           Halaman berikutnya

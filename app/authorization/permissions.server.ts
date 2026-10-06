@@ -35,3 +35,10 @@ export async function requirePrimary(request: Request, env: Env) {
     throw new Response("Akses tidak diizinkan.", { status: 403 });
   return access;
 }
+
+export async function requireReviewer(request: Request, env: Env) {
+  const access = await getAccess(request, env);
+  if (!access.permissions.reviewMembership)
+    throw new Response("Akses tidak diizinkan.", { status: 403 });
+  return access;
+}

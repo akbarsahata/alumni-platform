@@ -1,3 +1,4 @@
+import { decideMembershipStatus, requestSuspensionReview } from "../membership/suspensions.server";
 import { Hono } from "hono";
 import { getAccess } from "../authorization/permissions.server";
 import {
@@ -16,6 +17,21 @@ import {
 } from "../membership/references.server";
 
 export const membershipRoutes = new Hono<{ Bindings: Env }>()
+  .post("/suspension-review", async (c) =>
+    c.json(await requestSuspensionReview(c.req.raw, c.env, await c.req.json().catch(() => null)))
+  )
+  .all("/suspension-review", () => new Response(null, { status: 405 }))
+  .post("/reviews/:userId/status", async (c) =>
+    c.json(
+      await decideMembershipStatus(
+        c.req.raw,
+        c.env,
+        c.req.param("userId"),
+        await c.req.json().catch(() => null)
+      )
+    )
+  )
+  .all("/reviews/:userId/status", () => new Response(null, { status: 405 }))
   .get("/application", async (c) => {
     const { account } = await getAccess(c.req.raw, c.env);
     return c.json(await readApplication(c.env, account.id));

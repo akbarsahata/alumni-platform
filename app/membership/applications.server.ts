@@ -1,3 +1,5 @@
+import { suspensionRepository } from "../db/suspension.repository.server";
+import { suspensionStatus } from "./suspensions.server";
 import {
   parseInput,
   applicationInput,
@@ -6,13 +8,14 @@ import {
   queueCursor,
 } from "../http/validation";
 import { membershipRepository } from "../db/membership.repository.server";
-import { getAccess } from "../authorization/permissions.server";
+import { getAccess, requireReviewer } from "../authorization/permissions.server";
+export { requireReviewer } from "../authorization/permissions.server";
 import { hasTrustedOrigin } from "../auth/auth.server";
 
 import { captureNotifications } from "./notifications.server";
 import { referenceStatus, referenceHistory } from "./references.server";
 
-export async function readApplication(env: Env, userId: string) {
+async function applicationDetails(env: Env, userId: string) {
   // Callers authorize ownership/reviewer access before selecting private fields.
   const details = await membershipRepository(env.DB).applicantDetails(userId);
   return {
@@ -20,6 +23,13 @@ export async function readApplication(env: Env, userId: string) {
     referenceStatus: details.application
       ? await referenceStatus(env, userId, details.application.revision)
       : null,
+  };
+}
+
+export async function readApplication(env: Env, userId: string) {
+  return {
+    ...(await applicationDetails(env, userId)),
+    suspension: await suspensionStatus(env, userId),
   };
 }
 
@@ -55,19 +65,15 @@ export async function submitApplication(request: Request, env: Env, input: unkno
   return { changed: true, ...notification };
 }
 
-export async function requireReviewer(request: Request, env: Env) {
-  const access = await getAccess(request, env);
-  if (!access.permissions.reviewMembership)
-    throw new Response("Akses tidak diizinkan.", { status: 403 });
-  return access;
-}
-
 export async function reviewQueue(request: Request, env: Env) {
   await requireReviewer(request, env);
   const after = new URL(request.url).searchParams.get("after") || "";
   parseInput(queueCursor, after, "Kursor tidak valid.");
   const rows = await membershipRepository(env.DB).reviewQueue({ after: after });
+  const members = await suspensionRepository(env.DB).queue(after);
   return {
+    members: members.slice(0, 100),
+    memberNextCursor: members.length > 100 ? members[99].userId : null,
     applications: rows.slice(0, 100),
     nextCursor: rows.length > 100 ? rows[99].userId : null,
   };
@@ -75,12 +81,14 @@ export async function reviewQueue(request: Request, env: Env) {
 
 export async function reviewDetails(request: Request, env: Env, userId: string) {
   await requireReviewer(request, env);
-  const details = await readApplication(env, userId);
+  const details = await applicationDetails(env, userId);
   const membership = await membershipRepository(env.DB).membership(userId);
   const corrections = await membershipRepository(env.DB).correctionHistory(userId);
-  if (!details.application && membership?.status !== "approved")
+  if (!details.application && !membership)
     throw new Response("Pengajuan tidak ditemukan.", { status: 404 });
   const history = await membershipRepository(env.DB).decisionHistory({ userId: userId });
+  const statusDecisions = await suspensionRepository(env.DB).history(userId);
+  const suspensionRequests = await suspensionRepository(env.DB).requests(userId);
   return {
     ...details,
     application: details.application ?? {
@@ -93,6 +101,9 @@ export async function reviewDetails(request: Request, env: Env, userId: string) 
     decisions: history,
     references: await referenceHistory(env, userId),
     corrections,
+    statusVersion: statusDecisions[0]?.version ?? 0,
+    statusDecisions,
+    suspensionRequests,
   };
 }
 

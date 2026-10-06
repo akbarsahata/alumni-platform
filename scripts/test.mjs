@@ -89,6 +89,7 @@ try {
     await run(process.execPath, ["--test", "tests/corrections.test.mjs"]);
     await run(process.execPath, ["--test", "tests/account-bar.test.mjs"]);
     await run(process.execPath, ["--test", "tests/invitations.test.mjs"]);
+    await run(process.execPath, ["--test", "tests/suspensions.test.mjs"]);
   }
   const results = await Promise.allSettled(
     process.argv[2]

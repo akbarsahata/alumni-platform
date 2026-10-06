@@ -115,3 +115,14 @@ export const invitationInput = z
   })
   .strict();
 export const invitationAcceptanceInput = z.object({}).strict();
+
+export const membershipStatusInput = z.object({
+  expectedVersion: integer(0, Number.MAX_SAFE_INTEGER - 1),
+  outcome: z.enum(["suspended", "approved"]),
+  reason: requiredText(1000),
+  applicantMessage: requiredText(1000),
+});
+export const suspensionRequestInput = z.object({
+  suspensionId: z.string().uuid(),
+  explanation: requiredText(1000),
+});
