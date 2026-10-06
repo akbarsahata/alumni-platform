@@ -36,6 +36,16 @@ export function administrationRepository(binding: D1Database) {
       SELECT * FROM authorization_audit
       UNION ALL SELECT id || '0', issuer_id, email, 'invitation-issued', role, NULL, NULL, reason, issued_at FROM school_invitation
       UNION ALL SELECT id || '1', accepted_by, accepted_by, 'invitation-accepted', role, NULL, NULL, reason, accepted_at FROM school_invitation WHERE accepted_at IS NOT NULL
+      UNION ALL SELECT id || '0', actor_user_id, target_user_id, 'email-change-requested', NULL, NULL, identity_check, reason, requested_at FROM email_change_request
+      UNION ALL SELECT id || '1', COALESCE(verified_by,ended_by,actor_user_id), target_user_id,
+        CASE WHEN status='completed' THEN 'email-change-completed'
+          WHEN status='expired' OR expires_at <= strftime('%Y-%m-%dT%H:%M:%fZ','now') THEN 'email-change-expired'
+          WHEN status='replaced' THEN 'email-change-replaced' ELSE 'email-change-collision' END,
+        NULL, NULL,
+        CASE WHEN status='completed' THEN old_email || ' → ' || new_email ELSE identity_check END,
+        reason, COALESCE(completed_at,ended_at,expires_at)
+        FROM email_change_request
+        WHERE status != 'pending' OR expires_at <= strftime('%Y-%m-%dT%H:%M:%fZ','now')
     )
     WHERE ${input.time} IS NULL OR occurred_at < ${input.time} OR (occurred_at = ${input.time} AND id < ${input.id})
     ORDER BY occurred_at DESC, id DESC LIMIT 101`);

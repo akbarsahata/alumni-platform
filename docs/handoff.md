@@ -1,3 +1,22 @@
+## Issue #9 — administrator-assisted email changes — 2026-10-06
+
+Implemented Ticket 1.8 against the current `master` branch.
+
+- Added a membership-administrator-only Bahasa Indonesia workflow that records an
+  identity-check note and reason before sending a ten-minute verification token to
+  the proposed email. The account holder must authenticate with the current address
+  and verify the token through the account-bound route.
+- Stored only the token hash. Conditional D1 updates and triggers enforce current
+  administrator authority, target identity, expiry, single use and collision checks;
+  successful changes preserve account ID, membership and assigned roles, then revoke
+  existing sessions.
+- Added request/result audit events with actor, reason, identity-check note and UTC
+  timestamps, plus HTTP and Chromium coverage. See `email-changes.md`.
+
+The full `npm test` suite passes all 54 HTTP tests and nine Chromium journeys. Focused
+email-change journeys, lint, formatting, typecheck and build pass. No live email,
+deployment or production changes.
+
 ## Issue #8 — membership suspension and review requests — 2026-10-06
 
 Implemented the suspension/reinstatement slice on the current `master` branch,

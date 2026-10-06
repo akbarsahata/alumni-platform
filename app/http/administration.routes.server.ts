@@ -1,6 +1,11 @@
 import { Hono } from "hono";
 import { getAccess, requirePrimary } from "../authorization/permissions.server";
 import { listAccounts, readAudit, changeRole } from "../authorization/administration.server";
+import {
+  readEmailChange,
+  startEmailChange,
+  verifyEmailChange,
+} from "../authorization/email-changes.server";
 
 import {
   issueInvitation,
@@ -9,6 +14,24 @@ import {
 } from "../authorization/invitations.server";
 
 export const administrationRoutes = new Hono<{ Bindings: Env }>()
+  .post("/admin/email-changes", async (c) =>
+    c.json(await startEmailChange(c.req.raw, c.env, await c.req.json().catch(() => null)))
+  )
+  .all("/admin/email-changes", () => new Response(null, { status: 405 }))
+  .get("/email-changes/:id", async (c) =>
+    c.json(await readEmailChange(c.req.raw, c.env, c.req.param("id")))
+  )
+  .post("/email-changes/:id", async (c) =>
+    c.json(
+      await verifyEmailChange(
+        c.req.raw,
+        c.env,
+        c.req.param("id"),
+        await c.req.json().catch(() => null)
+      )
+    )
+  )
+  .all("/email-changes/:id", () => new Response(null, { status: 405 }))
   .post("/admin/invitations", async (c) =>
     c.json(await issueInvitation(c.req.raw, c.env, await c.req.json().catch(() => null)))
   )

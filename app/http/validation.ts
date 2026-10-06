@@ -126,3 +126,15 @@ export const suspensionRequestInput = z.object({
   suspensionId: z.string().uuid(),
   explanation: requiredText(1000),
 });
+export const emailChangeInput = z
+  .object({
+    targetUserId: z.string().min(1).max(200),
+    newEmail: referenceInput.shape.email,
+    identityCheck: requiredText(1000),
+    reason: requiredText(1000),
+  })
+  .strict();
+export const emailChangeVerificationInput = z
+  .object({ token: z.string().regex(/^[a-f0-9]{64}$/) })
+  .strict();
+export const emailChangeRequestId = z.string().regex(/^[a-f0-9]{32}$/);

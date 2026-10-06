@@ -18,6 +18,9 @@ export default function MembershipQueue({ loaderData }: Route.ComponentProps) {
       <Link to="/" className="underline">
         Beranda
       </Link>
+      <Link to="/admin/email-changes" className="underline">
+        Bantu perubahan email
+      </Link>
       <p>
         Pengajuan menunggu tinjauan manual. Keputusan memerlukan pemeriksaan independen melalui
         alumni tepercaya atau staf sekolah.
