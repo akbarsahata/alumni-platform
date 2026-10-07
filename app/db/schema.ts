@@ -119,3 +119,23 @@ export const membershipSuspensionRequest = sqliteTable("membership_suspension_re
   requestedAt: text("requested_at").notNull(),
   resolvedBy: text("resolved_by"),
 });
+
+export const emailChangeRequest = sqliteTable("email_change_request", {
+  id: text("id").primaryKey(),
+  targetUserId: text("target_user_id").notNull(),
+  actorUserId: text("actor_user_id").notNull(),
+  verifiedBy: text("verified_by"),
+  endedBy: text("ended_by"),
+  oldEmail: text("old_email").notNull(),
+  newEmail: text("new_email").notNull(),
+  identityCheck: text("identity_check").notNull(),
+  reason: text("reason").notNull(),
+  tokenHash: text("token_hash").notNull(),
+  status: text("status", {
+    enum: ["pending", "completed", "expired", "replaced", "collision"],
+  }).notNull(),
+  requestedAt: text("requested_at").notNull(),
+  expiresAt: text("expires_at").notNull(),
+  completedAt: text("completed_at"),
+  endedAt: text("ended_at"),
+});

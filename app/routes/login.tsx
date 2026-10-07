@@ -17,7 +17,7 @@ function invitationReturn(request: Request) {
 
 export async function loader({ request }: Route.LoaderArgs) {
   if (await getAccount(request, env)) throw redirect(invitationReturn(request));
-  return null;
+  return { emailChanged: new URL(request.url).searchParams.get("emailChanged") === "1" };
 }
 
 export async function action({ request }: Route.ActionArgs) {
@@ -52,13 +52,16 @@ export async function action({ request }: Route.ActionArgs) {
   return { email, sent: true, error: null };
 }
 
-export default function Login({ actionData }: Route.ComponentProps) {
+export default function Login({ loaderData, actionData }: Route.ComponentProps) {
   const navigation = useNavigation();
   const busy = navigation.state !== "idle";
   return (
     <main className="login-page mx-auto max-w-md p-8 space-y-6">
       <p className="eyebrow">SELAMAT DATANG KEMBALI</p>
       <h1 className="text-2xl font-semibold">Masuk ke keluarga alumni</h1>
+      {loaderData.emailChanged && (
+        <p role="status">Email login berubah. Masuk kembali menggunakan email baru.</p>
+      )}
       <p>Gunakan email Anda. Kami akan mengirim kode untuk masuk.</p>
       {actionData?.error && <p role="alert">{actionData.error}</p>}
       {actionData?.sent && (

@@ -19,6 +19,11 @@ const actionLabels: Record<string, string> = {
   "bootstrap-alumnus": "Penetapan alumni tepercaya",
   "invitation-issued": "Penerbitan undangan sekolah",
   "invitation-accepted": "Penerimaan undangan sekolah",
+  "email-change-requested": "Permintaan perubahan email",
+  "email-change-completed": "Perubahan email selesai",
+  "email-change-expired": "Verifikasi perubahan email kedaluwarsa",
+  "email-change-replaced": "Permintaan perubahan email diganti",
+  "email-change-collision": "Perubahan email ditolak karena alamat digunakan",
   grant: "Pemberian peran",
   revoke: "Pencabutan peran",
 };
@@ -39,7 +44,16 @@ export default function AdminAudit({ loaderData }: Route.ComponentProps) {
             </p>
             <p>Pelaku (ID akun): {event.actorUserId}</p>
             <p>Tujuan (ID akun atau email undangan): {event.targetUserId}</p>
-            {event.operator && <p>Operator: {event.operator}</p>}
+            {event.operator && (
+              <p>
+                {event.action === "email-change-completed"
+                  ? "Email lama → baru"
+                  : event.action.startsWith("email-change")
+                    ? "Pemeriksaan identitas"
+                    : "Operator"}
+                : {event.operator}
+              </p>
+            )}
             {event.house && <p>House: {event.house}</p>}
             <p>Alasan: {event.reason}</p>
             <time dateTime={event.occurredAt}>{event.occurredAt}</time>
