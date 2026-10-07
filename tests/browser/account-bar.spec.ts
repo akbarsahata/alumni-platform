@@ -1,7 +1,8 @@
+import { gotoReady } from "./app-ready";
 import { test, expect } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 
-test("shared account bar identifies separate sessions across navigation, wraps on mobile and logs out from membership", async ({
+test("shared account menu identifies separate sessions across navigation, wraps on mobile and logs out from membership", async ({
   browser,
 }) => {
   const fixture = JSON.parse(
@@ -24,35 +25,32 @@ test("shared account bar identifies separate sessions across navigation, wraps o
         },
       ]);
       const page = await contexts[index].newPage();
-      await page.goto("/");
-      const bar = page.getByRole("region", { name: "Akun aktif" });
+      await gotoReady(page, "/");
+      const bar = page.locator(".navigation-account");
+      await page.getByLabel("Menu akun", { exact: true }).click();
       await expect(bar.getByText(account.email, { exact: true })).toBeVisible();
-      await page.getByRole("link", { name: "Pengajuan keanggotaan" }).click();
+      await page.locator(".navigation-groups summary").filter({ hasText: "Pribadi" }).click();
+      await page.getByRole("link", { name: "Keanggotaan", exact: true }).click();
       await expect(page).toHaveURL(/\/membership$/);
+      await page.getByLabel("Menu akun", { exact: true }).click();
       await expect(bar.getByText(account.email, { exact: true })).toBeVisible();
-      await expect(bar.getByRole("button", { name: "Keluar", exact: true })).toBeVisible();
-      const overflow = await bar.evaluate((element) => element.scrollWidth > element.clientWidth);
-      expect(overflow).toBe(false);
       const identity = bar.getByText(account.email, { exact: true });
       expect(await identity.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(
         false
       );
-      await page.screenshot({
-        path: `test-results/account-bar-${index === 0 ? "desktop" : "mobile"}.png`,
-      });
-      await page.evaluate("window.scrollTo(0, document.body.scrollHeight)");
-      const bounds = await bar.boundingBox();
-      expect(bounds?.y).toBeGreaterThanOrEqual(0);
-      await page.goto("/admin/membership");
+      await page.screenshot({ path: `test-results/account-menu-${index}.png` });
+      await gotoReady(page, "/admin/membership");
+      await page.getByLabel("Menu akun", { exact: true }).click();
       await expect(bar.getByText(account.email, { exact: true })).toBeVisible();
-      await page.goto("/missing-account-bar-page");
+      await gotoReady(page, "/missing-account-bar-page");
+      await page.getByLabel("Menu akun", { exact: true }).click();
       await expect(bar.getByText(account.email, { exact: true })).toBeVisible();
-      await page.goto("/membership");
+      await gotoReady(page, "/membership");
+      await page.getByLabel("Menu akun", { exact: true }).click();
       await bar.getByRole("button", { name: "Keluar", exact: true }).click();
       await expect(page).toHaveURL(/\/login$/);
-      await expect(bar.getByText("Anda belum masuk.")).toBeVisible();
-      await expect(bar.getByRole("link", { name: "Masuk", exact: true })).toBeVisible();
-      await expect(bar.getByText(account.email, { exact: true })).toHaveCount(0);
+      await expect(bar).toHaveCount(0);
+      await expect(page.getByRole("heading", { name: "Masuk ke keluarga alumni" })).toBeVisible();
       const denied = await contexts[index].request.get("/api/access");
       expect(denied.status()).toBe(401);
     }

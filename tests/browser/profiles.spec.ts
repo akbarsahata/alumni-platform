@@ -1,3 +1,4 @@
+import { gotoReady, reloadReady } from "./app-ready";
 import { test, expect } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 test("member edits, consents, pauses, opts out, and reconfirms a private profile in Bahasa Indonesia", async ({
@@ -28,8 +29,9 @@ test("member edits, consents, pauses, opts out, and reconfirms a private profile
       await page.getByRole("option", { name: option, exact: true }).click();
       await input.press("Escape");
     }
-    await page.goto("/");
-    await page.getByRole("link", { name: "Profil & Keahlian" }).click();
+    await gotoReady(page, "/");
+    await page.locator(".navigation-groups summary").filter({ hasText: "Pribadi" }).click();
+    await page.getByRole("link", { name: "Profil & Keahlian", exact: true }).click();
     await page.getByText("Identitas sekolah terverifikasi ·", { exact: false }).click();
     await expect(page.getByLabel("Identitas sekolah terverifikasi")).toContainText(
       "Nama semasa sekolah"
@@ -72,7 +74,7 @@ test("member edits, consents, pauses, opts out, and reconfirms a private profile
     await expect(notifications).toContainText("tersimpan");
     await notifications.getByRole("button", { name: "Tutup pemberitahuan" }).click();
     await expect(page.getByText("Status relevansi profil: Memenuhi syarat")).toBeVisible();
-    await page.reload();
+    await reloadReady(page);
     await expect(page.getByLabel("Nama tampilan (opsional)")).toHaveValue("Nama profesional");
     await expect(page.getByLabel("Perkenalan profesional (wajib)")).toHaveValue(
       "Mendampingi klub robotika"
@@ -86,7 +88,7 @@ test("member edits, consents, pauses, opts out, and reconfirms a private profile
     await save();
     await expect(notifications).toContainText("tersimpan");
     await expect(page.getByLabel("Nama tampilan (opsional)")).toHaveValue("Nama aktif diperbarui");
-    await page.reload();
+    await reloadReady(page);
     await expect(page.getByLabel("Nama tampilan (opsional)")).toHaveValue("Nama aktif diperbarui");
     await expect(page.getByLabel("Perkenalan profesional (wajib)")).toHaveValue(
       "Perkenalan aktif diperbarui"
@@ -107,7 +109,7 @@ test("member edits, consents, pauses, opts out, and reconfirms a private profile
     await save();
     await expect(notifications).toContainText("tersimpan");
     await notifications.getByRole("button", { name: "Tutup pemberitahuan" }).click();
-    await page.reload();
+    await reloadReady(page);
     await expect(page.getByLabel("Nama tampilan (opsional)")).toHaveValue("Nama diperbarui");
     await expect(
       page
@@ -121,7 +123,7 @@ test("member edits, consents, pauses, opts out, and reconfirms a private profile
     await save();
     await expect(notifications).toContainText("tersimpan");
     await notifications.getByRole("button", { name: "Tutup pemberitahuan" }).click();
-    await page.reload();
+    await reloadReady(page);
     await expect(
       page.locator(".location__multi-value__label").filter({ hasText: "Australia" })
     ).toHaveCount(0);

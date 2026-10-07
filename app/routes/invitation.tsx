@@ -54,7 +54,6 @@ export default function Invitation({ loaderData, actionData }: Route.ComponentPr
               <Button>Terima undangan</Button>
             </Form>
           )}
-          <Link to="/">Beranda</Link>
         </>
       )}
     </main>

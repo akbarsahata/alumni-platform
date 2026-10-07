@@ -5,7 +5,7 @@ import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
 import { env } from "cloudflare:workers";
 import { useState } from "react";
-import { Form, Link, data, useNavigation } from "react-router";
+import { Form, data, useNavigation } from "react-router";
 import type { Route } from "./+types/membership";
 import { getAccess } from "../authorization/permissions.server";
 import { readApplication, submitApplication } from "../membership/applications.server";
@@ -173,9 +173,7 @@ export default function Membership({ loaderData, actionData }: Route.ComponentPr
   return (
     <main className="mx-auto max-w-2xl p-8 space-y-6">
       <h1 className="text-2xl font-semibold">Pengajuan keanggotaan</h1>
-      <Link to="/" className="underline">
-        Beranda
-      </Link>
+
       <p>
         {membership.status === "suspended"
           ? "Keanggotaan ditangguhkan"

@@ -1,3 +1,4 @@
+import { gotoReady, reloadReady } from "./app-ready";
 import { test, expect } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 
@@ -38,7 +39,7 @@ test("applicant requests a reference and authenticated alumnus responds before p
     const applicant = await contexts[0].newPage();
     const reference = await contexts[1].newPage();
     const reviewer = await contexts[2].newPage();
-    await applicant.goto("/membership");
+    await gotoReady(applicant, "/membership");
     await applicant.getByLabel("Nama semasa sekolah").fill("Nama Pemohon Referensi Browser");
     await applicant.getByLabel("Tahun kelulusan").fill("2008");
     await applicant.getByLabel("House", { exact: true }).selectOption("Komodo");
@@ -56,7 +57,7 @@ test("applicant requests a reference and authenticated alumnus responds before p
       )
     ).json();
     const path = mail.text.match(/\/references\/[a-f0-9-]+/)[0];
-    await reference.goto(path);
+    await gotoReady(reference, path);
     await expect(
       reference.getByText("Nama semasa sekolah: Nama Pemohon Referensi Browser")
     ).toBeVisible();
@@ -71,12 +72,12 @@ test("applicant requests a reference and authenticated alumnus responds before p
     await reference.getByRole("button", { name: "Kirim respons" }).click();
     await expect(reference.getByRole("status")).toContainText("Respons tersimpan");
     await expect(reference.getByRole("button", { name: "Kirim respons" })).toHaveCount(0);
-    await applicant.reload();
+    await reloadReady(applicant);
     await expect(
       applicant.getByText("Referensi diterima — menunggu keputusan administrator", { exact: true })
     ).toBeVisible();
     await expect(applicant.getByText("Komentar privat referensi browser.")).toHaveCount(0);
-    await reviewer.goto(`/admin/membership/${fixture.applicant.id}`);
+    await gotoReady(reviewer, `/admin/membership/${fixture.applicant.id}`);
     await expect(
       reviewer.getByText("Komentar privat: Komentar privat referensi browser.")
     ).toBeVisible();
@@ -90,7 +91,7 @@ test("applicant requests a reference and authenticated alumnus responds before p
       .fill("Keanggotaan disetujui setelah tinjauan administrator.");
     await reviewer.getByRole("button", { name: "Simpan keputusan" }).click();
     await expect(reviewer.getByRole("status")).toContainText("Keputusan tersimpan");
-    await applicant.reload();
+    await reloadReady(applicant);
     await expect(
       applicant.getByText("Keanggotaan disetujui", { exact: true }).first()
     ).toBeVisible();

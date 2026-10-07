@@ -20,7 +20,10 @@ The initial frontier was **#13** and **#15**. Issue #13 is implemented and local
 verified, including the responsive “Profil & Keahlian” editor, required professional
 introduction and single participation-consent checkbox. See the current summary in
 [handoff.md](handoff.md) and the [layout decision](profile-layout.md).
-The next runnable issues are **#14** and **#15**. Each issue includes its own end-to-end
+Issue #14 is also implemented and locally verified; see the directory entries in
+[handoff.md](handoff.md). The next unblocked issue is **#15**. Issue #16
+remains blocked by #15. This is the local implementation record; recheck the
+current tracker body, labels and dependencies before starting. Each issue includes its own end-to-end
 acceptance criteria, synthetic Worker/D1/captured-email HTTP and Chromium verification,
 and build/typecheck requirements. Automated deletion and anonymization remain out of scope.
 
@@ -28,7 +31,18 @@ The GitHub plugin exposes no native blocking-link operation; dependency edges ar
 explicit issue links in each issue's `Blocked by` section. No parent issue was
 created or modified. Existing historical membership issue structures were not changed.
 
-The specification and this index are committed local documents. The four profile
-refinement commits reviewed on `codex/profile-layout` have not been pushed or
-deployed; see the handoff for verification boundaries. Publication of the issues
-itself did not start their implementation.
+Publication of the issues itself did not start their implementation. Historical
+profile branch/commit details are recorded in the handoff; the current checkout
+and uncommitted UI changes are described in its opening summary.
+
+## UI baseline for subsequent issues
+
+Use the [shared navigation and guest-home decision](navigation-prototype.md).
+Signed-in destinations belong in the existing grouped menu and are shown only to
+explicitly authorized roles; multiple roles combine their menus. Add no dead links
+for unimplemented workflows. Keep the primary-only menu preview aligned with new
+role-based destinations, while server permission checks remain authoritative.
+Guests use `/` or `/login` without a menu. Breadcrumbs and the signed-in actionable
+home dashboard are deferred. Keep useful feature/parent links on pages, without
+redundant Beranda links. The current UI changes are local and uncommitted on
+`master`; preserve them when starting #15.

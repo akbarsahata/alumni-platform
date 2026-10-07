@@ -63,6 +63,21 @@ in the pilot; automated deletion and anonymization are outside this scope.
 
 ## Implementation Decisions
 
+### Shared navigation and guest entry
+
+Use the accepted [navigation and guest-home baseline](navigation-prototype.md).
+Guests sign in directly on `/`; `/login` remains compatible with invitation and
+identity-change flows. No guest menu is shown. Signed-in pages use the shared,
+non-sticky grouped menu. New implemented needs/outreach destinations must be
+available from this menu for the appropriate explicitly assigned roles; accounts
+with several roles receive their combined destinations. The primary-only role
+preview simulates the same menu visibility, never server authorization.
+
+Keep contextual links to related features and parent lists. Do not add redundant
+Beranda links, breadcrumbs, a separate account strip or homepage-only navigation.
+The actionable-items homepage is deferred and is not an acceptance requirement
+for school needs or outreach.
+
 ### Architecture and persistence
 
 - Extend the existing Hono API and React Router page/action architecture. Shared

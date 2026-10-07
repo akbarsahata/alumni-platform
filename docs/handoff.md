@@ -1,4 +1,80 @@
-# Current handoff — profile refinements — 2026-10-07
+# Current handoff — navigation and guest login — 2026-10-07
+
+Current checkout: `master`, based on `0fa0c91` (directory location normalization).
+The navigation and guest-home changes are **local and uncommitted**. Preserve the
+working tree when starting the next issue. No push, PR, deployment, remote
+migration or live email occurred in this UI session.
+
+## Current UI baseline
+
+- Guests use the email-code form directly on `/`, alongside the welcome typography
+  and school introduction. `/login` uses the same component/action and preserves
+  invitation return and email-change messaging. Guests have no menu bar.
+- Signed-in pages use option B: grouped navigation in
+  `app/components/site-navigation.tsx`, mounted in `app/root.tsx`. It scrolls with
+  the page. Home and account triggers are icons; the account target is a true
+  44×44px circle. Email and sign-out are inside the account dropdown.
+- Menu visibility comes from current server-loaded access. Group/account dropdowns
+  are mutually exclusive and close on outside click, Escape and navigation. Each
+  group shows one caret. Page-level Beranda links are removed; related-feature and
+  parent-list links remain. Breadcrumbs are deferred.
+- The real primary administrator alone can enable “Pratinjau peran” from the account
+  menu. The panel starts hidden and simulates combined menu roles only. It never
+  grants page/API permissions. Preview state is in memory; reload resets it.
+- Signed-in home has a brief welcome; its duplicate hero and feature-link list are
+  removed. A home dashboard with actionable items is **deferred**, not part of the
+  next issue by default.
+- The exploratory variants are captured on local `codex/navigation-prototype` at
+  `b31b386f1c64b1b29add9b33d8f3333d7dc4940d`. They are absent from `master`.
+
+Details and accepted decisions: [shared navigation and guest homepage](navigation-prototype.md).
+
+## Latest verification boundary
+
+Typecheck, lint, formatting and production build pass. Guest `/` and `/login`
+were inspected at 1280px/390px with no horizontal overflow. The final full
+`npm test` run passes six helper tests, 64 HTTP tests and 13 Chromium journeys
+through the isolated Worker/D1/captured-mail seam, including real 301-second OTP
+expiry. No tests failed or were skipped.
+
+The recent pushed CI run failed browser interactions before hydration finished.
+A delayed-script reproduction confirmed form selections reset at hydration;
+browser helpers now wait for the root hydration marker before interacting, and
+a permanent slow-start regression covers this race. Email-change and profile
+journeys also open the new dropdowns before checking their contents. Local Python
+`.venv/` dependencies are excluded from repository formatting checks.
+These fixes are local and uncommitted; the remote pipeline has not been rerun.
+Earlier results below retain their original dates and change boundaries.
+
+## Next issue
+
+Local implementation records show #13 (profiles) and #14 (directory discovery)
+complete. The next unblocked task is **#15 — school needs and independent
+approval**. #16 still requires #15; later outreach tasks retain their published
+dependencies. See the [implementation index](profiles-expertise-outreach-issues.md).
+Before implementing, fetch #15’s current body, labels and comments through the
+GitHub plugin and recheck its state/dependencies; this docs-only alignment did not
+query or modify the tracker.
+
+Read the current pilot, architecture, roadmap, outreach specification and this
+summary. Use the agreed needs/approval policy in
+[profiles-expertise-outreach-spec.md](profiles-expertise-outreach-spec.md). Add
+implemented destinations to the shared menu for their explicit roles, including
+accounts with several roles, and keep role preview aligned with those menu rules.
+Do not restore homepage-only menu access, guest navigation, breadcrumbs or an
+account strip. Retain useful feature/parent links within new pages. Exercise
+current-role revocation and independent approval through the real isolated
+Worker/D1/captured-email HTTP and Chromium seam; keep localhost available for
+manual testing. No live credentials or production rollout are needed.
+
+---
+
+# Historical handoff entries
+
+The summaries below record earlier work. Their branch/frontier/UI statements are
+historical and superseded by the current summary above.
+
+# Profile refinements — 2026-10-07
 
 The four local commits reviewed for this handoff are on `codex/profile-layout`,
 ahead of the local `origin/master` ref. The branch has no configured upstream.
@@ -740,3 +816,50 @@ HTTP journeys and the Chromium journey. Scoped the selected-location assertion t
 the filter form because result badges now repeat the same location text. Native
 input styles are excluded from the searchable control's inner text input so empty
 location controls align with surrounding fields. All changes remain local.
+
+## Global navigation prototype — 2026-10-07
+
+User requested easier cross-menu access and breadcrumbs, suggesting the top bar.
+Development-only throwaway variants now mount in the shared root on existing pages:
+A direct tabs, B grouped dropdowns, C compact expandable menu panel. Existing page
+loaders and authorization remain in place; menu visibility derives from current
+account access. Parent breadcrumbs enable return to directory and membership
+review lists. Floating switcher preserves `?variant=A/B/C` across navigation.
+
+Per explicit user instruction, exploration is on `master`. No winning layout or
+production rollout is decided. See [navigation-prototype.md](navigation-prototype.md)
+for the question, run command and capture/cleanup plan.
+
+Navigation prototype follow-up: integrated account email and sign-out into a right-aligned “Akun” menu across all three variants, removed the separate development account strip, and removed sticky positioning from the fallback account bar. No layout winner selected.
+
+Account menu visual refinement: replaced the text trigger with a Lucide user-circle icon and chevron, retaining “Menu akun” as its accessible name. Email stays inside the dropdown. Sign-out uses a logout icon and a tinted red outlined action, with a solid red hover state.
+
+Selected direction: B grouped menus, still under prototype refinement. Beranda uses a home icon. Account trigger is exactly 44×44px with a circular background. Group/account dropdowns are exclusive and close on outside click, Escape or navigation. Expand “Pratinjau peran” to simulate combined roles; URL parameters retain preview state. Preview changes menu visibility only, leaves server authorization intact, and disables sign-out. Finance/staff/student have no dedicated implemented menus yet. Final production promotion remains pending.
+
+## Shared navigation selected — 2026-10-07
+
+User selected option B and deferred breadcrumbs. Replaced the development-only
+prototype with shared grouped navigation for all builds, using real account access.
+Removed variants, role-preview switches, the floating switcher and the old account
+bar. The complete exploration is preserved on local `codex/navigation-prototype`
+at `b31b386f1c64b1b29add9b33d8f3333d7dc4940d`. This decision supersedes the pending
+prototype notes above. See [navigation-prototype.md](navigation-prototype.md).
+
+Primary-administrator refinement: the account dropdown now offers “Pratinjau peran”. It is hidden for every other account and remains based on real primary authority even while previewing other roles. The preview panel is off by default; enabled state and role combinations stay in memory and follow client navigation, reset on reload/account change, and stop immediately when current primary authority is absent. It changes menu visibility only; server authorization and sign-out use the real account. A close control restores real menus.
+
+Page navigation cleanup: removed redundant Beranda links from route content, including membership, profile, directory and administration flows. Home remains available through the shared menu icon and brand. Links to related features and parent lists remain in place.
+
+Guest homepage decision: `/` now renders the existing email-code login workflow alongside the welcome typography and school introduction. Guests have no menu bar. `/login` uses the same presentation and preserves invitation-return and email-change flows. Signed-in home removes the redundant hero and menu list, keeping a short welcome while actionable items are deferred.
+
+Guest home and selected-navigation verification: typecheck, lint, formatting and
+production build pass. Chromium at 1280px/390px confirms the HTML welcome and
+login form on `/` and `/login`, no guest menu and no horizontal overflow. Real
+captured-mail authentication passes all 11 HTTP checks, including the installed
+301-second OTP expiry check, and the login browser journey. A clean disposable
+Worker/D1 regression run passes six helper tests, 24 HTTP journeys (roles,
+membership, account identity, invitations and directory) and seven Chromium
+journeys, including primary-only preview and invitation return. Earlier ad hoc
+runs reused an already-bootstrapped scratch database or omitted fixture generation;
+these setup failures were resolved by the clean ordered fixture run. Browser
+selectors now exercise grouped navigation instead of removed homepage links.
+Changes remain local and uncommitted on `master`; no deployment or live email.

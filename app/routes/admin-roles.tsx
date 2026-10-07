@@ -45,9 +45,6 @@ export default function AdminRoles({ loaderData, actionData }: Route.ComponentPr
         keanggotaan alumni.
       </p>
       <nav className="flex gap-4">
-        <Link className="underline" to="/">
-          Beranda
-        </Link>
         <Link className="underline" to="/admin/audit">
           Riwayat perubahan
         </Link>

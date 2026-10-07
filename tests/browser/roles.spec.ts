@@ -1,3 +1,4 @@
+import { gotoReady } from "./app-ready";
 import { test, expect } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 
@@ -17,8 +18,9 @@ test("primary administrator grants and revokes roles in Bahasa Indonesia and ins
       sameSite: "Lax",
     },
   ]);
-  await page.goto("/");
-  await page.getByRole("link", { name: "Kelola peran" }).click();
+  await gotoReady(page, "/");
+  await page.locator(".navigation-groups summary").filter({ hasText: "Administrasi" }).click();
+  await page.getByRole("link", { name: "Kelola peran", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Kelola peran" })).toBeVisible();
   await page.getByLabel("Akun terverifikasi").selectOption(fixture.ordinary.id);
   await page.getByLabel("Peran", { exact: true }).selectOption("finance-coordinator");

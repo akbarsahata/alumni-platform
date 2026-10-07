@@ -44,9 +44,7 @@ export default function ReferenceResponse({ loaderData, actionData }: Route.Comp
   return (
     <main className="mx-auto max-w-2xl p-8 space-y-6">
       <h1 className="text-2xl font-semibold">Respons referensi alumni</h1>
-      <Link to="/" className="underline">
-        Beranda
-      </Link>
+
       <p>Nama semasa sekolah: {loaderData.schoolName}</p>
       <p>Tahun kelulusan: {loaderData.graduationYear}</p>
       <p>House: {loaderData.house}</p>

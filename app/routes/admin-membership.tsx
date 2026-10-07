@@ -16,9 +16,6 @@ export default function MembershipQueue({ loaderData }: Route.ComponentProps) {
     <main className="mx-auto max-w-3xl p-8 space-y-6">
       <h1 className="text-2xl font-semibold">Tinjau keanggotaan</h1>
       <div className="space-x-4">
-        <Link to="/" className="underline">
-          Beranda
-        </Link>
         <Link to="/admin/email-changes" className="underline">
           Bantu perubahan email
         </Link>

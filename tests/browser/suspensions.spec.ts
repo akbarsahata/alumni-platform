@@ -1,3 +1,4 @@
+import { gotoReady, reloadReady } from "./app-ready";
 import { test, expect } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 
@@ -27,8 +28,8 @@ test("administrator suspends and restores membership after a member requests rev
   try {
     const reviewer = await reviewerContext.newPage();
     const member = await memberContext.newPage();
-    await member.goto("/membership");
-    await reviewer.goto(`/admin/membership/${fixture.member.id}`);
+    await gotoReady(member, "/membership");
+    await gotoReady(reviewer, `/admin/membership/${fixture.member.id}`);
     await reviewer
       .getByLabel("Alasan perubahan status (privat)")
       .fill("PRIVATE browser suspension reason");
@@ -37,7 +38,7 @@ test("administrator suspends and restores membership after a member requests rev
       .fill("Hubungi pemeriksa melalui permintaan tinjauan.");
     await reviewer.getByRole("button", { name: "Tangguhkan keanggotaan", exact: true }).click();
     await expect(reviewer.getByRole("status")).toContainText("Keputusan tersimpan");
-    await member.reload();
+    await reloadReady(member);
     await expect(
       member.getByText("Keanggotaan ditangguhkan", { exact: true }).first()
     ).toBeVisible();
@@ -52,7 +53,7 @@ test("administrator suspends and restores membership after a member requests rev
     await expect(
       member.getByRole("button", { name: "Minta tinjauan penangguhan", exact: true })
     ).toHaveCount(0);
-    await reviewer.goto("/admin/membership");
+    await gotoReady(reviewer, "/admin/membership");
     await reviewer
       .getByRole("link", { name: `Tinjau anggota ${fixture.member.id}`, exact: true })
       .click();
@@ -65,7 +66,7 @@ test("administrator suspends and restores membership after a member requests rev
       .fill("Pemeriksaan selesai dan keanggotaan dipulihkan.");
     await reviewer.getByRole("button", { name: "Pulihkan keanggotaan", exact: true }).click();
     await expect(reviewer.getByRole("status")).toContainText("Keputusan tersimpan");
-    await member.reload();
+    await reloadReady(member);
     await expect(member.getByText("Tinjauan penangguhan selesai", { exact: true })).toBeVisible();
     await expect(
       member.getByText("Pemeriksaan selesai dan keanggotaan dipulihkan.", { exact: true })

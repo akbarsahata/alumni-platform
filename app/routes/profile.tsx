@@ -3,7 +3,7 @@ import { Toaster, toast } from "sonner";
 import { LocationSelect } from "../profiles/location-select";
 import { cityOptions, countryOptions } from "../profiles/locations";
 import { env } from "cloudflare:workers";
-import { Form, Link, data, useNavigation } from "react-router";
+import { Form, data, useNavigation } from "react-router";
 import type { Route } from "./+types/profile";
 import { readProfile, saveProfile } from "../profiles/profiles.server";
 import { helpTypes, helpLabels, availabilityChoices, availabilityLabels } from "../profiles/model";
@@ -77,7 +77,7 @@ export default function Profile({ loaderData, actionData }: Route.ComponentProps
       />
       <main className="profile-page">
         <h1 className="text-2xl font-semibold">Profil & Keahlian</h1>
-        <Link to="/">Beranda</Link>
+
         <details className="profile-privacy">
           <summary>Profil privat · Email hanya dibagikan dengan persetujuan</summary>{" "}
           <p>

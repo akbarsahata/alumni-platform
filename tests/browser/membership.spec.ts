@@ -1,3 +1,4 @@
+import { gotoReady, reloadReady } from "./app-ready";
 import { test, expect } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 
@@ -28,8 +29,9 @@ test("applicant and independent administrator complete action, rejection, correc
   const applicant = await applicantContext.newPage();
   const reviewer = await reviewerContext.newPage();
   try {
-    await applicant.goto("http://127.0.0.1:5173/");
-    await applicant.getByRole("link", { name: "Pengajuan keanggotaan" }).click();
+    await gotoReady(applicant, "http://127.0.0.1:5173/");
+    await applicant.locator(".navigation-groups summary").filter({ hasText: "Pribadi" }).click();
+    await applicant.getByRole("link", { name: "Keanggotaan", exact: true }).click();
     await applicant.getByLabel("Nama semasa sekolah").fill("Nama Browser Awal");
     await applicant.getByLabel("Tahun kelulusan").fill("2008");
     await applicant.getByLabel("House", { exact: true }).selectOption("Komodo");
@@ -38,22 +40,26 @@ test("applicant and independent administrator complete action, rejection, correc
       .fill("Alumni tepercaya dapat mengonfirmasi kehadiran saya.");
     await applicant.getByRole("button", { name: "Kirim pengajuan" }).click();
     await expect(applicant.getByText("Menunggu tinjauan manual", { exact: true })).toBeVisible();
-    await reviewer.goto("http://127.0.0.1:5173/");
-    await reviewer.getByRole("link", { name: "Tinjau keanggotaan" }).click();
+    await gotoReady(reviewer, "http://127.0.0.1:5173/");
+    await reviewer
+      .locator(".navigation-groups summary")
+      .filter({ hasText: "Administrasi" })
+      .click();
+    await reviewer.getByRole("link", { name: "Tinjau keanggotaan", exact: true }).click();
     await reviewer.getByRole("link", { name: "Nama Browser Awal" }).click();
     await reviewer.getByLabel("Keputusan", { exact: true }).selectOption("action-required");
     await reviewer.getByLabel("Alasan internal").fill("Catatan pemeriksaan privat browser");
     await reviewer.getByLabel("Pesan untuk pemohon").fill("Mohon perbaiki nama semasa sekolah.");
     await reviewer.getByRole("button", { name: "Simpan keputusan" }).click();
     await expect(reviewer.getByRole("status")).toContainText("Keputusan tersimpan");
-    await applicant.reload();
+    await reloadReady(applicant);
     await expect(applicant.getByText("Perlu perbaikan", { exact: true }).first()).toBeVisible();
     await expect(applicant.getByText("Mohon perbaiki nama semasa sekolah.")).toBeVisible();
     await expect(applicant.getByText("Catatan pemeriksaan privat browser")).toHaveCount(0);
     await applicant.getByLabel("Nama semasa sekolah").fill("Nama Browser Koreksi");
     await applicant.getByRole("button", { name: "Kirim perbaikan" }).click();
     await expect(applicant.getByRole("status")).toContainText("Pengajuan tersimpan");
-    await reviewer.reload();
+    await reloadReady(reviewer);
     await reviewer.getByLabel("Keputusan", { exact: true }).selectOption("rejected");
     await reviewer.getByLabel("Sumber pemeriksaan independen").selectOption("school-staff");
     await reviewer
@@ -67,7 +73,7 @@ test("applicant and independent administrator complete action, rejection, correc
       .fill("Ajukan masa kehadiran apabila tidak lulus.");
     await reviewer.getByRole("button", { name: "Simpan keputusan" }).click();
     await expect(reviewer.getByRole("status")).toContainText("Keputusan tersimpan");
-    await applicant.reload();
+    await reloadReady(applicant);
     await applicant.getByLabel("Riwayat sekolah").selectOption("former-student");
     await expect(applicant.getByLabel("Tahun kelulusan")).toHaveCount(0);
     await applicant.getByLabel("Tahun mulai bersekolah").fill("2004");
@@ -78,7 +84,7 @@ test("applicant and independent administrator complete action, rejection, correc
       .fill("Saya tidak lulus; mohon penilaian kelayakan secara individual.");
     await applicant.getByRole("button", { name: "Kirim perbaikan" }).click();
     await expect(applicant.getByRole("status")).toContainText("Pengajuan tersimpan");
-    await reviewer.reload();
+    await reloadReady(reviewer);
     await expect(reviewer.getByText("2004–2006").first()).toBeVisible();
     await reviewer.getByLabel("Keputusan", { exact: true }).selectOption("approved");
     await reviewer.getByLabel("Sumber pemeriksaan independen").selectOption("school-staff");
@@ -93,7 +99,7 @@ test("applicant and independent administrator complete action, rejection, correc
       .fill("Keanggotaan Anda disetujui setelah pemeriksaan sekolah.");
     await reviewer.getByRole("button", { name: "Simpan keputusan" }).click();
     await expect(reviewer.getByRole("status")).toContainText("Keputusan tersimpan");
-    await applicant.reload();
+    await reloadReady(applicant);
     await expect(
       applicant.getByText("Keanggotaan disetujui", { exact: true }).first()
     ).toBeVisible();

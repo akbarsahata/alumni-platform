@@ -21,7 +21,7 @@ export default function Directory({ loaderData }: Route.ComponentProps) {
   return (
     <main className="directory-page mx-auto max-w-4xl space-y-5">
       <h1>Direktori keahlian</h1>
-      <Link to="/">Beranda</Link> · <Link to="/directory/tags">Kelola keahlian</Link>
+      <Link to="/directory/tags">Kelola keahlian</Link>
       <p>
         Hanya alumni yang menyetujui partisipasi, tersedia, dan mengonfirmasi profil dalam 12 bulan
         terakhir. Tahun bersekolah terpisah dari tahun kelulusan.

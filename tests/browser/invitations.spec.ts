@@ -1,3 +1,4 @@
+import { gotoReady, reloadReady } from "./app-ready";
 import { test, expect } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 
@@ -23,7 +24,7 @@ test("primary invites a new school representative who verifies email and accepts
       sameSite: "Lax",
     },
   ]);
-  await page.goto("/admin/roles");
+  await gotoReady(page, "/admin/roles");
   await page.getByRole("link", { name: "Undang perwakilan sekolah" }).click();
   await page.getByLabel("Email penerima").fill(email);
   await page.getByLabel("Peran sekolah").selectOption("student");
@@ -40,7 +41,7 @@ test("primary invites a new school representative who verifies email and accepts
   ).json();
   expect(mail.text).toContain(invitationPath);
   await page.context().clearCookies();
-  await page.goto(invitationPath!);
+  await gotoReady(page, invitationPath!);
   await expect(page.getByRole("button", { name: "Terima undangan" })).toHaveCount(0);
   await page.getByRole("link", { name: "Masuk dengan kode email" }).click();
   await page.getByLabel("Email", { exact: true }).fill(email);
@@ -63,6 +64,6 @@ test("primary invites a new school representative who verifies email and accepts
   expect(access.permissions.directory).toBe(false);
   expect(access.permissions.finance).toBe(false);
   expect(access.permissions.endorse).toBe(false);
-  await page.reload();
+  await reloadReady(page);
   await expect(page.getByRole("button", { name: "Terima undangan" })).toHaveCount(0);
 });

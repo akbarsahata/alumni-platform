@@ -1,3 +1,4 @@
+import { gotoReady } from "./app-ready";
 import { test, expect } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 
@@ -39,7 +40,7 @@ test("administrator checks identity and the account holder verifies the new addr
     const reviewer = await reviewerContext.newPage();
     const member = await memberContext.newPage();
     const newEmail = `browser-${crypto.randomUUID()}@example.test`;
-    await reviewer.goto("/admin/email-changes");
+    await gotoReady(reviewer, "/admin/email-changes");
     await reviewer.getByLabel("Akun pemilik").selectOption(fixture.target.id);
     await reviewer.getByLabel("Email baru").fill(newEmail);
     await reviewer
@@ -57,7 +58,7 @@ test("administrator checks identity and the account holder verifies the new addr
       })
     ).json();
     const token = mail.text.match(/\b[a-f0-9]{64}\b/)[0];
-    await member.goto(link!);
+    await gotoReady(member, link!);
     await expect(member.getByText(newEmail)).toBeVisible();
     await member.getByLabel("Kode verifikasi email baru").fill(token);
     await member.getByRole("button", { name: "Verifikasi dan ubah email" }).click();
@@ -74,7 +75,10 @@ test("administrator checks identity and the account holder verifies the new addr
     await member.getByLabel("Kode masuk").fill(loginMail.text.match(/\b\d{6}\b/)[0]);
     await member.getByRole("button", { name: "Masuk", exact: true }).click();
     await expect(member).toHaveURL("/");
-    await expect(member.getByText(newEmail, { exact: true })).toBeVisible();
+    await member.getByLabel("Menu akun", { exact: true }).click();
+    await expect(
+      member.locator(".navigation-account").getByText(newEmail, { exact: true })
+    ).toBeVisible();
   } finally {
     await Promise.allSettled([reviewerContext.close(), memberContext.close()]);
   }

@@ -13,7 +13,7 @@ npm run db:migrate
 npm run dev
 ```
 
-Open http://localhost:5173/login. `local:setup` creates a private `.dev.vars` with separate random authentication and local mailbox keys, preserving any existing file. `.dev.vars.example` documents the names without credentials. Keep BETTER_AUTH_URL equal to the development origin, including its port. The committed D1 and KV IDs are local placeholders; no remote provisioning is needed. Wrangler persists synthetic D1/KV state under ignored `.wrangler/`.
+Open http://localhost:5173/ for the guest login page; `/login` remains supported for invitation and identity-change redirects. `local:setup` creates a private `.dev.vars` with separate random authentication and local mailbox keys, preserving any existing file. `.dev.vars.example` documents the names without credentials. Keep BETTER_AUTH_URL equal to the development origin, including its port. The committed D1 and KV IDs are local placeholders; no remote provisioning is needed. Wrangler persists synthetic D1/KV state under ignored `.wrangler/`.
 
 ## Formatting and linting
 
@@ -74,3 +74,22 @@ For suspension/reinstatement and controlled review requests, see
 For coordinator discovery and shared expertise vocabulary, see
 [directory-discovery.md](directory-discovery.md). Focused verification:
 `node scripts/test.mjs tests/directory.test.mjs tests/browser/directory.spec.ts`.
+
+## Browser startup and interaction
+
+Use `gotoReady(page, url)` and `reloadReady(page)` from
+`tests/browser/app-ready.ts` for hard navigation in browser journeys. The shared
+layout exposes `body[data-hydrated="true"]` only after React attaches its handlers.
+A visible server-rendered form or completed page load alone does not prove
+hydration. Before hydration, changing a controlled select can be overwritten and
+leave native validation blocking the subsequent submission. Wait for readiness,
+not a fixed sleep or a longer success-message timeout.
+
+`tests/browser/hydration.spec.ts` gates script delivery and verifies that the
+helper waits before a school-history change. Client navigation from an already
+hydrated page retains normal router behavior. Browser journeys must open the
+relevant grouped menu before using its links and open the account dropdown before
+checking email identity.
+
+Local Python dependencies under `.venv/` are excluded from Prettier; do not
+reformat installed third-party packages to satisfy project formatting checks.

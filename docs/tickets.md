@@ -2,6 +2,17 @@
 
 The numbered sections below are the historical pilot roadmap, not the naming or hierarchy for new GitHub issues. Consult the latest handoff for implementation status. Write agreed specifications locally first, then create flat implementation issues with descriptive titles, spec references, and explicit blockers as needed. Keep each change reviewable and update the session handoff.
 
+## Current continuation baseline
+
+Local records show profiles (#13) and directory discovery (#14) complete. School
+needs and independent approval (#15) is the next unblocked task; check its current
+tracker state before implementation. Follow the
+[implementation index](profiles-expertise-outreach-issues.md) and
+[shared navigation decision](navigation-prototype.md): role-based grouped menus,
+guest login on `/`, no breadcrumbs, and a deferred actionable home dashboard.
+The latest working-tree and focused verification boundary is at the top of
+[handoff.md](handoff.md).
+
 ## 0 — Cloudflare foundation and authentication compatibility
 
 Create the TypeScript/React Router Worker application, local D1 bindings and Drizzle migrations, environment templates and an email abstraction with local capture. Validate the authentication candidate before adopting it. Document local development and deployment commands.

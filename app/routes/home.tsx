@@ -1,82 +1,26 @@
 import { pageTitle } from "../content/page-title";
-import { alumniMessages } from "../content/alumni-messages";
-import { Card } from "../components/ui/card";
 import { env } from "cloudflare:workers";
-import { Link } from "react-router";
-import type { Route } from "./+types/home";
 import { getAccount } from "../auth/auth.server";
-import { getAccess } from "../authorization/permissions.server";
-
+import { LoginPage } from "../components/login-page";
+import type { Route } from "./+types/home";
+export { action } from "./login";
 export function meta() {
   return [{ title: pageTitle() }];
 }
 export async function loader({ request }: Route.LoaderArgs) {
   const account = await getAccount(request, env);
-  return { account, access: account ? await getAccess(request, env) : null };
+  return {
+    signedIn: !!account,
+    emailChanged: new URL(request.url).searchParams.get("emailChanged") === "1",
+  };
 }
-export default function Home({ loaderData }: Route.ComponentProps) {
+export default function Home({ loaderData, actionData }: Route.ComponentProps) {
+  if (!loaderData.signedIn) return <LoginPage loaderData={loaderData} actionData={actionData} />;
   return (
-    <main className="home-page mx-auto max-w-xl p-8 space-y-6">
-      <div className="home-intro">
-        <p className="eyebrow" lang="en">
-          {alumniMessages.home.eyebrow}
-        </p>
-        <h1 lang="en">
-          {alumniMessages.home.headline[0]}
-          <br />
-          {alumniMessages.home.headline[1]}
-          <br />
-          <em>{alumniMessages.home.headline[2]}</em>
-        </h1>
-        <p className="intro-copy">{alumniMessages.home.introduction}</p>
-        <div className="school-ribbon">
-          <span aria-hidden="true">✦</span> Palembang, Sumatera Selatan
-        </div>
-      </div>
-      <Card className="home-account gap-0">
-        <p className="eyebrow">KELUARGA ALUMNI</p>
-        <h2 lang={loaderData.account ? "id" : "en"}>
-          {loaderData.account ? "Selamat datang kembali." : alumniMessages.home.welcome}
-        </h2>
-        {loaderData.account ? (
-          <>
-            <p>Email Anda telah diverifikasi. Status keanggotaan ditinjau secara terpisah.</p>
-            <Link className="action-link" to="/membership">
-              Pengajuan keanggotaan <span aria-hidden="true">→</span>
-            </Link>
-            {["approved", "suspended"].includes(loaderData.access?.membership.status ?? "") && (
-              <Link className="action-link" to="/profile">
-                Profil & Keahlian <span aria-hidden="true">→</span>
-              </Link>
-            )}
-            {loaderData.access?.permissions.directory && (
-              <Link className="action-link" to="/directory">
-                Direktori keahlian <span aria-hidden="true">→</span>
-              </Link>
-            )}
-            {loaderData.access?.permissions.reviewMembership && (
-              <Link className="action-link" to="/admin/membership">
-                Tinjau keanggotaan <span aria-hidden="true">→</span>
-              </Link>
-            )}
-            {loaderData.access?.permissions.manageRoles && (
-              <Link className="action-link" to="/admin/roles">
-                Kelola peran <span aria-hidden="true">→</span>
-              </Link>
-            )}
-          </>
-        ) : (
-          <>
-            <p>Mulai dengan email Anda untuk bergabung dan mengajukan keanggotaan alumni.</p>
-            <Link className="primary-link" to="/login">
-              Masuk dengan kode email
-            </Link>
-            <p className="quiet-copy" lang="en">
-              {alumniMessages.home.family}
-            </p>
-          </>
-        )}
-      </Card>
+    <main className="mx-auto max-w-xl space-y-6">
+      <p className="eyebrow">KELUARGA ALUMNI</p>
+      <h1>Selamat datang kembali.</h1>
+      <p>Pilih menu di atas untuk melanjutkan aktivitas Anda.</p>
     </main>
   );
 }

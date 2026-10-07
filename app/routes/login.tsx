@@ -1,8 +1,7 @@
 import { pageTitle } from "../content/page-title";
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
+import { LoginPage } from "../components/login-page";
 import { env } from "cloudflare:workers";
-import { Form, data, redirect, useNavigation } from "react-router";
+import { data, redirect } from "react-router";
 import type { Route } from "./+types/login";
 import { authFormRequest, getAccount, handleAuth, hasTrustedOrigin } from "../auth/auth.server";
 
@@ -53,73 +52,5 @@ export async function action({ request }: Route.ActionArgs) {
 }
 
 export default function Login({ loaderData, actionData }: Route.ComponentProps) {
-  const navigation = useNavigation();
-  const busy = navigation.state !== "idle";
-  return (
-    <main className="login-page mx-auto max-w-md p-8 space-y-6">
-      <p className="eyebrow">SELAMAT DATANG KEMBALI</p>
-      <h1 className="text-2xl font-semibold">Masuk ke keluarga alumni</h1>
-      {loaderData.emailChanged && (
-        <p role="status">Email login berubah. Masuk kembali menggunakan email baru.</p>
-      )}
-      <p>Gunakan email Anda. Kami akan mengirim kode untuk masuk.</p>
-      {actionData?.error && <p role="alert">{actionData.error}</p>}
-      {actionData?.sent && (
-        <p role="status">Kode telah dikirim. Periksa email Anda. Kode berlaku selama 5 menit.</p>
-      )}
-      <Form method="post" className="space-y-4">
-        <label className="block">
-          Email
-          <Input
-            className="block border rounded p-2 w-full"
-            type="email"
-            name="email"
-            autoComplete="email"
-            defaultValue={actionData?.email}
-            required
-          />
-        </label>
-        <Button
-          type="submit"
-          disabled={busy}
-          name="intent"
-          value="send"
-          className="border rounded px-4 py-2"
-        >
-          {actionData?.sent ? "Kirim ulang kode" : "Kirim kode"}
-        </Button>
-      </Form>
-      {actionData?.sent && (
-        <Form method="post" className="space-y-4">
-          <Input type="hidden" name="email" value={actionData.email} />
-          <label className="block">
-            Kode masuk
-            <Input
-              className="block border rounded p-2 w-full"
-              type="text"
-              name="otp"
-              inputMode="numeric"
-              pattern="[0-9]{6}"
-              maxLength={6}
-              autoComplete="one-time-code"
-              required
-            />
-          </label>
-          <Button
-            type="submit"
-            disabled={busy}
-            name="intent"
-            value="verify"
-            className="border rounded px-4 py-2"
-          >
-            Masuk
-          </Button>
-        </Form>
-      )}
-      <p className="quiet-copy login-note">
-        Email menghubungkan Anda dengan keluarga alumni. Keanggotaan alumni ditinjau secara
-        terpisah.
-      </p>
-    </main>
-  );
+  return <LoginPage loaderData={loaderData} actionData={actionData} />;
 }

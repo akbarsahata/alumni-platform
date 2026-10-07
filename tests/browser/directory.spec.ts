@@ -1,3 +1,4 @@
+import { gotoReady } from "./app-ready";
 import { test, expect } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 test("coordinator searches private alumni and maintains shared expertise in Bahasa Indonesia", async ({
@@ -11,8 +12,9 @@ test("coordinator searches private alumni and maintains shared expertise in Baha
   await context.addCookies([{ name, value: value.join("="), url: "http://127.0.0.1:5173" }]);
   try {
     const page = await context.newPage();
-    await page.goto("/");
-    await page.getByRole("link", { name: "Direktori keahlian" }).click();
+    await gotoReady(page, "/");
+    await page.locator(".navigation-groups summary").filter({ hasText: "Direktori" }).click();
+    await page.getByRole("link", { name: "Direktori keahlian", exact: true }).click();
     await page.getByLabel("Perkenalan profesional", { exact: true }).fill("robotika");
     await page.getByRole("combobox", { name: "Kota", exact: true }).click();
     await page.getByRole("combobox", { name: "Kota", exact: true }).fill("Palembang");
@@ -31,11 +33,11 @@ test("coordinator searches private alumni and maintains shared expertise in Baha
       page.locator("form").getByText("Palembang — Sumatera Selatan", { exact: true })
     ).toBeVisible();
     await expect(page.getByLabel("Hasil pencarian")).toContainText("Ahli Robotika");
-    await page.goto(`/directory/${browserMember.id}`);
+    await gotoReady(page, `/directory/${browserMember.id}`);
     await expect(page.getByRole("heading", { name: "Profil alumni" })).toBeVisible();
     await expect(page.locator("main")).not.toContainText("Komodo");
     await expect(page.locator("main")).not.toContainText(browserMember.email);
-    await page.goto("/directory/tags");
+    await gotoReady(page, "/directory/tags");
     await page.getByLabel("Keahlian baru").fill("Astronomi browser");
     await page.getByRole("button", { name: "Tambah keahlian" }).click();
     await expect(
@@ -65,7 +67,7 @@ test("coordinator searches private alumni and maintains shared expertise in Baha
       },
     });
     expect(revoked.status()).toBe(200);
-    expect((await page.goto("/directory"))?.status()).toBe(403);
+    expect((await gotoReady(page, "/directory"))?.status()).toBe(403);
     expect((await context.request.get(`/directory/${browserMember.id}.data`)).status()).toBe(403);
   } finally {
     await context.close();

@@ -23,7 +23,7 @@ test("every page shows only the current account and a logout form, including den
         continue;
       }
       const html = await response.text();
-      assert.match(html, /aria-label="Akun aktif"/, path);
+      assert.match(html, /aria-label="Menu akun"/, path);
       assert.ok(html.includes(account.email), path);
       assert.ok(!html.includes(account === first ? second.email : first.email), path);
       assert.match(html, /action="\/logout"/);
@@ -37,12 +37,13 @@ test("every page shows only the current account and a logout form, including den
   );
 });
 
-test("guest pages show sign-in and logout from a non-home page revokes the session without retaining identity", async () => {
+test("guest login pages omit navigation and logout revokes the session without retaining identity", async () => {
   const account = await login("account-bar-logout");
   for (const path of ["/", "/login", "/missing-account-bar-page"]) {
     const response = await call(null, path);
     const html = await response.text();
-    assert.match(html, /Anda belum masuk/);
+    assert.doesNotMatch(html, /aria-label="Menu utama"/);
+    if (path !== "/missing-account-bar-page") assert.match(html, /Masuk ke keluarga alumni/);
     assert.ok(!html.includes(account.email));
   }
   const logout = await call(account, "/logout", {});
@@ -52,6 +53,6 @@ test("guest pages show sign-in and logout from a non-home page revokes the sessi
   const page = await call(account, "/membership");
   assert.equal(page.status, 401);
   const html = await page.text();
-  assert.match(html, /Anda belum masuk/);
+  assert.doesNotMatch(html, /aria-label="Menu akun"/);
   assert.ok(!html.includes(account.email));
 });

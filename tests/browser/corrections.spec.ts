@@ -1,3 +1,4 @@
+import { gotoReady } from "./app-ready";
 import { test, expect } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 
@@ -26,7 +27,7 @@ test("applicant replaces a reference, switches to manual review and corrects hou
   }
   try {
     const applicant = await contexts[0].newPage();
-    await applicant.goto("/membership");
+    await gotoReady(applicant, "/membership");
     await applicant.getByLabel("Email referensi baru").fill("browser-replacement@example.test");
     await applicant.getByRole("button", { name: "Ganti referensi", exact: true }).click();
     await expect(applicant.getByRole("status")).toContainText("Referensi diganti");
@@ -40,7 +41,7 @@ test("applicant replaces a reference, switches to manual review and corrects hou
     await expect(applicant.getByRole("status")).toContainText("Pengajuan tersimpan");
     await expect(applicant.getByText("Versi 4", { exact: true })).toBeVisible();
     const reviewer = await contexts[1].newPage();
-    await reviewer.goto(`/admin/membership/${fixture.member.id}`);
+    await gotoReady(reviewer, `/admin/membership/${fixture.member.id}`);
     await reviewer.getByLabel("House yang benar").selectOption("Lion");
     await reviewer.getByLabel("Sumber pemeriksaan independen").selectOption("school-staff");
     await reviewer
@@ -56,7 +57,7 @@ test("applicant replaces a reference, switches to manual review and corrects hou
     await expect(reviewer.getByRole("status")).toContainText("Keputusan tersimpan");
     await expect(reviewer.getByText("Versi 1: Komodo → Lion", { exact: true })).toBeVisible();
     const member = await contexts[2].newPage();
-    await member.goto("/membership");
+    await gotoReady(member, "/membership");
     await expect(
       member.getByText("House telah dikoreksi menjadi Lion setelah tinjauan baru.")
     ).toBeVisible();

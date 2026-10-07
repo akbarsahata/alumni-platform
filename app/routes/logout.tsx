@@ -1,7 +1,7 @@
 import { pageTitle } from "../content/page-title";
 import { Button } from "../components/ui/button";
 import { env } from "cloudflare:workers";
-import { Form, Link, redirect, useNavigation } from "react-router";
+import { Form, redirect, useNavigation } from "react-router";
 import type { Route } from "./+types/logout";
 import { authFormRequest, handleAuth } from "../auth/auth.server";
 
@@ -32,9 +32,6 @@ export default function Logout() {
           Keluar
         </Button>
       </Form>
-      <Link to="/" className="underline">
-        Kembali ke beranda
-      </Link>
     </main>
   );
 }

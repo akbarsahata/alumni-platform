@@ -280,17 +280,6 @@ main dd {
   color: var(--muted-ink);
   font-size: 0.75rem;
 }
-.app-shell > .home-page {
-  max-width: 1120px;
-  background: transparent;
-  border: 0;
-  box-shadow: none;
-  padding: 3rem 0;
-  display: grid;
-  grid-template-columns: 1.15fr 1fr;
-  align-items: center;
-  gap: clamp(2rem, 7vw, 6rem);
-}
 .home-intro h1 {
   font-size: clamp(2.6rem, 5vw, 4.3rem);
   margin: 1.4rem 0;
@@ -320,48 +309,6 @@ main dd {
 .school-ribbon span {
   color: #9c7728;
   font-size: 20px;
-}
-.home-account {
-  background: #fffefa;
-  border: 1px solid var(--line);
-  border-top: 3px solid #24786e;
-  border-radius: 5px 5px 18px 18px;
-  padding: clamp(1.5rem, 4vw, 2.7rem);
-  box-shadow: 0 10px 40px #183b4507;
-}
-.home-account > * + * {
-  margin-top: 1.4rem;
-}
-.home-account h2 {
-  font-family: Georgia, serif;
-  font-size: 1.8rem;
-  letter-spacing: -0.035em;
-  font-weight: 400;
-  line-height: 1.2;
-}
-.home-account p {
-  font-size: 0.85rem;
-  color: var(--muted-ink);
-  overflow-wrap: anywhere;
-}
-.home-account .quiet-copy {
-  font-size: 0.7rem;
-  padding-top: 0.8rem;
-  border-top: 1px solid var(--line);
-}
-.action-link {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.85rem 0;
-  border-bottom: 1px solid var(--line);
-  color: var(--ink);
-  font-size: 0.9rem;
-  text-decoration: none;
-}
-.action-link span {
-  color: var(--red);
 }
 .login-note {
   border-top: 1px solid var(--line);
@@ -400,11 +347,6 @@ main dd {
   .app-shell > main {
     margin-top: 1.75rem;
   }
-  .app-shell > .home-page {
-    grid-template-columns: 1fr;
-    padding: 1rem 0;
-    gap: 2rem;
-  }
   .home-intro h1 {
     font-size: clamp(2.6rem, 9vw, 3.8rem);
   }
@@ -429,44 +371,6 @@ main [data-slot="button"] {
 }
 main [data-slot="input"][type="hidden"] {
   display: none;
-}
-
-.account-bar {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.75rem max(1.25rem, calc((100vw - 1120px) / 2));
-  border-bottom: 1px solid var(--line);
-  background: #fffdf8;
-  font-size: 0.8rem;
-}
-.account-identity {
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-.account-identity span {
-  display: block;
-  color: var(--muted-ink);
-  font-size: 0.7rem;
-}
-.account-identity strong {
-  display: block;
-  font-weight: 600;
-}
-.account-bar form {
-  flex-shrink: 0;
-}
-.account-bar button {
-  min-height: 44px;
-  cursor: pointer;
-}
-.account-bar a {
-  color: var(--red);
-  text-underline-offset: 4px;
 }
 
 /* Keep searchable multi-select controls compact within the native form styles. */
@@ -991,4 +895,38 @@ main .profile-location-select input:not([type="hidden"]) {
   font-size: 0.75rem;
   color: #7a8586;
   margin-top: 0.6rem;
+}
+
+.app-shell > .guest-login-page {
+  max-width: 1120px;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding: 3rem 0;
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  align-items: center;
+  gap: clamp(2rem, 7vw, 6rem);
+}
+.guest-login-page .login-page {
+  min-width: 0;
+  padding: clamp(1rem, 2.5vw, 1.75rem);
+  background: #fffefa;
+  border: 1px solid var(--line);
+  border-top: 3px solid #24786e;
+  border-radius: 5px 5px 18px 18px;
+}
+.guest-login-page .login-page h2 {
+  font-family: Georgia, serif;
+  font-size: 1.75rem;
+  font-weight: 500;
+  letter-spacing: -0.035em;
+  line-height: 1.2;
+}
+@media (max-width: 700px) {
+  .app-shell > .guest-login-page {
+    grid-template-columns: 1fr;
+    padding: 1rem 0;
+    gap: 2rem;
+  }
 }

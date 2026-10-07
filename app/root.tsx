@@ -1,6 +1,8 @@
+import { useEffect, useState } from "react";
 import { env } from "cloudflare:workers";
 import { getAccount } from "./auth/auth.server";
-import { AccountBar } from "./components/account-bar";
+import { SiteNavigation } from "./components/site-navigation";
+import { getAccess } from "./authorization/permissions.server";
 import { pageTitle } from "./content/page-title";
 import {
   isRouteErrorResponse,
@@ -20,7 +22,13 @@ import "./app.css";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const account = await getAccount(request, env);
-  return { account: account ? { email: account.email } : null };
+  const access = account?.emailVerified ? await getAccess(request, env) : null;
+  return {
+    account: account ? { email: account.email } : null,
+    navigationAccess: access
+      ? { membership: access.membership.status, permissions: access.permissions }
+      : null,
+  };
 }
 
 export function meta() {
@@ -42,6 +50,8 @@ export const links: Route.LinksFunction = () => [
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => setHydrated(true), []);
   const rootData = useRouteLoaderData<typeof loader>("root");
   return (
     <html lang="id">
@@ -51,7 +61,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body data-hydrated={hydrated ? "true" : undefined}>
         <a className="skip-link" href="#page-content">
           Langsung ke konten
         </a>
@@ -79,7 +89,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
             Tentang sekolah <span aria-hidden="true">↗</span>
           </a>
         </header>
-        {rootData && <AccountBar account={rootData.account} />}
+        {rootData?.account && (
+          <SiteNavigation access={rootData.navigationAccess} account={rootData.account} />
+        )}
         <div id="page-content" className="app-shell" tabIndex={-1}>
           {children}
         </div>
