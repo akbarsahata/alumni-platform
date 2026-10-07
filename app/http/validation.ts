@@ -1,3 +1,4 @@
+import { expertiseTags, helpTypes, availabilityChoices } from "../profiles/model";
 import { z } from "zod";
 import { houses } from "../membership/model";
 import { roles } from "../authorization/roles";
@@ -138,3 +139,33 @@ export const emailChangeVerificationInput = z
   .object({ token: z.string().regex(/^[a-f0-9]{64}$/) })
   .strict();
 export const emailChangeRequestId = z.string().regex(/^[a-f0-9]{32}$/);
+
+const profileBoolean = z.boolean().default(false);
+export const profileInput = z
+  .object({
+    displayName: z.string().max(200).trim().default(""),
+    introduction: z.string().max(2000).trim().default(""),
+    city: z.string().max(100).trim().default(""),
+    country: z.string().max(100).trim().default(""),
+    availabilityNote: z.string().max(1000).trim().default(""),
+    expertiseTags: z
+      .array(z.enum(expertiseTags))
+      .max(expertiseTags.length)
+      .transform((values) => [...new Set(values)]),
+    helpTypes: z
+      .array(z.enum(helpTypes))
+      .max(helpTypes.length)
+      .transform((values) => [...new Set(values)]),
+    availability: z.enum(availabilityChoices).nullable().default(null),
+    participation: profileBoolean,
+    participationConsent: profileBoolean,
+  })
+  .strict()
+  .refine(
+    (value) =>
+      !value.participation ||
+      (value.participationConsent &&
+        value.expertiseTags.length > 0 &&
+        value.helpTypes.length > 0 &&
+        value.availability !== null)
+  );

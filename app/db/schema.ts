@@ -139,3 +139,17 @@ export const emailChangeRequest = sqliteTable("email_change_request", {
   completedAt: text("completed_at"),
   endedAt: text("ended_at"),
 });
+
+export const expertiseProfile = sqliteTable("expertise_profile", {
+  userId: text("user_id").primaryKey(),
+  displayName: text("display_name").notNull(),
+  introduction: text("introduction").notNull(),
+  city: text("city").notNull(),
+  country: text("country").notNull(),
+  availabilityNote: text("availability_note").notNull(),
+  expertiseTags: text("expertise_tags", { mode: "json" }).$type<string[]>().notNull(),
+  helpTypes: text("help_types", { mode: "json" }).$type<string[]>().notNull(),
+  availability: text("availability", { enum: ["available", "limited", "unavailable"] }),
+  participation: integer("participation", { mode: "boolean" }).notNull(),
+  confirmedAt: text("confirmed_at").notNull(),
+});

@@ -2,7 +2,7 @@
 
 Published on 2026-10-07 through the GitHub plugin after the user approved the eight
 vertical slices. Scope: [local specification](profiles-expertise-outreach-spec.md).
-Each issue is open and labeled `ready-for-agent`; blockers determine the runnable
+At publication, each issue was open and labeled `ready-for-agent`; blockers determine the runnable
 frontier. These are flat issues, without parent issues or decimal subtickets.
 
 | Issue                                                           | Title                                                  | Blocked by                                                                                                                       |
@@ -16,7 +16,9 @@ frontier. These are flat issues, without parent issues or decimal subtickets.
 | [#19](https://github.com/akbarsahata/alumni-platform/issues/19) | Track outcomes and close school needs                  | [#17](https://github.com/akbarsahata/alumni-platform/issues/17)                                                                  |
 | [#20](https://github.com/akbarsahata/alumni-platform/issues/20) | Process directory deletion and manual retention        | [#18](https://github.com/akbarsahata/alumni-platform/issues/18), [#19](https://github.com/akbarsahata/alumni-platform/issues/19) |
 
-The initial frontier is **#13** and **#15**. Each issue includes its own end-to-end
+The initial frontier was **#13** and **#15**. Issue #13 is implemented and locally
+verified; see the 2026-10-07 private-profile entry in [handoff.md](handoff.md).
+The next runnable issues are **#14** and **#15**. Each issue includes its own end-to-end
 acceptance criteria, synthetic Worker/D1/captured-email HTTP and Chromium verification,
 and build/typecheck requirements. Automated deletion and anonymization remain out of scope.
 

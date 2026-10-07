@@ -465,3 +465,49 @@ The user approved the eight tracer-bullet slices and authorized publication. Che
 Index: docs/profiles-expertise-outreach-issues.md. Dependencies: #14 requires #13; #16 requires #14 and #15; #17 and #18 require #16; #19 requires #17; #20 requires #18 and #19. Initial runnable frontier: #13 (private expertise profile) and #15 (school needs and independent approval). Updated the specification, roadmap and document index to reference the published issues.
 
 GitHub creation responses confirmed all issue bodies and ready-for-agent labels. No feature implementation, application tests, commit, push, deployment, or live email occurred. Documentation changes remain local and uncommitted. Next: implement a frontier issue when requested.
+
+## Private expertise profiles — issue #13 — 2026-10-07
+
+Implemented the owner-only `/profile` page and `/api/profile` read/save plus
+`/api/profile/confirm`. Approved alumni can maintain optional display name,
+professional introduction, city/country and availability note; select multiple
+initial expertise tags and help types; explicitly consent to participation; pause
+availability or opt out; and confirm current information. The home page links to
+the profile for approved and suspended members. Suspended members retain their
+own read-only view and see that they are ineligible; separately assigned roles
+remain independent. Nonmembers, primary-only accounts and other privileged roles
+receive no private-profile access. There is no member-ID profile route.
+
+Membership identity is projected from the approved application revision and current
+membership house, never from editable profile fields. Bootstrapped trusted alumni
+without an application see an explicit missing-school-name notice rather than an
+invented identity. Participation defaults off. Active participation requires tags,
+help types, availability and explicit consent; the participation checkbox and consent
+checkbox are separate. Saves confirm the profile; explicit reconfirmation is also
+available. Eligibility is computed on each read using current membership,
+participation, availability, required selections and a 12-calendar-month confirmation
+anniversary (February 29 clamps to February 28). No scheduled job is required.
+Future search/send issues must apply these same eligibility conditions at their own
+access and conditional-write boundaries; this slice exposes member eligibility only.
+
+Migration `0010_expertise_profiles.sql` adds private profile persistence and
+membership authority triggers. Conditional repository writes recheck approved
+membership atomically, returning a controlled conflict if suspension wins a race.
+The migration was applied to disposable test D1 and ordinary local D1 via
+`npm run db:migrate`. No new bindings, secrets, remote migration, deployment, or
+live email are required. Ordinary `localhost:5173` remained HTTP 200 throughout.
+
+Focused verification: `node scripts/test.mjs tests/profiles.test.mjs
+ tests/browser/profiles.spec.ts` passes four HTTP tests and one Chromium journey
+against real isolated Worker/D1/Better Auth/captured-email synthetic accounts.
+Tests cover default-off participation, validation/consent, all availability states,
+opt-out/edit/reconfirmation, forged ownership and membership fields, API/page/data
+privacy, no-store, hostile/missing origins, current-session suspension, independent
+roles, former-student years, and the 12-month boundary. Old confirmation timestamps
+are fixture setup in disposable D1 only; all behavior assertions use supported HTTP
+routes. Browser checks wait for actual save completion before subsequent edits.
+Typecheck, production build, lint and formatting pass. Final Standards and Spec
+reviews both have zero actionable findings. Final `npm test` passes all 58 HTTP tests and 10 Chromium journeys, including real
+OTP expiry and rate-limit windows. Changes are committed locally on `master`; no
+push or deployment was performed. Issue #13 is updated and closed through the
+GitHub plugin after verification.

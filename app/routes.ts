@@ -9,6 +9,7 @@ export default [
   route("invitations/:invitationId", "routes/invitation.tsx"),
   route("email-changes/:requestId", "routes/email-change.tsx"),
   route("admin/audit", "routes/admin-audit.tsx"),
+  route("profile", "routes/profile.tsx"),
   route("membership", "routes/membership.tsx"),
   route("references/:requestId", "routes/reference-response.tsx"),
   route("admin/membership", "routes/admin-membership.tsx"),

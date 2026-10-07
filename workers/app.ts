@@ -1,3 +1,4 @@
+import { profileRoutes } from "../app/http/profile.routes.server";
 import { apiMethodPolicy } from "../app/http/methods.server";
 import { createRequestHandler } from "react-router";
 import { Hono } from "hono";
@@ -17,6 +18,7 @@ app.use("/api/*", apiMethodPolicy);
 app.all("/api/auth/*", (c) => handleAuth(c.req.raw, c.env));
 app.route("/api", administrationRoutes);
 app.route("/api/membership", membershipRoutes);
+app.route("/api/profile", profileRoutes);
 app.all("/api/*", () => new Response(null, { status: 404 }));
 app.all("/__local/mail", (c) => readLocalMail(c.req.raw, c.env));
 app.all("*", (c) => requestHandler(c.req.raw));
