@@ -70,3 +70,7 @@ References: [Better Auth Email OTP](https://better-auth.com/docs/plugins/email-o
 For suspension/reinstatement and controlled review requests, see
 [membership-suspensions.md](membership-suspensions.md). Focused verification:
 `node scripts/test.mjs tests/suspensions.test.mjs suspensions.spec.ts`.
+
+For coordinator discovery and shared expertise vocabulary, see
+[directory-discovery.md](directory-discovery.md). Focused verification:
+`node scripts/test.mjs tests/directory.test.mjs tests/browser/directory.spec.ts`.

@@ -42,3 +42,9 @@ export async function requireReviewer(request: Request, env: Env) {
     throw new Response("Akses tidak diizinkan.", { status: 403 });
   return access;
 }
+
+export async function requireDirectory(request: Request, env: Env) {
+  const access = await getAccess(request, env);
+  if (!access.permissions.directory) throw new Response("Akses tidak diizinkan.", { status: 403 });
+  return access;
+}

@@ -49,6 +49,11 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                 Profil & Keahlian <span aria-hidden="true">→</span>
               </Link>
             )}
+            {loaderData.access?.permissions.directory && (
+              <Link className="action-link" to="/directory">
+                Direktori keahlian <span aria-hidden="true">→</span>
+              </Link>
+            )}
             {loaderData.access?.permissions.reviewMembership && (
               <Link className="action-link" to="/admin/membership">
                 Tinjau keanggotaan <span aria-hidden="true">→</span>

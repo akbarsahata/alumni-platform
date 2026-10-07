@@ -141,6 +141,7 @@ export const emailChangeRequest = sqliteTable("email_change_request", {
 });
 
 export const expertiseProfile = sqliteTable("expertise_profile", {
+  deletionRequestedAt: text("deletion_requested_at"),
   locationFormat: integer("location_format").notNull(),
   userId: text("user_id").primaryKey(),
   displayName: text("display_name").notNull(),
@@ -153,4 +154,22 @@ export const expertiseProfile = sqliteTable("expertise_profile", {
   availability: text("availability", { enum: ["available", "limited", "unavailable"] }),
   participation: integer("participation", { mode: "boolean" }).notNull(),
   confirmedAt: text("confirmed_at").notNull(),
+});
+
+export const expertiseTag = sqliteTable("expertise_tag", {
+  id: text("id").primaryKey(),
+  label: text("label").notNull(),
+  retired: integer("retired", { mode: "boolean" }).notNull(),
+  version: integer("version").notNull(),
+  replacementId: text("replacement_id"),
+});
+export const expertiseTagEvent = sqliteTable("expertise_tag_event", {
+  id: text("id").primaryKey(),
+  actorUserId: text("actor_user_id").notNull(),
+  action: text("action").notNull(),
+  tagId: text("tag_id").notNull(),
+  label: text("label").notNull(),
+  expectedVersion: integer("expected_version").notNull(),
+  replacementId: text("replacement_id"),
+  occurredAt: text("occurred_at").notNull(),
 });

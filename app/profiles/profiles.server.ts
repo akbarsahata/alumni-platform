@@ -1,3 +1,5 @@
+import { taxonomyRepository } from "../db/taxonomy.repository.server";
+import { profileEligibilityReason } from "./eligibility";
 import { readLocationValues, validLocationValues } from "./locations";
 import { encodeLocationList } from "./location-list";
 import { getAccess } from "../authorization/permissions.server";
@@ -26,27 +28,14 @@ export async function readProfile(request: Request, env: Env) {
         country: readLocationValues(stored.country, stored.locationFormat, "country"),
       }
     : emptyProfile;
-  const anniversary = profile.confirmedAt ? new Date(profile.confirmedAt) : null;
-  if (anniversary) {
-    const month = anniversary.getUTCMonth();
-    anniversary.setUTCFullYear(anniversary.getUTCFullYear() + 1);
-    // Clamp February 29 to February 28 in a non-leap anniversary year.
-    if (anniversary.getUTCMonth() !== month) anniversary.setUTCDate(0);
-  }
-  const reason =
-    access.membership.status !== "approved"
-      ? "membership"
-      : !profile.participation
-        ? "participation"
-        : profile.availability === "unavailable"
-          ? "unavailable"
-          : !anniversary || Date.now() >= anniversary.getTime()
-            ? "stale"
-            : !profile.availability || !profile.expertiseTags.length || !profile.helpTypes.length
-              ? "incomplete"
-              : null;
+  const reason = profileEligibilityReason({
+    ...profile,
+    membershipStatus: access.membership.status,
+    deletionRequestedAt: stored?.deletionRequestedAt,
+  });
   return {
     profile,
+    tags: await taxonomyRepository(env.DB).tags(),
     identity: { ...own.identity, house: access.membership.house },
     membershipStatus: access.membership.status,
     eligibility: { eligible: reason === null, reason },
@@ -74,6 +63,18 @@ export async function saveProfile(request: Request, env: Env, input: unknown, co
       "Isi perkenalan profesional dan lengkapi pilihan keahlian, bentuk bantuan, ketersediaan, dan persetujuan partisipasi."
     );
     const own = await repository.own(access.account.id);
+    const tags = await taxonomyRepository(env.DB).tags();
+    if (
+      !profile.expertiseTags.every((id) =>
+        tags.some(
+          (tag) => tag.id === id && (!tag.retired || own.profile?.expertiseTags.includes(id))
+        )
+      )
+    )
+      throw new Response(
+        "Pilih keahlian aktif dari daftar; keahlian yang dihentikan hanya dapat dipertahankan.",
+        { status: 400 }
+      );
     const existingCity = own.profile
       ? readLocationValues(own.profile.city, own.profile.locationFormat, "city")
       : [];

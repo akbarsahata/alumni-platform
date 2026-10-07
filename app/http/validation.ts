@@ -1,4 +1,4 @@
-import { expertiseTags, helpTypes, availabilityChoices } from "../profiles/model";
+import { helpTypes, availabilityChoices } from "../profiles/model";
 import { z } from "zod";
 import { houses } from "../membership/model";
 import { roles } from "../authorization/roles";
@@ -149,8 +149,8 @@ export const profileInput = z
     country: z.array(z.string().min(1).max(500)).max(20).default([]),
     availabilityNote: z.string().max(1000).trim().default(""),
     expertiseTags: z
-      .array(z.enum(expertiseTags))
-      .max(expertiseTags.length)
+      .array(z.string().min(1).max(100))
+      .max(50)
       .transform((values) => [...new Set(values)]),
     helpTypes: z
       .array(z.enum(helpTypes))
@@ -169,3 +169,48 @@ export const profileInput = z
         value.helpTypes.length > 0 &&
         value.availability !== null)
   );
+
+const optionalYear = year.optional();
+export const directorySearchInput = z
+  .object({
+    expertise: z.string().min(1).max(100).optional(),
+    introduction: z.string().max(200).optional(),
+    city: z.string().max(200).optional(),
+    country: z.string().max(200).optional(),
+    helpType: z.enum(helpTypes).optional(),
+    availability: z.enum(["available", "limited"]).optional(),
+    graduationFrom: optionalYear,
+    graduationTo: optionalYear,
+    attendanceFrom: optionalYear,
+    attendanceTo: optionalYear,
+    cursor: z.string().max(200).optional(),
+  })
+  .strict()
+  .refine(
+    (v) =>
+      (v.graduationFrom === undefined ||
+        v.graduationTo === undefined ||
+        v.graduationFrom <= v.graduationTo) &&
+      (v.attendanceFrom === undefined ||
+        v.attendanceTo === undefined ||
+        v.attendanceFrom <= v.attendanceTo)
+  );
+
+export const taxonomyInput = z.discriminatedUnion("action", [
+  z.object({ action: z.literal("add"), label: requiredText(100) }).strict(),
+  z
+    .object({
+      action: z.enum(["rename", "replace"]),
+      id: z.string().min(1).max(100),
+      expectedVersion: integer(0),
+      label: requiredText(100),
+    })
+    .strict(),
+  z
+    .object({
+      action: z.literal("retire"),
+      id: z.string().min(1).max(100),
+      expectedVersion: integer(0),
+    })
+    .strict(),
+]);

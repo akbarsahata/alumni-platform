@@ -633,3 +633,56 @@ email is part of this change.
 - Renamed the status section to “Status relevansi profil” and moved the separate “Konfirmasi profil masih benar” form inside it. Suspended members cannot confirm.
 - Browser regression covers first save, opted-in edits (display name, introduction, availability note), immediate feedback and values after reload, locations, availability, opt-out and confirmation placement. A separate storage failure was not reproduced in the real local Worker/D1 flow.
 - Focused verification passed: `npm run test -- tests/profiles.test.mjs tests/browser/profiles.spec.ts` (4 helper tests, 5 HTTP journeys, 1 Chromium journey). Typecheck, build and lint passed. Standards and Spec reviews: zero findings. Final full `npm run test` passed: 4 helper tests, 59 HTTP tests, and 10 Chromium journeys. Formatting also passed. No deployment or live email.
+
+## Coordinator expertise discovery — issue #14 — 2026-10-07
+
+Implemented Bahasa Indonesia `/directory`, eligible profile detail and
+`/directory/tags` pages with matching Hono APIs and React Router data surfaces.
+Current directory assignment is required on every request, including existing
+sessions after revocation; primary and all other roles have no implicit access.
+Search supports expertise, introduction, city/country labels, help type,
+availability, graduation ranges and separate overlapping attendance ranges.
+House and bulk-export filters/endpoints are unavailable. Explicit projections
+omit email, house and unrelated membership review fields. Search pages return at
+most 50 profiles with stable cursor links. Eligibility is shared with owner status
+and rechecks approval, opt-in, availability, required fields, 12-calendar-month
+confirmation and the deletion marker. Pending/rejected/nonmembers have no profiles
+eligible for discovery; suspended, opted-out, unavailable, stale and marked records
+are hidden from both searches and details.
+
+Migration `0012_directory_taxonomy.sql` seeds existing stable tags and introduces
+shared labels, versions, retirement/replacement and atomic audited mutations.
+Retirement preserves selections; members choose replacement tags themselves.
+Profile pages read the shared vocabulary and preserve only their own retired
+selections. Conditional writes recheck coordinator authority, version and tag
+validity. Minimal taxonomy evidence joins the general audit without profile content.
+The first full-suite attempt caught D1's compound SELECT limit in the expanded
+audit query; nested source grouping fixes it and the seven-test role/audit suite
+passes. Standards review prompted shared eligibility consolidation; final Standards
+and Spec reviews both report zero remaining findings.
+
+Migration applied to ordinary local and disposable test D1; no new secrets or
+bindings. `localhost:5173` remains usable (HTTP 200). No deployment, remote
+migration or live email. The deletion marker anticipates #19, with no deletion UI
+or automated removal added. Detailed operations: [directory-discovery.md](directory-discovery.md).
+
+Focused command: `node scripts/test.mjs tests/directory.test.mjs
+ tests/browser/directory.spec.ts` passes four location helper tests, five HTTP
+journeys and one Chromium journey against real isolated Worker/D1/Better Auth/
+captured email. It covers filters, former years, role and field privacy across
+API/page/data, immediate eligibility changes, tag retirement/replacement, audit,
+version conflicts, origins/no-store and current-session coordinator revocation.
+Typecheck, build, lint and formatting pass.
+
+During verification, an external workspace reset removed staged files. At the
+user's request, recovered the complete reviewed implementation from Git snapshot
+objects and verified it matches the staged tree. Work is on `codex/profile-layout`,
+not `master`. The user requested committing locally and pulling `origin/master`
+with rebase. The final `npm test` run passed four helper tests, 64 HTTP tests and all 11
+Chromium journeys, including real OTP expiry (301 seconds). The rebase succeeded
+without conflicts; the rebased implementation tree is identical to the reviewed
+and tested tree. The local feature commit sits one commit ahead of `origin/master`
+on `codex/profile-layout`, with no push. Typecheck and formatting were verified
+again after exact snapshot recovery. Final handoff evidence was amended into that
+local feature commit. Issue #14 is updated and closed through the GitHub plugin
+after verification.

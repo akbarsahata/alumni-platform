@@ -6,14 +6,7 @@ import { env } from "cloudflare:workers";
 import { Form, Link, data, useNavigation } from "react-router";
 import type { Route } from "./+types/profile";
 import { readProfile, saveProfile } from "../profiles/profiles.server";
-import {
-  expertiseTags,
-  expertiseLabels,
-  helpTypes,
-  helpLabels,
-  availabilityChoices,
-  availabilityLabels,
-} from "../profiles/model";
+import { helpTypes, helpLabels, availabilityChoices, availabilityLabels } from "../profiles/model";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
 import { Button } from "../components/ui/button";
@@ -54,13 +47,14 @@ export async function action({ request }: Route.ActionArgs) {
 }
 const reasons: Record<string, string> = {
   membership: "Keanggotaan ditangguhkan.",
+  deletion: "Penghapusan profil sedang diproses.",
   participation: "Partisipasi belum diaktifkan.",
   unavailable: "Anda sementara tidak tersedia.",
   stale: "Konfirmasi profil diperlukan setelah 12 bulan.",
   incomplete: "Pilihan profil belum lengkap.",
 };
 export default function Profile({ loaderData, actionData }: Route.ComponentProps) {
-  const { profile, identity, eligibility, membershipStatus } = loaderData;
+  const { profile, identity, eligibility, membershipStatus, tags } = loaderData;
   const busy = useNavigation().state !== "idle";
   useEffect(() => {
     if (actionData?.message)
@@ -183,18 +177,21 @@ export default function Profile({ loaderData, actionData }: Route.ComponentProps
                 <h2>Keahlian & bantuan</h2>
                 <fieldset>
                   <legend>Keahlian</legend>
-                  {expertiseTags.map((tag) => (
-                    <label className="block" key={tag}>
-                      <input
-                        type="checkbox"
-                        style={{ width: "auto", minHeight: "auto", marginRight: "0.5rem" }}
-                        name="expertiseTags"
-                        value={tag}
-                        defaultChecked={profile.expertiseTags.includes(tag)}
-                      />{" "}
-                      {expertiseLabels[tag]}
-                    </label>
-                  ))}
+                  {tags
+                    .filter((tag) => !tag.retired || profile.expertiseTags.includes(tag.id))
+                    .map((tag) => (
+                      <label className="block" key={tag.id}>
+                        <input
+                          type="checkbox"
+                          style={{ width: "auto", minHeight: "auto", marginRight: "0.5rem" }}
+                          name="expertiseTags"
+                          value={tag.id}
+                          defaultChecked={profile.expertiseTags.includes(tag.id)}
+                        />{" "}
+                        {tag.label}
+                        {tag.retired ? " (dihentikan)" : ""}
+                      </label>
+                    ))}
                 </fieldset>
                 <fieldset>
                   <legend>Bentuk bantuan</legend>

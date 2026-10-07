@@ -33,7 +33,10 @@ export function administrationRepository(binding: D1Database) {
         occurredAt: string;
       }>(sql`SELECT id, actor_user_id AS actorUserId, target_user_id AS targetUserId,
     action, role, house, operator, reason, occurred_at AS occurredAt FROM (
-      SELECT * FROM authorization_audit
+      SELECT * FROM (
+        SELECT * FROM authorization_audit
+        UNION ALL SELECT id, actor_user_id, tag_id, 'expertise-' || action, NULL, NULL, NULL, '', occurred_at FROM expertise_tag_event
+      )
       UNION ALL SELECT id || '0', issuer_id, email, 'invitation-issued', role, NULL, NULL, reason, issued_at FROM school_invitation
       UNION ALL SELECT id || '1', accepted_by, accepted_by, 'invitation-accepted', role, NULL, NULL, reason, accepted_at FROM school_invitation WHERE accepted_at IS NOT NULL
       UNION ALL SELECT id || '0', actor_user_id, target_user_id, 'email-change-requested', NULL, NULL, identity_check, reason, requested_at FROM email_change_request
