@@ -701,3 +701,10 @@ Focused Worker/D1/Better Auth/captured-email suite passes five HTTP journeys and
 one Chromium journey; typecheck, build and lint pass. Desktop and 390px mobile
 screenshots were visually checked under ignored `test-results/directory*-ui.png`;
 temporary capture lines were removed from the existing browser test afterward.
+
+Directory responsive follow-up: expertise cards use three columns at 1200px+,
+two at 700–1199px, and one below 700px. Search filters use three/two/one columns;
+results use two columns or one on phones. The coordinator container expands up to
+1180px. Checked 1440px, 820px and 390px Chromium layouts and absence of horizontal
+overflow using temporary capture/assertion instrumentation, then removed it.
+Focused five HTTP journeys and one Chromium journey pass.

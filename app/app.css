@@ -824,3 +824,51 @@ main.profile-page textarea {
     gap: 0.6rem;
   }
 }
+
+/* Directory layouts adapt to the available screen width. */
+.app-shell > main.directory-page {
+  max-width: 1180px;
+}
+.taxonomy-grid,
+.directory-results-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+.taxonomy-grid .taxonomy-editor {
+  grid-template-columns: 1fr;
+  gap: 0.65rem;
+}
+.taxonomy-grid .taxonomy-card,
+.directory-results-grid .directory-result {
+  min-width: 0;
+  margin: 0;
+}
+.directory-results-grid {
+  margin-top: 0.75rem;
+}
+.taxonomy-history {
+  padding: 1rem;
+  background: #f1f6f3;
+  border-radius: 10px;
+  overflow-wrap: anywhere;
+}
+@media (min-width: 1200px) {
+  .taxonomy-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .directory-filters {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 699px) {
+  .taxonomy-grid,
+  .directory-results-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  .directory-filters {
+    grid-template-columns: 1fr;
+  }
+}

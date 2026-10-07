@@ -55,67 +55,73 @@ export default function Tags({ loaderData, actionData }: Route.ComponentProps) {
           <Plus size={18} aria-hidden="true" />
         </button>
       </Form>
-      {loaderData.tags.map((tag) => (
-        <section key={`${tag.id}-${tag.version}`} aria-label={tag.label} className="taxonomy-card">
-          <h2>
-            {tag.label}
-            {tag.retired ? " (dihentikan)" : ""}
-          </h2>
-          {tag.replacementId && (
-            <p>Pengganti: {loaderData.tags.find((t) => t.id === tag.replacementId)?.label}</p>
-          )}
-          {!tag.retired && (
-            <div className="taxonomy-editor">
-              <Form method="post" id={`tag-edit-${tag.id}`}>
-                <input type="hidden" name="id" value={tag.id} />
-                <input type="hidden" name="expectedVersion" value={tag.version} />
-                <label>
-                  Label keahlian
-                  <input name="label" defaultValue={tag.label} required maxLength={100} />
-                </label>
-              </Form>
-              <div className="taxonomy-actions">
-                <button
-                  className="directory-icon-action"
-                  form={`tag-edit-${tag.id}`}
-                  disabled={busy}
-                  name="action"
-                  value="rename"
-                  aria-label="Ubah label"
-                  title="Ubah label"
-                >
-                  <Pencil size={18} aria-hidden="true" />
-                </button>
-                <button
-                  className="directory-icon-action"
-                  form={`tag-edit-${tag.id}`}
-                  disabled={busy}
-                  name="action"
-                  value="replace"
-                  aria-label="Buat pengganti"
-                  title="Buat pengganti"
-                >
-                  <ArrowRightLeft size={18} aria-hidden="true" />
-                </button>
-                <Form method="post">
+      <div className="taxonomy-grid">
+        {loaderData.tags.map((tag) => (
+          <section
+            key={`${tag.id}-${tag.version}`}
+            aria-label={tag.label}
+            className="taxonomy-card"
+          >
+            <h2>
+              {tag.label}
+              {tag.retired ? " (dihentikan)" : ""}
+            </h2>
+            {tag.replacementId && (
+              <p>Pengganti: {loaderData.tags.find((t) => t.id === tag.replacementId)?.label}</p>
+            )}
+            {!tag.retired && (
+              <div className="taxonomy-editor">
+                <Form method="post" id={`tag-edit-${tag.id}`}>
                   <input type="hidden" name="id" value={tag.id} />
                   <input type="hidden" name="expectedVersion" value={tag.version} />
-                  <input type="hidden" name="action" value="retire" />
-                  <button
-                    className="directory-icon-action taxonomy-retire"
-                    disabled={busy}
-                    aria-label="Hentikan keahlian"
-                    title="Hentikan keahlian"
-                  >
-                    <Archive size={18} aria-hidden="true" />
-                  </button>
+                  <label>
+                    Label keahlian
+                    <input name="label" defaultValue={tag.label} required maxLength={100} />
+                  </label>
                 </Form>
+                <div className="taxonomy-actions">
+                  <button
+                    className="directory-icon-action"
+                    form={`tag-edit-${tag.id}`}
+                    disabled={busy}
+                    name="action"
+                    value="rename"
+                    aria-label="Ubah label"
+                    title="Ubah label"
+                  >
+                    <Pencil size={18} aria-hidden="true" />
+                  </button>
+                  <button
+                    className="directory-icon-action"
+                    form={`tag-edit-${tag.id}`}
+                    disabled={busy}
+                    name="action"
+                    value="replace"
+                    aria-label="Buat pengganti"
+                    title="Buat pengganti"
+                  >
+                    <ArrowRightLeft size={18} aria-hidden="true" />
+                  </button>
+                  <Form method="post">
+                    <input type="hidden" name="id" value={tag.id} />
+                    <input type="hidden" name="expectedVersion" value={tag.version} />
+                    <input type="hidden" name="action" value="retire" />
+                    <button
+                      className="directory-icon-action taxonomy-retire"
+                      disabled={busy}
+                      aria-label="Hentikan keahlian"
+                      title="Hentikan keahlian"
+                    >
+                      <Archive size={18} aria-hidden="true" />
+                    </button>
+                  </Form>
+                </div>
               </div>
-            </div>
-          )}
-        </section>
-      ))}
-      <section aria-label="Riwayat keahlian">
+            )}
+          </section>
+        ))}
+      </div>
+      <section className="taxonomy-history" aria-label="Riwayat keahlian">
         <h2>Riwayat keahlian</h2>
         <p>100 perubahan terakhir; waktu UTC.</p>
         {loaderData.events.map((event) => (

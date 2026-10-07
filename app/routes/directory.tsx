@@ -105,30 +105,32 @@ export default function Directory({ loaderData }: Route.ComponentProps) {
       <section aria-label="Hasil pencarian">
         <h2>Hasil pencarian</h2>
         {!profiles.length && <p>Tidak ada profil yang sesuai.</p>}
-        {profiles.map((p) => (
-          <article key={p.id} className="directory-result">
-            <h3>
-              <Link to={`/directory/${p.id}`}>{p.displayName || p.schoolName || "Alumni"}</Link>
-            </h3>
-            <p>{p.introduction}</p>
-            <p>
-              {p.city.join(", ")} · {p.country.join(", ")}
-            </p>
-            <div className="directory-badges">
-              {p.expertiseTags.map((id) => (
-                <span key={id}>{tags.find((t) => t.id === id)?.label ?? id}</span>
-              ))}
-            </div>
-            <p>{p.availability ? availabilityLabels[p.availability] : ""}</p>
-            {p.studentType === "graduate" ? (
-              <p>Kelulusan: {p.graduationYear}</p>
-            ) : p.studentType === "former-student" ? (
+        <div className="directory-results-grid">
+          {profiles.map((p) => (
+            <article key={p.id} className="directory-result">
+              <h3>
+                <Link to={`/directory/${p.id}`}>{p.displayName || p.schoolName || "Alumni"}</Link>
+              </h3>
+              <p>{p.introduction}</p>
               <p>
-                Bersekolah: {p.attendanceStart}–{p.attendanceEnd}
+                {p.city.join(", ")} · {p.country.join(", ")}
               </p>
-            ) : null}
-          </article>
-        ))}
+              <div className="directory-badges">
+                {p.expertiseTags.map((id) => (
+                  <span key={id}>{tags.find((t) => t.id === id)?.label ?? id}</span>
+                ))}
+              </div>
+              <p>{p.availability ? availabilityLabels[p.availability] : ""}</p>
+              {p.studentType === "graduate" ? (
+                <p>Kelulusan: {p.graduationYear}</p>
+              ) : p.studentType === "former-student" ? (
+                <p>
+                  Bersekolah: {p.attendanceStart}–{p.attendanceEnd}
+                </p>
+              ) : null}
+            </article>
+          ))}
+        </div>
       </section>
       {nextCursor && <Link to={`?${next}`}>Halaman berikutnya</Link>}
     </main>
