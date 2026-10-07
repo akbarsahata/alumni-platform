@@ -14,6 +14,8 @@ function run(command, args) {
   });
 }
 
+await run(process.execPath, ["--test", "tests/location-list.test.mjs"]);
+
 await mkdir("test-results", { recursive: true });
 await mkdir(".wrangler", { recursive: true });
 process.env.ALUMNI_TEST_STATE = resolve(await mkdtemp(".wrangler/integration-state-"));

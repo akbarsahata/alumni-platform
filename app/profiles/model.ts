@@ -32,8 +32,8 @@ export const availabilityLabels = {
 export const emptyProfile = {
   displayName: "",
   introduction: "",
-  city: "",
-  country: "",
+  city: [] as string[],
+  country: [] as string[],
   availabilityNote: "",
   expertiseTags: [] as string[],
   helpTypes: [] as string[],

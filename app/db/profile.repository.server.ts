@@ -15,6 +15,7 @@ export function profileRepository(binding: D1Database) {
           .select({
             displayName: expertiseProfile.displayName,
             introduction: expertiseProfile.introduction,
+            locationFormat: expertiseProfile.locationFormat,
             city: expertiseProfile.city,
             country: expertiseProfile.country,
             availabilityNote: expertiseProfile.availabilityNote,
@@ -51,10 +52,10 @@ export function profileRepository(binding: D1Database) {
     async save(userId: string, profile: Omit<typeof expertiseProfile.$inferInsert, "userId">) {
       // One conditional statement prevents a concurrent suspension from writing.
       return await db.all<{ userId: string }>(sql`
-        INSERT INTO expertise_profile (user_id, display_name, introduction, city, country, availability_note, expertise_tags, help_types, availability, participation, confirmed_at)
-        SELECT ${userId}, ${profile.displayName}, ${profile.introduction}, ${profile.city}, ${profile.country}, ${profile.availabilityNote}, ${JSON.stringify(profile.expertiseTags)}, ${JSON.stringify(profile.helpTypes)}, ${profile.availability}, ${profile.participation ? 1 : 0}, ${profile.confirmedAt}
+        INSERT INTO expertise_profile (user_id, display_name, introduction, city, country, availability_note, expertise_tags, help_types, availability, participation, confirmed_at, location_format)
+        SELECT ${userId}, ${profile.displayName}, ${profile.introduction}, ${profile.city}, ${profile.country}, ${profile.availabilityNote}, ${JSON.stringify(profile.expertiseTags)}, ${JSON.stringify(profile.helpTypes)}, ${profile.availability}, ${profile.participation ? 1 : 0}, ${profile.confirmedAt}, ${profile.locationFormat}
         WHERE EXISTS (SELECT 1 FROM alumni_membership WHERE user_id = ${userId} AND status = 'approved')
-        ON CONFLICT(user_id) DO UPDATE SET display_name = excluded.display_name, introduction = excluded.introduction, city = excluded.city, country = excluded.country, availability_note = excluded.availability_note, expertise_tags = excluded.expertise_tags, help_types = excluded.help_types, availability = excluded.availability, participation = excluded.participation, confirmed_at = excluded.confirmed_at
+        ON CONFLICT(user_id) DO UPDATE SET display_name = excluded.display_name, introduction = excluded.introduction, city = excluded.city, country = excluded.country, availability_note = excluded.availability_note, expertise_tags = excluded.expertise_tags, help_types = excluded.help_types, availability = excluded.availability, participation = excluded.participation, confirmed_at = excluded.confirmed_at, location_format = excluded.location_format
         RETURNING user_id AS userId
       `);
     },

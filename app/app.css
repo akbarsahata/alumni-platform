@@ -468,3 +468,32 @@ main [data-slot="input"][type="hidden"] {
   color: var(--red);
   text-underline-offset: 4px;
 }
+
+/* Keep searchable multi-select controls compact within the native form styles. */
+.profile-location-select .location__input-container {
+  margin: 0;
+  padding: 0;
+}
+main .profile-location-select input {
+  margin: 0;
+  padding: 0;
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+main .profile-location-select input:focus {
+  outline: none;
+}
+.profile-location-select .location__control {
+  min-height: 46px;
+  border-radius: 8px;
+}
+.profile-location-select .location__control--is-focused {
+  outline: 2px solid #dcae4870;
+  border-color: #8a723e;
+  box-shadow: none;
+}
+.profile-location-select .location__menu {
+  z-index: 20;
+}

@@ -141,6 +141,7 @@ export const emailChangeRequest = sqliteTable("email_change_request", {
 });
 
 export const expertiseProfile = sqliteTable("expertise_profile", {
+  locationFormat: integer("location_format").notNull(),
   userId: text("user_id").primaryKey(),
   displayName: text("display_name").notNull(),
   introduction: text("introduction").notNull(),

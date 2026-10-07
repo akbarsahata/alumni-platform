@@ -511,3 +511,57 @@ reviews both have zero actionable findings. Final `npm test` passes all 58 HTTP 
 OTP expiry and rate-limit windows. Changes are committed locally on `master`; no
 push or deployment was performed. Issue #13 is updated and closed through the
 GitHub plugin after verification.
+
+## Profile form feedback and structured locations — 2026-10-07
+
+Follow-up to issue #13: profile saves and reconfirmation now show a dismissible
+six-second Sonner toast at the top of the viewport, below the sticky account bar.
+Errors also show a toast while retaining inline validation. Pending saves show
+“Menyimpan…”. Each participation checkbox has its own Bahasa Indonesia description
+of ticking and unticking it, including the distinction between stopping participation
+and withholding consent, and the separate consent needed to share email.
+
+Replaced free-text location inputs with optional searchable React Select multi-selects.
+The user narrowed the city list to Indonesia only; countries remain worldwide. A
+committed generated snapshot includes 889 Indonesian city/locality entries with
+province labels and 250 country options with Indonesian labels. The source package
+`country-state-city@3.2.1` is a development dependency, so the worldwide city database
+is absent from runtime bundles. Regenerate with `npm run locations:generate` and
+review the resulting snapshot when updating the package. Data source and attribution:
+[country-state-city](https://github.com/harpreetkhalsagtbit/country-state-city), based
+on [Countries States Cities Database](https://github.com/dr5hn/countries-states-cities-database)
+under ODbL-1.0. UI libraries: [React Select](https://react-select.com/) and
+[Sonner](https://github.com/emilkowalski/sonner), with pinned versions in package.json.
+
+The profile API now accepts/returns arrays for `city` and `country`. D1 still stores
+TEXT: ISO country codes and country/province/city identifiers, each URI-escaped and
+joined by commas. `encodeLocationList` and `parseLocationList` trim empty values,
+deduplicate in selection order, and preserve delimiters, percent signs and Unicode.
+Malformed escaping fails instead of silently corrupting saved data. Four direct
+helper tests run with `npm run test:unit` and as part of the integration runner;
+this helper seam was explicitly requested by the user.
+
+Migration `0011_profile_location_selections.sql` adds a location-format discriminator
+without changing existing fields. Legacy free-text values are normalized when an
+unambiguous catalogue match exists. Otherwise they remain owner-visible legacy chips;
+only that owner's existing legacy values may be retained, and members may remove or
+replace them. Fresh city/country selections must match the catalogue, with at most
+20 per field. No custom or foreign-city additions are accepted. A normal profile save
+writes the new escaped comma-separated representation; reconfirmation leaves location
+data intact. The migration is applied to ordinary local D1 and disposable test D1.
+The settled local specification now records these refinements for subsequent issues.
+
+Focused verification: `node scripts/test.mjs tests/profiles.test.mjs
+ tests/browser/profiles.spec.ts` passes four helper tests, five real HTTP journeys,
+and one Chromium journey. Coverage includes persistence of multiple locations,
+foreign-city and fabricated-country rejection, old-format conversion/preservation/
+removal, search selection, clear checkbox descriptions, repeated success notifications,
+and toast positioning. A screenshot is captured at `test-results/profile-feedback.png`.
+Typecheck, build, lint and formatting pass. Standards and Spec reviews report zero
+actionable findings. Final `npm test` passes four helper tests, 59 HTTP tests and
+10 Chromium journeys. The focused suite was repeated after shortening checkbox copy
+and localizing removal labels; it also verifies that removing a selected country
+survives save and reload. The final typecheck, build, lint and formatting pass.
+Changes are committed locally on `master`, with no push. A pre-existing homepage
+link edit is outside this follow-up commit. No remote migration, deployment or live
+email is part of this change.

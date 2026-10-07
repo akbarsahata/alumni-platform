@@ -145,8 +145,8 @@ export const profileInput = z
   .object({
     displayName: z.string().max(200).trim().default(""),
     introduction: z.string().max(2000).trim().default(""),
-    city: z.string().max(100).trim().default(""),
-    country: z.string().max(100).trim().default(""),
+    city: z.array(z.string().min(1).max(500)).max(20).default([]),
+    country: z.array(z.string().min(1).max(500)).max(20).default([]),
     availabilityNote: z.string().max(1000).trim().default(""),
     expertiseTags: z
       .array(z.enum(expertiseTags))

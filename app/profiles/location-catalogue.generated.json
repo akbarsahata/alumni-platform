@@ -1,0 +1,5702 @@
+{
+  "source": "country-state-city@3.2.1; upstream dr5hn/countries-states-cities-database (ODbL-1.0)",
+  "countries": [
+    {
+      "value": "AF",
+      "label": "Afganistan",
+      "legacyName": "Afghanistan"
+    },
+    {
+      "value": "ZA",
+      "label": "Afrika Selatan",
+      "legacyName": "South Africa"
+    },
+    {
+      "value": "AL",
+      "label": "Albania",
+      "legacyName": "Albania"
+    },
+    {
+      "value": "DZ",
+      "label": "Aljazair",
+      "legacyName": "Algeria"
+    },
+    {
+      "value": "US",
+      "label": "Amerika Serikat",
+      "legacyName": "United States"
+    },
+    {
+      "value": "AD",
+      "label": "Andorra",
+      "legacyName": "Andorra"
+    },
+    {
+      "value": "AO",
+      "label": "Angola",
+      "legacyName": "Angola"
+    },
+    {
+      "value": "AI",
+      "label": "Anguilla",
+      "legacyName": "Anguilla"
+    },
+    {
+      "value": "AQ",
+      "label": "Antarktika",
+      "legacyName": "Antarctica"
+    },
+    {
+      "value": "AG",
+      "label": "Antigua dan Barbuda",
+      "legacyName": "Antigua And Barbuda"
+    },
+    {
+      "value": "SA",
+      "label": "Arab Saudi",
+      "legacyName": "Saudi Arabia"
+    },
+    {
+      "value": "AR",
+      "label": "Argentina",
+      "legacyName": "Argentina"
+    },
+    {
+      "value": "AM",
+      "label": "Armenia",
+      "legacyName": "Armenia"
+    },
+    {
+      "value": "AW",
+      "label": "Aruba",
+      "legacyName": "Aruba"
+    },
+    {
+      "value": "AU",
+      "label": "Australia",
+      "legacyName": "Australia"
+    },
+    {
+      "value": "AT",
+      "label": "Austria",
+      "legacyName": "Austria"
+    },
+    {
+      "value": "AZ",
+      "label": "Azerbaijan",
+      "legacyName": "Azerbaijan"
+    },
+    {
+      "value": "BS",
+      "label": "Bahama",
+      "legacyName": "The Bahamas"
+    },
+    {
+      "value": "BH",
+      "label": "Bahrain",
+      "legacyName": "Bahrain"
+    },
+    {
+      "value": "BD",
+      "label": "Bangladesh",
+      "legacyName": "Bangladesh"
+    },
+    {
+      "value": "BB",
+      "label": "Barbados",
+      "legacyName": "Barbados"
+    },
+    {
+      "value": "NL",
+      "label": "Belanda",
+      "legacyName": "Netherlands"
+    },
+    {
+      "value": "BQ",
+      "label": "Belanda Karibia",
+      "legacyName": "Bonaire, Sint Eustatius and Saba"
+    },
+    {
+      "value": "BY",
+      "label": "Belarus",
+      "legacyName": "Belarus"
+    },
+    {
+      "value": "BE",
+      "label": "Belgia",
+      "legacyName": "Belgium"
+    },
+    {
+      "value": "BZ",
+      "label": "Belize",
+      "legacyName": "Belize"
+    },
+    {
+      "value": "BJ",
+      "label": "Benin",
+      "legacyName": "Benin"
+    },
+    {
+      "value": "BM",
+      "label": "Bermuda",
+      "legacyName": "Bermuda"
+    },
+    {
+      "value": "BT",
+      "label": "Bhutan",
+      "legacyName": "Bhutan"
+    },
+    {
+      "value": "BO",
+      "label": "Bolivia",
+      "legacyName": "Bolivia"
+    },
+    {
+      "value": "BA",
+      "label": "Bosnia dan Herzegovina",
+      "legacyName": "Bosnia and Herzegovina"
+    },
+    {
+      "value": "BW",
+      "label": "Botswana",
+      "legacyName": "Botswana"
+    },
+    {
+      "value": "BR",
+      "label": "Brasil",
+      "legacyName": "Brazil"
+    },
+    {
+      "value": "BN",
+      "label": "Brunei",
+      "legacyName": "Brunei"
+    },
+    {
+      "value": "BG",
+      "label": "Bulgaria",
+      "legacyName": "Bulgaria"
+    },
+    {
+      "value": "BF",
+      "label": "Burkina Faso",
+      "legacyName": "Burkina Faso"
+    },
+    {
+      "value": "BI",
+      "label": "Burundi",
+      "legacyName": "Burundi"
+    },
+    {
+      "value": "CZ",
+      "label": "Ceko",
+      "legacyName": "Czech Republic"
+    },
+    {
+      "value": "TD",
+      "label": "Chad",
+      "legacyName": "Chad"
+    },
+    {
+      "value": "CL",
+      "label": "Cile",
+      "legacyName": "Chile"
+    },
+    {
+      "value": "CI",
+      "label": "Côte d’Ivoire",
+      "legacyName": "Cote D'Ivoire (Ivory Coast)"
+    },
+    {
+      "value": "CW",
+      "label": "Curaçao",
+      "legacyName": "Curaçao"
+    },
+    {
+      "value": "DK",
+      "label": "Denmark",
+      "legacyName": "Denmark"
+    },
+    {
+      "value": "DM",
+      "label": "Dominika",
+      "legacyName": "Dominica"
+    },
+    {
+      "value": "EC",
+      "label": "Ekuador",
+      "legacyName": "Ecuador"
+    },
+    {
+      "value": "SV",
+      "label": "El Salvador",
+      "legacyName": "El Salvador"
+    },
+    {
+      "value": "ER",
+      "label": "Eritrea",
+      "legacyName": "Eritrea"
+    },
+    {
+      "value": "EE",
+      "label": "Estonia",
+      "legacyName": "Estonia"
+    },
+    {
+      "value": "SZ",
+      "label": "eSwatini",
+      "legacyName": "Swaziland"
+    },
+    {
+      "value": "ET",
+      "label": "Etiopia",
+      "legacyName": "Ethiopia"
+    },
+    {
+      "value": "FJ",
+      "label": "Fiji",
+      "legacyName": "Fiji Islands"
+    },
+    {
+      "value": "PH",
+      "label": "Filipina",
+      "legacyName": "Philippines"
+    },
+    {
+      "value": "FI",
+      "label": "Finlandia",
+      "legacyName": "Finland"
+    },
+    {
+      "value": "GA",
+      "label": "Gabon",
+      "legacyName": "Gabon"
+    },
+    {
+      "value": "GM",
+      "label": "Gambia",
+      "legacyName": "The Gambia"
+    },
+    {
+      "value": "GE",
+      "label": "Georgia",
+      "legacyName": "Georgia"
+    },
+    {
+      "value": "GS",
+      "label": "Georgia Selatan & Kep. Sandwich Selatan",
+      "legacyName": "South Georgia"
+    },
+    {
+      "value": "GH",
+      "label": "Ghana",
+      "legacyName": "Ghana"
+    },
+    {
+      "value": "GI",
+      "label": "Gibraltar",
+      "legacyName": "Gibraltar"
+    },
+    {
+      "value": "GL",
+      "label": "Greenland",
+      "legacyName": "Greenland"
+    },
+    {
+      "value": "GD",
+      "label": "Grenada",
+      "legacyName": "Grenada"
+    },
+    {
+      "value": "GP",
+      "label": "Guadeloupe",
+      "legacyName": "Guadeloupe"
+    },
+    {
+      "value": "GU",
+      "label": "Guam",
+      "legacyName": "Guam"
+    },
+    {
+      "value": "GT",
+      "label": "Guatemala",
+      "legacyName": "Guatemala"
+    },
+    {
+      "value": "GG",
+      "label": "Guernsey",
+      "legacyName": "Guernsey and Alderney"
+    },
+    {
+      "value": "GN",
+      "label": "Guinea",
+      "legacyName": "Guinea"
+    },
+    {
+      "value": "GQ",
+      "label": "Guinea Ekuatorial",
+      "legacyName": "Equatorial Guinea"
+    },
+    {
+      "value": "GW",
+      "label": "Guinea-Bissau",
+      "legacyName": "Guinea-Bissau"
+    },
+    {
+      "value": "GY",
+      "label": "Guyana",
+      "legacyName": "Guyana"
+    },
+    {
+      "value": "GF",
+      "label": "Guyana Prancis",
+      "legacyName": "French Guiana"
+    },
+    {
+      "value": "HT",
+      "label": "Haiti",
+      "legacyName": "Haiti"
+    },
+    {
+      "value": "HN",
+      "label": "Honduras",
+      "legacyName": "Honduras"
+    },
+    {
+      "value": "HK",
+      "label": "Hong Kong DAK Tiongkok",
+      "legacyName": "Hong Kong S.A.R."
+    },
+    {
+      "value": "HU",
+      "label": "Hungaria",
+      "legacyName": "Hungary"
+    },
+    {
+      "value": "IN",
+      "label": "India",
+      "legacyName": "India"
+    },
+    {
+      "value": "ID",
+      "label": "Indonesia",
+      "legacyName": "Indonesia"
+    },
+    {
+      "value": "GB",
+      "label": "Inggris Raya",
+      "legacyName": "United Kingdom"
+    },
+    {
+      "value": "IQ",
+      "label": "Irak",
+      "legacyName": "Iraq"
+    },
+    {
+      "value": "IR",
+      "label": "Iran",
+      "legacyName": "Iran"
+    },
+    {
+      "value": "IE",
+      "label": "Irlandia",
+      "legacyName": "Ireland"
+    },
+    {
+      "value": "IS",
+      "label": "Islandia",
+      "legacyName": "Iceland"
+    },
+    {
+      "value": "IL",
+      "label": "Israel",
+      "legacyName": "Israel"
+    },
+    {
+      "value": "IT",
+      "label": "Italia",
+      "legacyName": "Italy"
+    },
+    {
+      "value": "JM",
+      "label": "Jamaika",
+      "legacyName": "Jamaica"
+    },
+    {
+      "value": "JP",
+      "label": "Jepang",
+      "legacyName": "Japan"
+    },
+    {
+      "value": "DE",
+      "label": "Jerman",
+      "legacyName": "Germany"
+    },
+    {
+      "value": "JE",
+      "label": "Jersey",
+      "legacyName": "Jersey"
+    },
+    {
+      "value": "DJ",
+      "label": "Jibuti",
+      "legacyName": "Djibouti"
+    },
+    {
+      "value": "NC",
+      "label": "Kaledonia Baru",
+      "legacyName": "New Caledonia"
+    },
+    {
+      "value": "KH",
+      "label": "Kamboja",
+      "legacyName": "Cambodia"
+    },
+    {
+      "value": "CM",
+      "label": "Kamerun",
+      "legacyName": "Cameroon"
+    },
+    {
+      "value": "CA",
+      "label": "Kanada",
+      "legacyName": "Canada"
+    },
+    {
+      "value": "KZ",
+      "label": "Kazakhstan",
+      "legacyName": "Kazakhstan"
+    },
+    {
+      "value": "KE",
+      "label": "Kenya",
+      "legacyName": "Kenya"
+    },
+    {
+      "value": "AX",
+      "label": "Kepulauan Aland",
+      "legacyName": "Aland Islands"
+    },
+    {
+      "value": "KY",
+      "label": "Kepulauan Cayman",
+      "legacyName": "Cayman Islands"
+    },
+    {
+      "value": "CC",
+      "label": "Kepulauan Cocos (Keeling)",
+      "legacyName": "Cocos (Keeling) Islands"
+    },
+    {
+      "value": "CK",
+      "label": "Kepulauan Cook",
+      "legacyName": "Cook Islands"
+    },
+    {
+      "value": "FK",
+      "label": "Kepulauan Falkland",
+      "legacyName": "Falkland Islands"
+    },
+    {
+      "value": "FO",
+      "label": "Kepulauan Faroe",
+      "legacyName": "Faroe Islands"
+    },
+    {
+      "value": "MP",
+      "label": "Kepulauan Mariana Utara",
+      "legacyName": "Northern Mariana Islands"
+    },
+    {
+      "value": "MH",
+      "label": "Kepulauan Marshall",
+      "legacyName": "Marshall Islands"
+    },
+    {
+      "value": "NF",
+      "label": "Kepulauan Norfolk",
+      "legacyName": "Norfolk Island"
+    },
+    {
+      "value": "PN",
+      "label": "Kepulauan Pitcairn",
+      "legacyName": "Pitcairn Island"
+    },
+    {
+      "value": "SB",
+      "label": "Kepulauan Solomon",
+      "legacyName": "Solomon Islands"
+    },
+    {
+      "value": "SJ",
+      "label": "Kepulauan Svalbard dan Jan Mayen",
+      "legacyName": "Svalbard And Jan Mayen Islands"
+    },
+    {
+      "value": "UM",
+      "label": "Kepulauan Terluar AS",
+      "legacyName": "United States Minor Outlying Islands"
+    },
+    {
+      "value": "TC",
+      "label": "Kepulauan Turks dan Caicos",
+      "legacyName": "Turks And Caicos Islands"
+    },
+    {
+      "value": "VI",
+      "label": "Kepulauan Virgin Amerika Serikat",
+      "legacyName": "Virgin Islands (US)"
+    },
+    {
+      "value": "VG",
+      "label": "Kepulauan Virgin Britania Raya",
+      "legacyName": "Virgin Islands (British)"
+    },
+    {
+      "value": "WF",
+      "label": "Kepulauan Wallis dan Futuna",
+      "legacyName": "Wallis And Futuna Islands"
+    },
+    {
+      "value": "KG",
+      "label": "Kirgizstan",
+      "legacyName": "Kyrgyzstan"
+    },
+    {
+      "value": "KI",
+      "label": "Kiribati",
+      "legacyName": "Kiribati"
+    },
+    {
+      "value": "CO",
+      "label": "Kolombia",
+      "legacyName": "Colombia"
+    },
+    {
+      "value": "KM",
+      "label": "Komoro",
+      "legacyName": "Comoros"
+    },
+    {
+      "value": "CG",
+      "label": "Kongo - Brazzaville",
+      "legacyName": "Congo"
+    },
+    {
+      "value": "CD",
+      "label": "Kongo - Kinshasa",
+      "legacyName": "Democratic Republic of the Congo"
+    },
+    {
+      "value": "KR",
+      "label": "Korea Selatan",
+      "legacyName": "South Korea"
+    },
+    {
+      "value": "KP",
+      "label": "Korea Utara",
+      "legacyName": "North Korea"
+    },
+    {
+      "value": "XK",
+      "label": "Kosovo",
+      "legacyName": "Kosovo"
+    },
+    {
+      "value": "CR",
+      "label": "Kosta Rika",
+      "legacyName": "Costa Rica"
+    },
+    {
+      "value": "HR",
+      "label": "Kroasia",
+      "legacyName": "Croatia"
+    },
+    {
+      "value": "CU",
+      "label": "Kuba",
+      "legacyName": "Cuba"
+    },
+    {
+      "value": "KW",
+      "label": "Kuwait",
+      "legacyName": "Kuwait"
+    },
+    {
+      "value": "LA",
+      "label": "Laos",
+      "legacyName": "Laos"
+    },
+    {
+      "value": "LV",
+      "label": "Latvia",
+      "legacyName": "Latvia"
+    },
+    {
+      "value": "LB",
+      "label": "Lebanon",
+      "legacyName": "Lebanon"
+    },
+    {
+      "value": "LS",
+      "label": "Lesotho",
+      "legacyName": "Lesotho"
+    },
+    {
+      "value": "LR",
+      "label": "Liberia",
+      "legacyName": "Liberia"
+    },
+    {
+      "value": "LY",
+      "label": "Libya",
+      "legacyName": "Libya"
+    },
+    {
+      "value": "LI",
+      "label": "Liechtenstein",
+      "legacyName": "Liechtenstein"
+    },
+    {
+      "value": "LT",
+      "label": "Lituania",
+      "legacyName": "Lithuania"
+    },
+    {
+      "value": "LU",
+      "label": "Luksemburg",
+      "legacyName": "Luxembourg"
+    },
+    {
+      "value": "MG",
+      "label": "Madagaskar",
+      "legacyName": "Madagascar"
+    },
+    {
+      "value": "MO",
+      "label": "Makau DAK Tiongkok",
+      "legacyName": "Macau S.A.R."
+    },
+    {
+      "value": "MK",
+      "label": "Makedonia Utara",
+      "legacyName": "Macedonia"
+    },
+    {
+      "value": "MV",
+      "label": "Maladewa",
+      "legacyName": "Maldives"
+    },
+    {
+      "value": "MW",
+      "label": "Malawi",
+      "legacyName": "Malawi"
+    },
+    {
+      "value": "MY",
+      "label": "Malaysia",
+      "legacyName": "Malaysia"
+    },
+    {
+      "value": "ML",
+      "label": "Mali",
+      "legacyName": "Mali"
+    },
+    {
+      "value": "MT",
+      "label": "Malta",
+      "legacyName": "Malta"
+    },
+    {
+      "value": "MA",
+      "label": "Maroko",
+      "legacyName": "Morocco"
+    },
+    {
+      "value": "MQ",
+      "label": "Martinik",
+      "legacyName": "Martinique"
+    },
+    {
+      "value": "MR",
+      "label": "Mauritania",
+      "legacyName": "Mauritania"
+    },
+    {
+      "value": "MU",
+      "label": "Mauritius",
+      "legacyName": "Mauritius"
+    },
+    {
+      "value": "YT",
+      "label": "Mayotte",
+      "legacyName": "Mayotte"
+    },
+    {
+      "value": "MX",
+      "label": "Meksiko",
+      "legacyName": "Mexico"
+    },
+    {
+      "value": "EG",
+      "label": "Mesir",
+      "legacyName": "Egypt"
+    },
+    {
+      "value": "FM",
+      "label": "Mikronesia",
+      "legacyName": "Micronesia"
+    },
+    {
+      "value": "MD",
+      "label": "Moldova",
+      "legacyName": "Moldova"
+    },
+    {
+      "value": "MC",
+      "label": "Monako",
+      "legacyName": "Monaco"
+    },
+    {
+      "value": "MN",
+      "label": "Mongolia",
+      "legacyName": "Mongolia"
+    },
+    {
+      "value": "ME",
+      "label": "Montenegro",
+      "legacyName": "Montenegro"
+    },
+    {
+      "value": "MS",
+      "label": "Montserrat",
+      "legacyName": "Montserrat"
+    },
+    {
+      "value": "MZ",
+      "label": "Mozambik",
+      "legacyName": "Mozambique"
+    },
+    {
+      "value": "MM",
+      "label": "Myanmar (Burma)",
+      "legacyName": "Myanmar"
+    },
+    {
+      "value": "NA",
+      "label": "Namibia",
+      "legacyName": "Namibia"
+    },
+    {
+      "value": "NR",
+      "label": "Nauru",
+      "legacyName": "Nauru"
+    },
+    {
+      "value": "NP",
+      "label": "Nepal",
+      "legacyName": "Nepal"
+    },
+    {
+      "value": "NE",
+      "label": "Niger",
+      "legacyName": "Niger"
+    },
+    {
+      "value": "NG",
+      "label": "Nigeria",
+      "legacyName": "Nigeria"
+    },
+    {
+      "value": "NI",
+      "label": "Nikaragua",
+      "legacyName": "Nicaragua"
+    },
+    {
+      "value": "NU",
+      "label": "Niue",
+      "legacyName": "Niue"
+    },
+    {
+      "value": "NO",
+      "label": "Norwegia",
+      "legacyName": "Norway"
+    },
+    {
+      "value": "OM",
+      "label": "Oman",
+      "legacyName": "Oman"
+    },
+    {
+      "value": "PK",
+      "label": "Pakistan",
+      "legacyName": "Pakistan"
+    },
+    {
+      "value": "PW",
+      "label": "Palau",
+      "legacyName": "Palau"
+    },
+    {
+      "value": "PA",
+      "label": "Panama",
+      "legacyName": "Panama"
+    },
+    {
+      "value": "PG",
+      "label": "Papua Nugini",
+      "legacyName": "Papua new Guinea"
+    },
+    {
+      "value": "PY",
+      "label": "Paraguay",
+      "legacyName": "Paraguay"
+    },
+    {
+      "value": "PE",
+      "label": "Peru",
+      "legacyName": "Peru"
+    },
+    {
+      "value": "PL",
+      "label": "Polandia",
+      "legacyName": "Poland"
+    },
+    {
+      "value": "PF",
+      "label": "Polinesia Prancis",
+      "legacyName": "French Polynesia"
+    },
+    {
+      "value": "PT",
+      "label": "Portugal",
+      "legacyName": "Portugal"
+    },
+    {
+      "value": "FR",
+      "label": "Prancis",
+      "legacyName": "France"
+    },
+    {
+      "value": "PR",
+      "label": "Puerto Riko",
+      "legacyName": "Puerto Rico"
+    },
+    {
+      "value": "BV",
+      "label": "Pulau Bouvet",
+      "legacyName": "Bouvet Island"
+    },
+    {
+      "value": "HM",
+      "label": "Pulau Heard dan Kepulauan McDonald",
+      "legacyName": "Heard Island and McDonald Islands"
+    },
+    {
+      "value": "IM",
+      "label": "Pulau Man",
+      "legacyName": "Man (Isle of)"
+    },
+    {
+      "value": "CX",
+      "label": "Pulau Natal",
+      "legacyName": "Christmas Island"
+    },
+    {
+      "value": "QA",
+      "label": "Qatar",
+      "legacyName": "Qatar"
+    },
+    {
+      "value": "CF",
+      "label": "Republik Afrika Tengah",
+      "legacyName": "Central African Republic"
+    },
+    {
+      "value": "DO",
+      "label": "Republik Dominika",
+      "legacyName": "Dominican Republic"
+    },
+    {
+      "value": "RE",
+      "label": "Réunion",
+      "legacyName": "Reunion"
+    },
+    {
+      "value": "RO",
+      "label": "Rumania",
+      "legacyName": "Romania"
+    },
+    {
+      "value": "RU",
+      "label": "Rusia",
+      "legacyName": "Russia"
+    },
+    {
+      "value": "RW",
+      "label": "Rwanda",
+      "legacyName": "Rwanda"
+    },
+    {
+      "value": "EH",
+      "label": "Sahara Barat",
+      "legacyName": "Western Sahara"
+    },
+    {
+      "value": "BL",
+      "label": "Saint Barthélemy",
+      "legacyName": "Saint-Barthelemy"
+    },
+    {
+      "value": "SH",
+      "label": "Saint Helena",
+      "legacyName": "Saint Helena"
+    },
+    {
+      "value": "KN",
+      "label": "Saint Kitts dan Nevis",
+      "legacyName": "Saint Kitts And Nevis"
+    },
+    {
+      "value": "LC",
+      "label": "Saint Lucia",
+      "legacyName": "Saint Lucia"
+    },
+    {
+      "value": "MF",
+      "label": "Saint Martin",
+      "legacyName": "Saint-Martin (French part)"
+    },
+    {
+      "value": "PM",
+      "label": "Saint Pierre dan Miquelon",
+      "legacyName": "Saint Pierre and Miquelon"
+    },
+    {
+      "value": "VC",
+      "label": "Saint Vincent dan Grenadine",
+      "legacyName": "Saint Vincent And The Grenadines"
+    },
+    {
+      "value": "WS",
+      "label": "Samoa",
+      "legacyName": "Samoa"
+    },
+    {
+      "value": "AS",
+      "label": "Samoa Amerika",
+      "legacyName": "American Samoa"
+    },
+    {
+      "value": "SM",
+      "label": "San Marino",
+      "legacyName": "San Marino"
+    },
+    {
+      "value": "ST",
+      "label": "Sao Tome dan Principe",
+      "legacyName": "Sao Tome and Principe"
+    },
+    {
+      "value": "NZ",
+      "label": "Selandia Baru",
+      "legacyName": "New Zealand"
+    },
+    {
+      "value": "SN",
+      "label": "Senegal",
+      "legacyName": "Senegal"
+    },
+    {
+      "value": "RS",
+      "label": "Serbia",
+      "legacyName": "Serbia"
+    },
+    {
+      "value": "SC",
+      "label": "Seychelles",
+      "legacyName": "Seychelles"
+    },
+    {
+      "value": "SL",
+      "label": "Sierra Leone",
+      "legacyName": "Sierra Leone"
+    },
+    {
+      "value": "SG",
+      "label": "Singapura",
+      "legacyName": "Singapore"
+    },
+    {
+      "value": "SX",
+      "label": "Sint Maarten",
+      "legacyName": "Sint Maarten (Dutch part)"
+    },
+    {
+      "value": "CY",
+      "label": "Siprus",
+      "legacyName": "Cyprus"
+    },
+    {
+      "value": "SK",
+      "label": "Slovakia",
+      "legacyName": "Slovakia"
+    },
+    {
+      "value": "SI",
+      "label": "Slovenia",
+      "legacyName": "Slovenia"
+    },
+    {
+      "value": "SO",
+      "label": "Somalia",
+      "legacyName": "Somalia"
+    },
+    {
+      "value": "ES",
+      "label": "Spanyol",
+      "legacyName": "Spain"
+    },
+    {
+      "value": "LK",
+      "label": "Sri Lanka",
+      "legacyName": "Sri Lanka"
+    },
+    {
+      "value": "SD",
+      "label": "Sudan",
+      "legacyName": "Sudan"
+    },
+    {
+      "value": "SS",
+      "label": "Sudan Selatan",
+      "legacyName": "South Sudan"
+    },
+    {
+      "value": "SY",
+      "label": "Suriah",
+      "legacyName": "Syria"
+    },
+    {
+      "value": "SR",
+      "label": "Suriname",
+      "legacyName": "Suriname"
+    },
+    {
+      "value": "SE",
+      "label": "Swedia",
+      "legacyName": "Sweden"
+    },
+    {
+      "value": "CH",
+      "label": "Swiss",
+      "legacyName": "Switzerland"
+    },
+    {
+      "value": "TW",
+      "label": "Taiwan",
+      "legacyName": "Taiwan"
+    },
+    {
+      "value": "TJ",
+      "label": "Tajikistan",
+      "legacyName": "Tajikistan"
+    },
+    {
+      "value": "CV",
+      "label": "Tanjung Verde",
+      "legacyName": "Cape Verde"
+    },
+    {
+      "value": "TZ",
+      "label": "Tanzania",
+      "legacyName": "Tanzania"
+    },
+    {
+      "value": "TH",
+      "label": "Thailand",
+      "legacyName": "Thailand"
+    },
+    {
+      "value": "TL",
+      "label": "Timor Leste",
+      "legacyName": "East Timor"
+    },
+    {
+      "value": "CN",
+      "label": "Tiongkok",
+      "legacyName": "China"
+    },
+    {
+      "value": "TG",
+      "label": "Togo",
+      "legacyName": "Togo"
+    },
+    {
+      "value": "TK",
+      "label": "Tokelau",
+      "legacyName": "Tokelau"
+    },
+    {
+      "value": "TO",
+      "label": "Tonga",
+      "legacyName": "Tonga"
+    },
+    {
+      "value": "TT",
+      "label": "Trinidad dan Tobago",
+      "legacyName": "Trinidad And Tobago"
+    },
+    {
+      "value": "TN",
+      "label": "Tunisia",
+      "legacyName": "Tunisia"
+    },
+    {
+      "value": "TR",
+      "label": "Turki",
+      "legacyName": "Turkey"
+    },
+    {
+      "value": "TM",
+      "label": "Turkmenistan",
+      "legacyName": "Turkmenistan"
+    },
+    {
+      "value": "TV",
+      "label": "Tuvalu",
+      "legacyName": "Tuvalu"
+    },
+    {
+      "value": "UG",
+      "label": "Uganda",
+      "legacyName": "Uganda"
+    },
+    {
+      "value": "UA",
+      "label": "Ukraina",
+      "legacyName": "Ukraine"
+    },
+    {
+      "value": "AE",
+      "label": "Uni Emirat Arab",
+      "legacyName": "United Arab Emirates"
+    },
+    {
+      "value": "UY",
+      "label": "Uruguay",
+      "legacyName": "Uruguay"
+    },
+    {
+      "value": "UZ",
+      "label": "Uzbekistan",
+      "legacyName": "Uzbekistan"
+    },
+    {
+      "value": "VU",
+      "label": "Vanuatu",
+      "legacyName": "Vanuatu"
+    },
+    {
+      "value": "VA",
+      "label": "Vatikan",
+      "legacyName": "Vatican City State (Holy See)"
+    },
+    {
+      "value": "VE",
+      "label": "Venezuela",
+      "legacyName": "Venezuela"
+    },
+    {
+      "value": "VN",
+      "label": "Vietnam",
+      "legacyName": "Vietnam"
+    },
+    {
+      "value": "IO",
+      "label": "Wilayah Inggris di Samudra Hindia",
+      "legacyName": "British Indian Ocean Territory"
+    },
+    {
+      "value": "PS",
+      "label": "Wilayah Palestina",
+      "legacyName": "Palestinian Territory Occupied"
+    },
+    {
+      "value": "TF",
+      "label": "Wilayah Selatan Prancis",
+      "legacyName": "French Southern Territories"
+    },
+    {
+      "value": "YE",
+      "label": "Yaman",
+      "legacyName": "Yemen"
+    },
+    {
+      "value": "JO",
+      "label": "Yordania",
+      "legacyName": "Jordan"
+    },
+    {
+      "value": "GR",
+      "label": "Yunani",
+      "legacyName": "Greece"
+    },
+    {
+      "value": "ZM",
+      "label": "Zambia",
+      "legacyName": "Zambia"
+    },
+    {
+      "value": "ZW",
+      "label": "Zimbabwe",
+      "legacyName": "Zimbabwe"
+    }
+  ],
+  "cities": [
+    {
+      "value": "ID:PA:Abepura",
+      "label": "Abepura — Papua",
+      "legacyName": "Abepura"
+    },
+    {
+      "value": "ID:JT:Adiwerna",
+      "label": "Adiwerna — Jawa Tengah",
+      "legacyName": "Adiwerna"
+    },
+    {
+      "value": "ID:MA:Amahai",
+      "label": "Amahai — Maluku",
+      "legacyName": "Amahai"
+    },
+    {
+      "value": "ID:JT:Ambarawa",
+      "label": "Ambarawa — Jawa Tengah",
+      "legacyName": "Ambarawa"
+    },
+    {
+      "value": "ID:SU:Ambarita",
+      "label": "Ambarita — Sumatera Utara",
+      "legacyName": "Ambarita"
+    },
+    {
+      "value": "ID:MA:Ambon",
+      "label": "Ambon — Maluku",
+      "legacyName": "Ambon"
+    },
+    {
+      "value": "ID:BA:Amlapura",
+      "label": "Amlapura — Bali",
+      "legacyName": "Amlapura"
+    },
+    {
+      "value": "ID:BA:Amlapura city",
+      "label": "Amlapura city — Bali",
+      "legacyName": "Amlapura city"
+    },
+    {
+      "value": "ID:KS:Amuntai",
+      "label": "Amuntai — Kalimantan Selatan",
+      "legacyName": "Amuntai"
+    },
+    {
+      "value": "ID:JB:Arjawinangun",
+      "label": "Arjawinangun — Jawa Barat",
+      "legacyName": "Arjawinangun"
+    },
+    {
+      "value": "ID:JB:Astanajapura",
+      "label": "Astanajapura — Jawa Barat",
+      "legacyName": "Astanajapura"
+    },
+    {
+      "value": "ID:NT:Atambua",
+      "label": "Atambua — Nusa Tenggara Timur",
+      "legacyName": "Atambua"
+    },
+    {
+      "value": "ID:JI:Babat",
+      "label": "Babat — Jawa Timur",
+      "legacyName": "Babat"
+    },
+    {
+      "value": "ID:JT:Baekrajan",
+      "label": "Baekrajan — Jawa Tengah",
+      "legacyName": "Baekrajan"
+    },
+    {
+      "value": "ID:JT:Baki",
+      "label": "Baki — Jawa Tengah",
+      "legacyName": "Baki"
+    },
+    {
+      "value": "ID:RI:Balaipungut",
+      "label": "Balaipungut — Riau",
+      "legacyName": "Balaipungut"
+    },
+    {
+      "value": "ID:JT:Balapulang",
+      "label": "Balapulang — Jawa Tengah",
+      "legacyName": "Balapulang"
+    },
+    {
+      "value": "ID:KI:Balikpapan",
+      "label": "Balikpapan — Kalimantan Timur",
+      "legacyName": "Balikpapan"
+    },
+    {
+      "value": "ID:JI:Balung",
+      "label": "Balung — Jawa Timur",
+      "legacyName": "Balung"
+    },
+    {
+      "value": "ID:YO:Bambanglipuro",
+      "label": "Bambanglipuro — DI Yogyakarta",
+      "legacyName": "Bambanglipuro"
+    },
+    {
+      "value": "ID:AC:Banda Aceh",
+      "label": "Banda Aceh — Aceh",
+      "legacyName": "Banda Aceh"
+    },
+    {
+      "value": "ID:SU:Bandar",
+      "label": "Bandar — Sumatera Utara",
+      "legacyName": "Bandar"
+    },
+    {
+      "value": "ID:LA:Bandar Lampung",
+      "label": "Bandar Lampung — Lampung",
+      "legacyName": "Bandar Lampung"
+    },
+    {
+      "value": "ID:JB:Bandung",
+      "label": "Bandung — Jawa Barat",
+      "legacyName": "Bandung"
+    },
+    {
+      "value": "ID:JI:Bangil",
+      "label": "Bangil — Jawa Timur",
+      "legacyName": "Bangil"
+    },
+    {
+      "value": "ID:JI:Bangkalan",
+      "label": "Bangkalan — Jawa Timur",
+      "legacyName": "Bangkalan"
+    },
+    {
+      "value": "ID:BA:Banjar",
+      "label": "Banjar — Bali",
+      "legacyName": "Banjar"
+    },
+    {
+      "value": "ID:JB:Banjar",
+      "label": "Banjar — Jawa Barat",
+      "legacyName": "Banjar"
+    },
+    {
+      "value": "ID:BA:Banjar Wangsian",
+      "label": "Banjar Wangsian — Bali",
+      "legacyName": "Banjar Wangsian"
+    },
+    {
+      "value": "ID:JB:Banjaran",
+      "label": "Banjaran — Jawa Barat",
+      "legacyName": "Banjaran"
+    },
+    {
+      "value": "ID:KS:Banjarmasin",
+      "label": "Banjarmasin — Kalimantan Selatan",
+      "legacyName": "Banjarmasin"
+    },
+    {
+      "value": "ID:YO:Bantul",
+      "label": "Bantul — DI Yogyakarta",
+      "legacyName": "Bantul"
+    },
+    {
+      "value": "ID:JT:Banyumas",
+      "label": "Banyumas — Jawa Tengah",
+      "legacyName": "Banyumas"
+    },
+    {
+      "value": "ID:JI:Banyuwangi",
+      "label": "Banyuwangi — Jawa Timur",
+      "legacyName": "Banyuwangi"
+    },
+    {
+      "value": "ID:KS:Barabai",
+      "label": "Barabai — Kalimantan Selatan",
+      "legacyName": "Barabai"
+    },
+    {
+      "value": "ID:RI:Batam",
+      "label": "Batam — Riau",
+      "legacyName": "Batam"
+    },
+    {
+      "value": "ID:JT:Batang",
+      "label": "Batang — Jawa Tengah",
+      "legacyName": "Batang"
+    },
+    {
+      "value": "ID:JI:Batu",
+      "label": "Batu — Jawa Timur",
+      "legacyName": "Batu"
+    },
+    {
+      "value": "ID:JT:Baturaden",
+      "label": "Baturaden — Jawa Tengah",
+      "legacyName": "Baturaden"
+    },
+    {
+      "value": "ID:SS:Baturaja",
+      "label": "Baturaja — Sumatera Selatan",
+      "legacyName": "Baturaja"
+    },
+    {
+      "value": "ID:BA:Bedugul",
+      "label": "Bedugul — Bali",
+      "legacyName": "Bedugul"
+    },
+    {
+      "value": "ID:JA:Bejubang Dua",
+      "label": "Bejubang Dua — Jambi",
+      "legacyName": "Bejubang Dua"
+    },
+    {
+      "value": "ID:JB:Bekasi",
+      "label": "Bekasi — Jawa Barat",
+      "legacyName": "Bekasi"
+    },
+    {
+      "value": "ID:SU:Belawan",
+      "label": "Belawan — Sumatera Utara",
+      "legacyName": "Belawan"
+    },
+    {
+      "value": "ID:BE:Bengkulu",
+      "label": "Bengkulu — Bengkulu",
+      "legacyName": "Bengkulu"
+    },
+    {
+      "value": "ID:SU:Berastagi",
+      "label": "Berastagi — Sumatera Utara",
+      "legacyName": "Berastagi"
+    },
+    {
+      "value": "ID:JI:Besuki",
+      "label": "Besuki — Jawa Timur",
+      "legacyName": "Besuki"
+    },
+    {
+      "value": "ID:PA:Biak",
+      "label": "Biak — Papua",
+      "legacyName": "Biak"
+    },
+    {
+      "value": "ID:NB:Bima",
+      "label": "Bima — Nusa Tenggara Barat",
+      "legacyName": "Bima"
+    },
+    {
+      "value": "ID:SU:Binjai",
+      "label": "Binjai — Sumatera Utara",
+      "legacyName": "Binjai"
+    },
+    {
+      "value": "ID:AC:Bireun",
+      "label": "Bireun — Aceh",
+      "legacyName": "Bireun"
+    },
+    {
+      "value": "ID:JI:Blitar",
+      "label": "Blitar — Jawa Timur",
+      "legacyName": "Blitar"
+    },
+    {
+      "value": "ID:JT:Blora",
+      "label": "Blora — Jawa Tengah",
+      "legacyName": "Blora"
+    },
+    {
+      "value": "ID:JB:Bogor",
+      "label": "Bogor — Jawa Barat",
+      "legacyName": "Bogor"
+    },
+    {
+      "value": "ID:JI:Bojonegoro",
+      "label": "Bojonegoro — Jawa Timur",
+      "legacyName": "Bojonegoro"
+    },
+    {
+      "value": "ID:JI:Bondowoso",
+      "label": "Bondowoso — Jawa Timur",
+      "legacyName": "Bondowoso"
+    },
+    {
+      "value": "ID:KI:Bontang",
+      "label": "Bontang — Kalimantan Timur",
+      "legacyName": "Bontang"
+    },
+    {
+      "value": "ID:JT:Boyolali",
+      "label": "Boyolali — Jawa Tengah",
+      "legacyName": "Boyolali"
+    },
+    {
+      "value": "ID:JI:Boyolangu",
+      "label": "Boyolangu — Jawa Timur",
+      "legacyName": "Boyolangu"
+    },
+    {
+      "value": "ID:JT:Buaran",
+      "label": "Buaran — Jawa Tengah",
+      "legacyName": "Buaran"
+    },
+    {
+      "value": "ID:JI:Buduran",
+      "label": "Buduran — Jawa Timur",
+      "legacyName": "Buduran"
+    },
+    {
+      "value": "ID:SB:Bukittinggi",
+      "label": "Bukittinggi — Sumatera Barat",
+      "legacyName": "Bukittinggi"
+    },
+    {
+      "value": "ID:JT:Bulakamba",
+      "label": "Bulakamba — Jawa Tengah",
+      "legacyName": "Bulakamba"
+    },
+    {
+      "value": "ID:JT:Candi Prambanan",
+      "label": "Candi Prambanan — Jawa Tengah",
+      "legacyName": "Candi Prambanan"
+    },
+    {
+      "value": "ID:JB:Caringin",
+      "label": "Caringin — Jawa Barat",
+      "legacyName": "Caringin"
+    },
+    {
+      "value": "ID:JT:Ceper",
+      "label": "Ceper — Jawa Tengah",
+      "legacyName": "Ceper"
+    },
+    {
+      "value": "ID:JT:Cepu",
+      "label": "Cepu — Jawa Tengah",
+      "legacyName": "Cepu"
+    },
+    {
+      "value": "ID:JB:Ciamis",
+      "label": "Ciamis — Jawa Barat",
+      "legacyName": "Ciamis"
+    },
+    {
+      "value": "ID:JB:Ciampea",
+      "label": "Ciampea — Jawa Barat",
+      "legacyName": "Ciampea"
+    },
+    {
+      "value": "ID:JB:Cibinong",
+      "label": "Cibinong — Jawa Barat",
+      "legacyName": "Cibinong"
+    },
+    {
+      "value": "ID:JB:Cicurug",
+      "label": "Cicurug — Jawa Barat",
+      "legacyName": "Cicurug"
+    },
+    {
+      "value": "ID:JB:Cikampek",
+      "label": "Cikampek — Jawa Barat",
+      "legacyName": "Cikampek"
+    },
+    {
+      "value": "ID:JB:Cikarang",
+      "label": "Cikarang — Jawa Barat",
+      "legacyName": "Cikarang"
+    },
+    {
+      "value": "ID:JB:Cikupa",
+      "label": "Cikupa — Jawa Barat",
+      "legacyName": "Cikupa"
+    },
+    {
+      "value": "ID:JB:Cileungsir",
+      "label": "Cileungsir — Jawa Barat",
+      "legacyName": "Cileungsir"
+    },
+    {
+      "value": "ID:JB:Cileunyi",
+      "label": "Cileunyi — Jawa Barat",
+      "legacyName": "Cileunyi"
+    },
+    {
+      "value": "ID:JB:Cimahi",
+      "label": "Cimahi — Jawa Barat",
+      "legacyName": "Cimahi"
+    },
+    {
+      "value": "ID:JB:Ciputat",
+      "label": "Ciputat — Jawa Barat",
+      "legacyName": "Ciputat"
+    },
+    {
+      "value": "ID:JB:Ciranjang-hilir",
+      "label": "Ciranjang-hilir — Jawa Barat",
+      "legacyName": "Ciranjang-hilir"
+    },
+    {
+      "value": "ID:JB:Cirebon",
+      "label": "Cirebon — Jawa Barat",
+      "legacyName": "Cirebon"
+    },
+    {
+      "value": "ID:JB:Citeureup",
+      "label": "Citeureup — Jawa Barat",
+      "legacyName": "Citeureup"
+    },
+    {
+      "value": "ID:KI:City of Balikpapan",
+      "label": "City of Balikpapan — Kalimantan Timur",
+      "legacyName": "City of Balikpapan"
+    },
+    {
+      "value": "ID:JT:Colomadu",
+      "label": "Colomadu — Jawa Tengah",
+      "legacyName": "Colomadu"
+    },
+    {
+      "value": "ID:JT:Comal",
+      "label": "Comal — Jawa Tengah",
+      "legacyName": "Comal"
+    },
+    {
+      "value": "ID:BT:Curug",
+      "label": "Curug — Banten",
+      "legacyName": "Curug"
+    },
+    {
+      "value": "ID:BE:Curup",
+      "label": "Curup — Bengkulu",
+      "legacyName": "Curup"
+    },
+    {
+      "value": "ID:JI:Dampit",
+      "label": "Dampit — Jawa Timur",
+      "legacyName": "Dampit"
+    },
+    {
+      "value": "ID:JT:Delanggu",
+      "label": "Delanggu — Jawa Tengah",
+      "legacyName": "Delanggu"
+    },
+    {
+      "value": "ID:SU:Deli Tua",
+      "label": "Deli Tua — Sumatera Utara",
+      "legacyName": "Deli Tua"
+    },
+    {
+      "value": "ID:JT:Demak",
+      "label": "Demak — Jawa Tengah",
+      "legacyName": "Demak"
+    },
+    {
+      "value": "ID:BA:Denpasar",
+      "label": "Denpasar — Bali",
+      "legacyName": "Denpasar"
+    },
+    {
+      "value": "ID:JB:Depok",
+      "label": "Depok — Jawa Barat",
+      "legacyName": "Depok"
+    },
+    {
+      "value": "ID:YO:Depok",
+      "label": "Depok — DI Yogyakarta",
+      "legacyName": "Depok"
+    },
+    {
+      "value": "ID:JI:Diwek",
+      "label": "Diwek — Jawa Timur",
+      "legacyName": "Diwek"
+    },
+    {
+      "value": "ID:NB:Dompu",
+      "label": "Dompu — Nusa Tenggara Barat",
+      "legacyName": "Dompu"
+    },
+    {
+      "value": "ID:JI:Driyorejo",
+      "label": "Driyorejo — Jawa Timur",
+      "legacyName": "Driyorejo"
+    },
+    {
+      "value": "ID:JT:Dukuhturi",
+      "label": "Dukuhturi — Jawa Tengah",
+      "legacyName": "Dukuhturi"
+    },
+    {
+      "value": "ID:RI:Dumai",
+      "label": "Dumai — Riau",
+      "legacyName": "Dumai"
+    },
+    {
+      "value": "ID:MU:East Halmahera Regency",
+      "label": "East Halmahera Regency — Maluku Utara",
+      "legacyName": "East Halmahera Regency"
+    },
+    {
+      "value": "ID:NT:Ende",
+      "label": "Ende — Nusa Tenggara Timur",
+      "legacyName": "Ende"
+    },
+    {
+      "value": "ID:SN:Galesong",
+      "label": "Galesong — Sulawesi Selatan",
+      "legacyName": "Galesong"
+    },
+    {
+      "value": "ID:JI:Gambiran Satu",
+      "label": "Gambiran Satu — Jawa Timur",
+      "legacyName": "Gambiran Satu"
+    },
+    {
+      "value": "ID:JI:Gampengrejo",
+      "label": "Gampengrejo — Jawa Timur",
+      "legacyName": "Gampengrejo"
+    },
+    {
+      "value": "ID:YO:Gamping Lor",
+      "label": "Gamping Lor — DI Yogyakarta",
+      "legacyName": "Gamping Lor"
+    },
+    {
+      "value": "ID:JT:Gatak",
+      "label": "Gatak — Jawa Tengah",
+      "legacyName": "Gatak"
+    },
+    {
+      "value": "ID:JT:Gebog",
+      "label": "Gebog — Jawa Tengah",
+      "legacyName": "Gebog"
+    },
+    {
+      "value": "ID:JI:Gedangan",
+      "label": "Gedangan — Jawa Timur",
+      "legacyName": "Gedangan"
+    },
+    {
+      "value": "ID:JI:Genteng",
+      "label": "Genteng — Jawa Timur",
+      "legacyName": "Genteng"
+    },
+    {
+      "value": "ID:NB:Gili Air",
+      "label": "Gili Air — Nusa Tenggara Barat",
+      "legacyName": "Gili Air"
+    },
+    {
+      "value": "ID:YO:Godean",
+      "label": "Godean — DI Yogyakarta",
+      "legacyName": "Godean"
+    },
+    {
+      "value": "ID:JT:Gombong",
+      "label": "Gombong — Jawa Tengah",
+      "legacyName": "Gombong"
+    },
+    {
+      "value": "ID:JI:Gongdanglegi Kulon",
+      "label": "Gongdanglegi Kulon — Jawa Timur",
+      "legacyName": "Gongdanglegi Kulon"
+    },
+    {
+      "value": "ID:GO:Gorontalo",
+      "label": "Gorontalo — Gorontalo",
+      "legacyName": "Gorontalo"
+    },
+    {
+      "value": "ID:JI:Gresik",
+      "label": "Gresik — Jawa Timur",
+      "legacyName": "Gresik"
+    },
+    {
+      "value": "ID:JI:Gresik Regency",
+      "label": "Gresik Regency — Jawa Timur",
+      "legacyName": "Gresik Regency"
+    },
+    {
+      "value": "ID:JT:Grogol",
+      "label": "Grogol — Jawa Tengah",
+      "legacyName": "Grogol"
+    },
+    {
+      "value": "ID:JT:Gunung Kendil",
+      "label": "Gunung Kendil — Jawa Tengah",
+      "legacyName": "Gunung Kendil"
+    },
+    {
+      "value": "ID:SU:Gunungsitoli",
+      "label": "Gunungsitoli — Sumatera Utara",
+      "legacyName": "Gunungsitoli"
+    },
+    {
+      "value": "ID:JB:Indramayu",
+      "label": "Indramayu — Jawa Barat",
+      "legacyName": "Indramayu"
+    },
+    {
+      "value": "ID:PA:Insrom",
+      "label": "Insrom — Papua",
+      "legacyName": "Insrom"
+    },
+    {
+      "value": "ID:JK:Jakarta",
+      "label": "Jakarta — DKI Jakarta",
+      "legacyName": "Jakarta"
+    },
+    {
+      "value": "ID:JA:Jambi City",
+      "label": "Jambi City — Jambi",
+      "legacyName": "Jambi City"
+    },
+    {
+      "value": "ID:JT:Jaten",
+      "label": "Jaten — Jawa Tengah",
+      "legacyName": "Jaten"
+    },
+    {
+      "value": "ID:JB:Jatibarang",
+      "label": "Jatibarang — Jawa Barat",
+      "legacyName": "Jatibarang"
+    },
+    {
+      "value": "ID:JT:Jatiroto",
+      "label": "Jatiroto — Jawa Tengah",
+      "legacyName": "Jatiroto"
+    },
+    {
+      "value": "ID:JB:Jatiwangi",
+      "label": "Jatiwangi — Jawa Barat",
+      "legacyName": "Jatiwangi"
+    },
+    {
+      "value": "ID:PA:Jayapura",
+      "label": "Jayapura — Papua",
+      "legacyName": "Jayapura"
+    },
+    {
+      "value": "ID:JT:Jekulo",
+      "label": "Jekulo — Jawa Tengah",
+      "legacyName": "Jekulo"
+    },
+    {
+      "value": "ID:JI:Jember",
+      "label": "Jember — Jawa Timur",
+      "legacyName": "Jember"
+    },
+    {
+      "value": "ID:BA:Jimbaran",
+      "label": "Jimbaran — Bali",
+      "legacyName": "Jimbaran"
+    },
+    {
+      "value": "ID:JT:Jogonalan",
+      "label": "Jogonalan — Jawa Tengah",
+      "legacyName": "Jogonalan"
+    },
+    {
+      "value": "ID:JI:Jombang",
+      "label": "Jombang — Jawa Timur",
+      "legacyName": "Jombang"
+    },
+    {
+      "value": "ID:JT:Juwana",
+      "label": "Juwana — Jawa Tengah",
+      "legacyName": "Juwana"
+    },
+    {
+      "value": "ID:SU:Kabanjahe",
+      "label": "Kabanjahe — Sumatera Utara",
+      "legacyName": "Kabanjahe"
+    },
+    {
+      "value": "ID:AC:Kabupaten Aceh Barat",
+      "label": "Kabupaten Aceh Barat — Aceh",
+      "legacyName": "Kabupaten Aceh Barat"
+    },
+    {
+      "value": "ID:AC:Kabupaten Aceh Barat Daya",
+      "label": "Kabupaten Aceh Barat Daya — Aceh",
+      "legacyName": "Kabupaten Aceh Barat Daya"
+    },
+    {
+      "value": "ID:AC:Kabupaten Aceh Besar",
+      "label": "Kabupaten Aceh Besar — Aceh",
+      "legacyName": "Kabupaten Aceh Besar"
+    },
+    {
+      "value": "ID:AC:Kabupaten Aceh Jaya",
+      "label": "Kabupaten Aceh Jaya — Aceh",
+      "legacyName": "Kabupaten Aceh Jaya"
+    },
+    {
+      "value": "ID:AC:Kabupaten Aceh Selatan",
+      "label": "Kabupaten Aceh Selatan — Aceh",
+      "legacyName": "Kabupaten Aceh Selatan"
+    },
+    {
+      "value": "ID:AC:Kabupaten Aceh Singkil",
+      "label": "Kabupaten Aceh Singkil — Aceh",
+      "legacyName": "Kabupaten Aceh Singkil"
+    },
+    {
+      "value": "ID:AC:Kabupaten Aceh Tamiang",
+      "label": "Kabupaten Aceh Tamiang — Aceh",
+      "legacyName": "Kabupaten Aceh Tamiang"
+    },
+    {
+      "value": "ID:AC:Kabupaten Aceh Tengah",
+      "label": "Kabupaten Aceh Tengah — Aceh",
+      "legacyName": "Kabupaten Aceh Tengah"
+    },
+    {
+      "value": "ID:AC:Kabupaten Aceh Tenggara",
+      "label": "Kabupaten Aceh Tenggara — Aceh",
+      "legacyName": "Kabupaten Aceh Tenggara"
+    },
+    {
+      "value": "ID:AC:Kabupaten Aceh Timur",
+      "label": "Kabupaten Aceh Timur — Aceh",
+      "legacyName": "Kabupaten Aceh Timur"
+    },
+    {
+      "value": "ID:AC:Kabupaten Aceh Utara",
+      "label": "Kabupaten Aceh Utara — Aceh",
+      "legacyName": "Kabupaten Aceh Utara"
+    },
+    {
+      "value": "ID:SB:Kabupaten Agam",
+      "label": "Kabupaten Agam — Sumatera Barat",
+      "legacyName": "Kabupaten Agam"
+    },
+    {
+      "value": "ID:NT:Kabupaten Alor",
+      "label": "Kabupaten Alor — Nusa Tenggara Timur",
+      "legacyName": "Kabupaten Alor"
+    },
+    {
+      "value": "ID:SU:Kabupaten Asahan",
+      "label": "Kabupaten Asahan — Sumatera Utara",
+      "legacyName": "Kabupaten Asahan"
+    },
+    {
+      "value": "ID:PA:Kabupaten Asmat",
+      "label": "Kabupaten Asmat — Papua",
+      "legacyName": "Kabupaten Asmat"
+    },
+    {
+      "value": "ID:BA:Kabupaten Badung",
+      "label": "Kabupaten Badung — Bali",
+      "legacyName": "Kabupaten Badung"
+    },
+    {
+      "value": "ID:KS:Kabupaten Balangan",
+      "label": "Kabupaten Balangan — Kalimantan Selatan",
+      "legacyName": "Kabupaten Balangan"
+    },
+    {
+      "value": "ID:JB:Kabupaten Bandung",
+      "label": "Kabupaten Bandung — Jawa Barat",
+      "legacyName": "Kabupaten Bandung"
+    },
+    {
+      "value": "ID:JB:Kabupaten Bandung Barat",
+      "label": "Kabupaten Bandung Barat — Jawa Barat",
+      "legacyName": "Kabupaten Bandung Barat"
+    },
+    {
+      "value": "ID:ST:Kabupaten Banggai",
+      "label": "Kabupaten Banggai — Sulawesi Tengah",
+      "legacyName": "Kabupaten Banggai"
+    },
+    {
+      "value": "ID:ST:Kabupaten Banggai Kepulauan",
+      "label": "Kabupaten Banggai Kepulauan — Sulawesi Tengah",
+      "legacyName": "Kabupaten Banggai Kepulauan"
+    },
+    {
+      "value": "ID:ST:Kabupaten Banggai Laut",
+      "label": "Kabupaten Banggai Laut — Sulawesi Tengah",
+      "legacyName": "Kabupaten Banggai Laut"
+    },
+    {
+      "value": "ID:BB:Kabupaten Bangka",
+      "label": "Kabupaten Bangka — Kepulauan Bangka Belitung",
+      "legacyName": "Kabupaten Bangka"
+    },
+    {
+      "value": "ID:BB:Kabupaten Bangka Barat",
+      "label": "Kabupaten Bangka Barat — Kepulauan Bangka Belitung",
+      "legacyName": "Kabupaten Bangka Barat"
+    },
+    {
+      "value": "ID:BB:Kabupaten Bangka Selatan",
+      "label": "Kabupaten Bangka Selatan — Kepulauan Bangka Belitung",
+      "legacyName": "Kabupaten Bangka Selatan"
+    },
+    {
+      "value": "ID:BB:Kabupaten Bangka Tengah",
+      "label": "Kabupaten Bangka Tengah — Kepulauan Bangka Belitung",
+      "legacyName": "Kabupaten Bangka Tengah"
+    },
+    {
+      "value": "ID:JI:Kabupaten Bangkalan",
+      "label": "Kabupaten Bangkalan — Jawa Timur",
+      "legacyName": "Kabupaten Bangkalan"
+    },
+    {
+      "value": "ID:BA:Kabupaten Bangli",
+      "label": "Kabupaten Bangli — Bali",
+      "legacyName": "Kabupaten Bangli"
+    },
+    {
+      "value": "ID:KS:Kabupaten Banjar",
+      "label": "Kabupaten Banjar — Kalimantan Selatan",
+      "legacyName": "Kabupaten Banjar"
+    },
+    {
+      "value": "ID:JT:Kabupaten Banjarnegara",
+      "label": "Kabupaten Banjarnegara — Jawa Tengah",
+      "legacyName": "Kabupaten Banjarnegara"
+    },
+    {
+      "value": "ID:SN:Kabupaten Bantaeng",
+      "label": "Kabupaten Bantaeng — Sulawesi Selatan",
+      "legacyName": "Kabupaten Bantaeng"
+    },
+    {
+      "value": "ID:YO:Kabupaten Bantul",
+      "label": "Kabupaten Bantul — DI Yogyakarta",
+      "legacyName": "Kabupaten Bantul"
+    },
+    {
+      "value": "ID:JT:Kabupaten Banyumas",
+      "label": "Kabupaten Banyumas — Jawa Tengah",
+      "legacyName": "Kabupaten Banyumas"
+    },
+    {
+      "value": "ID:JI:Kabupaten Banyuwangi",
+      "label": "Kabupaten Banyuwangi — Jawa Timur",
+      "legacyName": "Kabupaten Banyuwangi"
+    },
+    {
+      "value": "ID:KS:Kabupaten Barito Kuala",
+      "label": "Kabupaten Barito Kuala — Kalimantan Selatan",
+      "legacyName": "Kabupaten Barito Kuala"
+    },
+    {
+      "value": "ID:KT:Kabupaten Barito Selatan",
+      "label": "Kabupaten Barito Selatan — Kalimantan Tengah",
+      "legacyName": "Kabupaten Barito Selatan"
+    },
+    {
+      "value": "ID:KT:Kabupaten Barito Timur",
+      "label": "Kabupaten Barito Timur — Kalimantan Tengah",
+      "legacyName": "Kabupaten Barito Timur"
+    },
+    {
+      "value": "ID:KT:Kabupaten Barito Utara",
+      "label": "Kabupaten Barito Utara — Kalimantan Tengah",
+      "legacyName": "Kabupaten Barito Utara"
+    },
+    {
+      "value": "ID:SN:Kabupaten Barru",
+      "label": "Kabupaten Barru — Sulawesi Selatan",
+      "legacyName": "Kabupaten Barru"
+    },
+    {
+      "value": "ID:JT:Kabupaten Batang",
+      "label": "Kabupaten Batang — Jawa Tengah",
+      "legacyName": "Kabupaten Batang"
+    },
+    {
+      "value": "ID:JA:Kabupaten Batang Hari",
+      "label": "Kabupaten Batang Hari — Jambi",
+      "legacyName": "Kabupaten Batang Hari"
+    },
+    {
+      "value": "ID:SU:Kabupaten Batu Bara",
+      "label": "Kabupaten Batu Bara — Sumatera Utara",
+      "legacyName": "Kabupaten Batu Bara"
+    },
+    {
+      "value": "ID:JB:Kabupaten Bekasi",
+      "label": "Kabupaten Bekasi — Jawa Barat",
+      "legacyName": "Kabupaten Bekasi"
+    },
+    {
+      "value": "ID:BB:Kabupaten Belitung",
+      "label": "Kabupaten Belitung — Kepulauan Bangka Belitung",
+      "legacyName": "Kabupaten Belitung"
+    },
+    {
+      "value": "ID:BB:Kabupaten Belitung Timur",
+      "label": "Kabupaten Belitung Timur — Kepulauan Bangka Belitung",
+      "legacyName": "Kabupaten Belitung Timur"
+    },
+    {
+      "value": "ID:NT:Kabupaten Belu",
+      "label": "Kabupaten Belu — Nusa Tenggara Timur",
+      "legacyName": "Kabupaten Belu"
+    },
+    {
+      "value": "ID:AC:Kabupaten Bener Meriah",
+      "label": "Kabupaten Bener Meriah — Aceh",
+      "legacyName": "Kabupaten Bener Meriah"
+    },
+    {
+      "value": "ID:RI:Kabupaten Bengkalis",
+      "label": "Kabupaten Bengkalis — Riau",
+      "legacyName": "Kabupaten Bengkalis"
+    },
+    {
+      "value": "ID:BE:Kabupaten Bengkulu Selatan",
+      "label": "Kabupaten Bengkulu Selatan — Bengkulu",
+      "legacyName": "Kabupaten Bengkulu Selatan"
+    },
+    {
+      "value": "ID:BE:Kabupaten Bengkulu Tengah",
+      "label": "Kabupaten Bengkulu Tengah — Bengkulu",
+      "legacyName": "Kabupaten Bengkulu Tengah"
+    },
+    {
+      "value": "ID:BE:Kabupaten Bengkulu Utara",
+      "label": "Kabupaten Bengkulu Utara — Bengkulu",
+      "legacyName": "Kabupaten Bengkulu Utara"
+    },
+    {
+      "value": "ID:KI:Kabupaten Berau",
+      "label": "Kabupaten Berau — Kalimantan Timur",
+      "legacyName": "Kabupaten Berau"
+    },
+    {
+      "value": "ID:PA:Kabupaten Biak Numfor",
+      "label": "Kabupaten Biak Numfor — Papua",
+      "legacyName": "Kabupaten Biak Numfor"
+    },
+    {
+      "value": "ID:NB:Kabupaten Bima",
+      "label": "Kabupaten Bima — Nusa Tenggara Barat",
+      "legacyName": "Kabupaten Bima"
+    },
+    {
+      "value": "ID:KR:Kabupaten Bintan",
+      "label": "Kabupaten Bintan — Kepulauan Riau",
+      "legacyName": "Kabupaten Bintan"
+    },
+    {
+      "value": "ID:AC:Kabupaten Bireuen",
+      "label": "Kabupaten Bireuen — Aceh",
+      "legacyName": "Kabupaten Bireuen"
+    },
+    {
+      "value": "ID:JI:Kabupaten Blitar",
+      "label": "Kabupaten Blitar — Jawa Timur",
+      "legacyName": "Kabupaten Blitar"
+    },
+    {
+      "value": "ID:JT:Kabupaten Blora",
+      "label": "Kabupaten Blora — Jawa Tengah",
+      "legacyName": "Kabupaten Blora"
+    },
+    {
+      "value": "ID:GO:Kabupaten Boalemo",
+      "label": "Kabupaten Boalemo — Gorontalo",
+      "legacyName": "Kabupaten Boalemo"
+    },
+    {
+      "value": "ID:JB:Kabupaten Bogor",
+      "label": "Kabupaten Bogor — Jawa Barat",
+      "legacyName": "Kabupaten Bogor"
+    },
+    {
+      "value": "ID:JI:Kabupaten Bojonegoro",
+      "label": "Kabupaten Bojonegoro — Jawa Timur",
+      "legacyName": "Kabupaten Bojonegoro"
+    },
+    {
+      "value": "ID:SA:Kabupaten Bolaang Mongondow",
+      "label": "Kabupaten Bolaang Mongondow — Sulawesi Utara",
+      "legacyName": "Kabupaten Bolaang Mongondow"
+    },
+    {
+      "value": "ID:SA:Kabupaten Bolaang Mongondow Selatan",
+      "label": "Kabupaten Bolaang Mongondow Selatan — Sulawesi Utara",
+      "legacyName": "Kabupaten Bolaang Mongondow Selatan"
+    },
+    {
+      "value": "ID:SA:Kabupaten Bolaang Mongondow Timur",
+      "label": "Kabupaten Bolaang Mongondow Timur — Sulawesi Utara",
+      "legacyName": "Kabupaten Bolaang Mongondow Timur"
+    },
+    {
+      "value": "ID:SA:Kabupaten Bolaang Mongondow Utara",
+      "label": "Kabupaten Bolaang Mongondow Utara — Sulawesi Utara",
+      "legacyName": "Kabupaten Bolaang Mongondow Utara"
+    },
+    {
+      "value": "ID:SG:Kabupaten Bombana",
+      "label": "Kabupaten Bombana — Sulawesi Tenggara",
+      "legacyName": "Kabupaten Bombana"
+    },
+    {
+      "value": "ID:JI:Kabupaten Bondowoso",
+      "label": "Kabupaten Bondowoso — Jawa Timur",
+      "legacyName": "Kabupaten Bondowoso"
+    },
+    {
+      "value": "ID:SN:Kabupaten Bone",
+      "label": "Kabupaten Bone — Sulawesi Selatan",
+      "legacyName": "Kabupaten Bone"
+    },
+    {
+      "value": "ID:GO:Kabupaten Bone Bolango",
+      "label": "Kabupaten Bone Bolango — Gorontalo",
+      "legacyName": "Kabupaten Bone Bolango"
+    },
+    {
+      "value": "ID:PA:Kabupaten Boven Digoel",
+      "label": "Kabupaten Boven Digoel — Papua",
+      "legacyName": "Kabupaten Boven Digoel"
+    },
+    {
+      "value": "ID:JT:Kabupaten Boyolali",
+      "label": "Kabupaten Boyolali — Jawa Tengah",
+      "legacyName": "Kabupaten Boyolali"
+    },
+    {
+      "value": "ID:JT:Kabupaten Brebes",
+      "label": "Kabupaten Brebes — Jawa Tengah",
+      "legacyName": "Kabupaten Brebes"
+    },
+    {
+      "value": "ID:BA:Kabupaten Buleleng",
+      "label": "Kabupaten Buleleng — Bali",
+      "legacyName": "Kabupaten Buleleng"
+    },
+    {
+      "value": "ID:SN:Kabupaten Bulukumba",
+      "label": "Kabupaten Bulukumba — Sulawesi Selatan",
+      "legacyName": "Kabupaten Bulukumba"
+    },
+    {
+      "value": "ID:KU:Kabupaten Bulungan",
+      "label": "Kabupaten Bulungan — Kalimantan Utara",
+      "legacyName": "Kabupaten Bulungan"
+    },
+    {
+      "value": "ID:JA:Kabupaten Bungo",
+      "label": "Kabupaten Bungo — Jambi",
+      "legacyName": "Kabupaten Bungo"
+    },
+    {
+      "value": "ID:ST:Kabupaten Buol",
+      "label": "Kabupaten Buol — Sulawesi Tengah",
+      "legacyName": "Kabupaten Buol"
+    },
+    {
+      "value": "ID:MA:Kabupaten Buru",
+      "label": "Kabupaten Buru — Maluku",
+      "legacyName": "Kabupaten Buru"
+    },
+    {
+      "value": "ID:MA:Kabupaten Buru Selatan",
+      "label": "Kabupaten Buru Selatan — Maluku",
+      "legacyName": "Kabupaten Buru Selatan"
+    },
+    {
+      "value": "ID:SG:Kabupaten Buton",
+      "label": "Kabupaten Buton — Sulawesi Tenggara",
+      "legacyName": "Kabupaten Buton"
+    },
+    {
+      "value": "ID:SG:Kabupaten Buton Selatan",
+      "label": "Kabupaten Buton Selatan — Sulawesi Tenggara",
+      "legacyName": "Kabupaten Buton Selatan"
+    },
+    {
+      "value": "ID:SG:Kabupaten Buton Tengah",
+      "label": "Kabupaten Buton Tengah — Sulawesi Tenggara",
+      "legacyName": "Kabupaten Buton Tengah"
+    },
+    {
+      "value": "ID:SG:Kabupaten Buton Utara",
+      "label": "Kabupaten Buton Utara — Sulawesi Tenggara",
+      "legacyName": "Kabupaten Buton Utara"
+    },
+    {
+      "value": "ID:JB:Kabupaten Ciamis",
+      "label": "Kabupaten Ciamis — Jawa Barat",
+      "legacyName": "Kabupaten Ciamis"
+    },
+    {
+      "value": "ID:JB:Kabupaten Cianjur",
+      "label": "Kabupaten Cianjur — Jawa Barat",
+      "legacyName": "Kabupaten Cianjur"
+    },
+    {
+      "value": "ID:JT:Kabupaten Cilacap",
+      "label": "Kabupaten Cilacap — Jawa Tengah",
+      "legacyName": "Kabupaten Cilacap"
+    },
+    {
+      "value": "ID:JB:Kabupaten Cirebon",
+      "label": "Kabupaten Cirebon — Jawa Barat",
+      "legacyName": "Kabupaten Cirebon"
+    },
+    {
+      "value": "ID:SU:Kabupaten Dairi",
+      "label": "Kabupaten Dairi — Sumatera Utara",
+      "legacyName": "Kabupaten Dairi"
+    },
+    {
+      "value": "ID:PA:Kabupaten Deiyai",
+      "label": "Kabupaten Deiyai — Papua",
+      "legacyName": "Kabupaten Deiyai"
+    },
+    {
+      "value": "ID:SU:Kabupaten Deli Serdang",
+      "label": "Kabupaten Deli Serdang — Sumatera Utara",
+      "legacyName": "Kabupaten Deli Serdang"
+    },
+    {
+      "value": "ID:JT:Kabupaten Demak",
+      "label": "Kabupaten Demak — Jawa Tengah",
+      "legacyName": "Kabupaten Demak"
+    },
+    {
+      "value": "ID:SB:Kabupaten Dharmasraya",
+      "label": "Kabupaten Dharmasraya — Sumatera Barat",
+      "legacyName": "Kabupaten Dharmasraya"
+    },
+    {
+      "value": "ID:PA:Kabupaten Dogiyai",
+      "label": "Kabupaten Dogiyai — Papua",
+      "legacyName": "Kabupaten Dogiyai"
+    },
+    {
+      "value": "ID:NB:Kabupaten Dompu",
+      "label": "Kabupaten Dompu — Nusa Tenggara Barat",
+      "legacyName": "Kabupaten Dompu"
+    },
+    {
+      "value": "ID:ST:Kabupaten Donggala",
+      "label": "Kabupaten Donggala — Sulawesi Tengah",
+      "legacyName": "Kabupaten Donggala"
+    },
+    {
+      "value": "ID:SS:Kabupaten Empat Lawang",
+      "label": "Kabupaten Empat Lawang — Sumatera Selatan",
+      "legacyName": "Kabupaten Empat Lawang"
+    },
+    {
+      "value": "ID:NT:Kabupaten Ende",
+      "label": "Kabupaten Ende — Nusa Tenggara Timur",
+      "legacyName": "Kabupaten Ende"
+    },
+    {
+      "value": "ID:SN:Kabupaten Enrekang",
+      "label": "Kabupaten Enrekang — Sulawesi Selatan",
+      "legacyName": "Kabupaten Enrekang"
+    },
+    {
+      "value": "ID:PB:Kabupaten Fakfak",
+      "label": "Kabupaten Fakfak — Papua Barat",
+      "legacyName": "Kabupaten Fakfak"
+    },
+    {
+      "value": "ID:NT:Kabupaten Flores Timur",
+      "label": "Kabupaten Flores Timur — Nusa Tenggara Timur",
+      "legacyName": "Kabupaten Flores Timur"
+    },
+    {
+      "value": "ID:JB:Kabupaten Garut",
+      "label": "Kabupaten Garut — Jawa Barat",
+      "legacyName": "Kabupaten Garut"
+    },
+    {
+      "value": "ID:AC:Kabupaten Gayo Lues",
+      "label": "Kabupaten Gayo Lues — Aceh",
+      "legacyName": "Kabupaten Gayo Lues"
+    },
+    {
+      "value": "ID:BA:Kabupaten Gianyar",
+      "label": "Kabupaten Gianyar — Bali",
+      "legacyName": "Kabupaten Gianyar"
+    },
+    {
+      "value": "ID:GO:Kabupaten Gorontalo",
+      "label": "Kabupaten Gorontalo — Gorontalo",
+      "legacyName": "Kabupaten Gorontalo"
+    },
+    {
+      "value": "ID:GO:Kabupaten Gorontalo Utara",
+      "label": "Kabupaten Gorontalo Utara — Gorontalo",
+      "legacyName": "Kabupaten Gorontalo Utara"
+    },
+    {
+      "value": "ID:SN:Kabupaten Gowa",
+      "label": "Kabupaten Gowa — Sulawesi Selatan",
+      "legacyName": "Kabupaten Gowa"
+    },
+    {
+      "value": "ID:JT:Kabupaten Grobogan",
+      "label": "Kabupaten Grobogan — Jawa Tengah",
+      "legacyName": "Kabupaten Grobogan"
+    },
+    {
+      "value": "ID:YO:Kabupaten Gunung Kidul",
+      "label": "Kabupaten Gunung Kidul — DI Yogyakarta",
+      "legacyName": "Kabupaten Gunung Kidul"
+    },
+    {
+      "value": "ID:KT:Kabupaten Gunung Mas",
+      "label": "Kabupaten Gunung Mas — Kalimantan Tengah",
+      "legacyName": "Kabupaten Gunung Mas"
+    },
+    {
+      "value": "ID:MU:Kabupaten Halmahera Barat",
+      "label": "Kabupaten Halmahera Barat — Maluku Utara",
+      "legacyName": "Kabupaten Halmahera Barat"
+    },
+    {
+      "value": "ID:MU:Kabupaten Halmahera Selatan",
+      "label": "Kabupaten Halmahera Selatan — Maluku Utara",
+      "legacyName": "Kabupaten Halmahera Selatan"
+    },
+    {
+      "value": "ID:MU:Kabupaten Halmahera Tengah",
+      "label": "Kabupaten Halmahera Tengah — Maluku Utara",
+      "legacyName": "Kabupaten Halmahera Tengah"
+    },
+    {
+      "value": "ID:MU:Kabupaten Halmahera Utara",
+      "label": "Kabupaten Halmahera Utara — Maluku Utara",
+      "legacyName": "Kabupaten Halmahera Utara"
+    },
+    {
+      "value": "ID:KS:Kabupaten Hulu Sungai Selatan",
+      "label": "Kabupaten Hulu Sungai Selatan — Kalimantan Selatan",
+      "legacyName": "Kabupaten Hulu Sungai Selatan"
+    },
+    {
+      "value": "ID:KS:Kabupaten Hulu Sungai Tengah",
+      "label": "Kabupaten Hulu Sungai Tengah — Kalimantan Selatan",
+      "legacyName": "Kabupaten Hulu Sungai Tengah"
+    },
+    {
+      "value": "ID:KS:Kabupaten Hulu Sungai Utara",
+      "label": "Kabupaten Hulu Sungai Utara — Kalimantan Selatan",
+      "legacyName": "Kabupaten Hulu Sungai Utara"
+    },
+    {
+      "value": "ID:SU:Kabupaten Humbang Hasundutan",
+      "label": "Kabupaten Humbang Hasundutan — Sumatera Utara",
+      "legacyName": "Kabupaten Humbang Hasundutan"
+    },
+    {
+      "value": "ID:RI:Kabupaten Indragiri Hilir",
+      "label": "Kabupaten Indragiri Hilir — Riau",
+      "legacyName": "Kabupaten Indragiri Hilir"
+    },
+    {
+      "value": "ID:RI:Kabupaten Indragiri Hulu",
+      "label": "Kabupaten Indragiri Hulu — Riau",
+      "legacyName": "Kabupaten Indragiri Hulu"
+    },
+    {
+      "value": "ID:JB:Kabupaten Indramayu",
+      "label": "Kabupaten Indramayu — Jawa Barat",
+      "legacyName": "Kabupaten Indramayu"
+    },
+    {
+      "value": "ID:PA:Kabupaten Intan Jaya",
+      "label": "Kabupaten Intan Jaya — Papua",
+      "legacyName": "Kabupaten Intan Jaya"
+    },
+    {
+      "value": "ID:PA:Kabupaten Jayapura",
+      "label": "Kabupaten Jayapura — Papua",
+      "legacyName": "Kabupaten Jayapura"
+    },
+    {
+      "value": "ID:PA:Kabupaten Jayawijaya",
+      "label": "Kabupaten Jayawijaya — Papua",
+      "legacyName": "Kabupaten Jayawijaya"
+    },
+    {
+      "value": "ID:JI:Kabupaten Jember",
+      "label": "Kabupaten Jember — Jawa Timur",
+      "legacyName": "Kabupaten Jember"
+    },
+    {
+      "value": "ID:BA:Kabupaten Jembrana",
+      "label": "Kabupaten Jembrana — Bali",
+      "legacyName": "Kabupaten Jembrana"
+    },
+    {
+      "value": "ID:SN:Kabupaten Jeneponto",
+      "label": "Kabupaten Jeneponto — Sulawesi Selatan",
+      "legacyName": "Kabupaten Jeneponto"
+    },
+    {
+      "value": "ID:JT:Kabupaten Jepara",
+      "label": "Kabupaten Jepara — Jawa Tengah",
+      "legacyName": "Kabupaten Jepara"
+    },
+    {
+      "value": "ID:JI:Kabupaten Jombang",
+      "label": "Kabupaten Jombang — Jawa Timur",
+      "legacyName": "Kabupaten Jombang"
+    },
+    {
+      "value": "ID:PB:Kabupaten Kaimana",
+      "label": "Kabupaten Kaimana — Papua Barat",
+      "legacyName": "Kabupaten Kaimana"
+    },
+    {
+      "value": "ID:RI:Kabupaten Kampar",
+      "label": "Kabupaten Kampar — Riau",
+      "legacyName": "Kabupaten Kampar"
+    },
+    {
+      "value": "ID:KT:Kabupaten Kapuas",
+      "label": "Kabupaten Kapuas — Kalimantan Tengah",
+      "legacyName": "Kabupaten Kapuas"
+    },
+    {
+      "value": "ID:BA:Kabupaten Karang Asem",
+      "label": "Kabupaten Karang Asem — Bali",
+      "legacyName": "Kabupaten Karang Asem"
+    },
+    {
+      "value": "ID:JT:Kabupaten Karanganyar",
+      "label": "Kabupaten Karanganyar — Jawa Tengah",
+      "legacyName": "Kabupaten Karanganyar"
+    },
+    {
+      "value": "ID:JB:Kabupaten Karawang",
+      "label": "Kabupaten Karawang — Jawa Barat",
+      "legacyName": "Kabupaten Karawang"
+    },
+    {
+      "value": "ID:KR:Kabupaten Karimun",
+      "label": "Kabupaten Karimun — Kepulauan Riau",
+      "legacyName": "Kabupaten Karimun"
+    },
+    {
+      "value": "ID:SU:Kabupaten Karo",
+      "label": "Kabupaten Karo — Sumatera Utara",
+      "legacyName": "Kabupaten Karo"
+    },
+    {
+      "value": "ID:KT:Kabupaten Katingan",
+      "label": "Kabupaten Katingan — Kalimantan Tengah",
+      "legacyName": "Kabupaten Katingan"
+    },
+    {
+      "value": "ID:BE:Kabupaten Kaur",
+      "label": "Kabupaten Kaur — Bengkulu",
+      "legacyName": "Kabupaten Kaur"
+    },
+    {
+      "value": "ID:JT:Kabupaten Kebumen",
+      "label": "Kabupaten Kebumen — Jawa Tengah",
+      "legacyName": "Kabupaten Kebumen"
+    },
+    {
+      "value": "ID:JI:Kabupaten Kediri",
+      "label": "Kabupaten Kediri — Jawa Timur",
+      "legacyName": "Kabupaten Kediri"
+    },
+    {
+      "value": "ID:PA:Kabupaten Keerom",
+      "label": "Kabupaten Keerom — Papua",
+      "legacyName": "Kabupaten Keerom"
+    },
+    {
+      "value": "ID:JT:Kabupaten Kendal",
+      "label": "Kabupaten Kendal — Jawa Tengah",
+      "legacyName": "Kabupaten Kendal"
+    },
+    {
+      "value": "ID:BE:Kabupaten Kepahiang",
+      "label": "Kabupaten Kepahiang — Bengkulu",
+      "legacyName": "Kabupaten Kepahiang"
+    },
+    {
+      "value": "ID:KR:Kabupaten Kepulauan Anambas",
+      "label": "Kabupaten Kepulauan Anambas — Kepulauan Riau",
+      "legacyName": "Kabupaten Kepulauan Anambas"
+    },
+    {
+      "value": "ID:MA:Kabupaten Kepulauan Aru",
+      "label": "Kabupaten Kepulauan Aru — Maluku",
+      "legacyName": "Kabupaten Kepulauan Aru"
+    },
+    {
+      "value": "ID:SB:Kabupaten Kepulauan Mentawai",
+      "label": "Kabupaten Kepulauan Mentawai — Sumatera Barat",
+      "legacyName": "Kabupaten Kepulauan Mentawai"
+    },
+    {
+      "value": "ID:RI:Kabupaten Kepulauan Meranti",
+      "label": "Kabupaten Kepulauan Meranti — Riau",
+      "legacyName": "Kabupaten Kepulauan Meranti"
+    },
+    {
+      "value": "ID:SA:Kabupaten Kepulauan Sangihe",
+      "label": "Kabupaten Kepulauan Sangihe — Sulawesi Utara",
+      "legacyName": "Kabupaten Kepulauan Sangihe"
+    },
+    {
+      "value": "ID:MU:Kabupaten Kepulauan Sula",
+      "label": "Kabupaten Kepulauan Sula — Maluku Utara",
+      "legacyName": "Kabupaten Kepulauan Sula"
+    },
+    {
+      "value": "ID:SA:Kabupaten Kepulauan Talaud",
+      "label": "Kabupaten Kepulauan Talaud — Sulawesi Utara",
+      "legacyName": "Kabupaten Kepulauan Talaud"
+    },
+    {
+      "value": "ID:PA:Kabupaten Kepulauan Yapen",
+      "label": "Kabupaten Kepulauan Yapen — Papua",
+      "legacyName": "Kabupaten Kepulauan Yapen"
+    },
+    {
+      "value": "ID:JA:Kabupaten Kerinci",
+      "label": "Kabupaten Kerinci — Jambi",
+      "legacyName": "Kabupaten Kerinci"
+    },
+    {
+      "value": "ID:JT:Kabupaten Klaten",
+      "label": "Kabupaten Klaten — Jawa Tengah",
+      "legacyName": "Kabupaten Klaten"
+    },
+    {
+      "value": "ID:BA:Kabupaten Klungkung",
+      "label": "Kabupaten Klungkung — Bali",
+      "legacyName": "Kabupaten Klungkung"
+    },
+    {
+      "value": "ID:SG:Kabupaten Kolaka",
+      "label": "Kabupaten Kolaka — Sulawesi Tenggara",
+      "legacyName": "Kabupaten Kolaka"
+    },
+    {
+      "value": "ID:SG:Kabupaten Kolaka Timur",
+      "label": "Kabupaten Kolaka Timur — Sulawesi Tenggara",
+      "legacyName": "Kabupaten Kolaka Timur"
+    },
+    {
+      "value": "ID:SG:Kabupaten Kolaka Utara",
+      "label": "Kabupaten Kolaka Utara — Sulawesi Tenggara",
+      "legacyName": "Kabupaten Kolaka Utara"
+    },
+    {
+      "value": "ID:SG:Kabupaten Konawe",
+      "label": "Kabupaten Konawe — Sulawesi Tenggara",
+      "legacyName": "Kabupaten Konawe"
+    },
+    {
+      "value": "ID:SG:Kabupaten Konawe Kepulauan",
+      "label": "Kabupaten Konawe Kepulauan — Sulawesi Tenggara",
+      "legacyName": "Kabupaten Konawe Kepulauan"
+    },
+    {
+      "value": "ID:SG:Kabupaten Konawe Selatan",
+      "label": "Kabupaten Konawe Selatan — Sulawesi Tenggara",
+      "legacyName": "Kabupaten Konawe Selatan"
+    },
+    {
+      "value": "ID:SG:Kabupaten Konawe Utara",
+      "label": "Kabupaten Konawe Utara — Sulawesi Tenggara",
+      "legacyName": "Kabupaten Konawe Utara"
+    },
+    {
+      "value": "ID:KS:Kabupaten Kota Baru",
+      "label": "Kabupaten Kota Baru — Kalimantan Selatan",
+      "legacyName": "Kabupaten Kota Baru"
+    },
+    {
+      "value": "ID:KT:Kabupaten Kotawaringin Barat",
+      "label": "Kabupaten Kotawaringin Barat — Kalimantan Tengah",
+      "legacyName": "Kabupaten Kotawaringin Barat"
+    },
+    {
+      "value": "ID:KT:Kabupaten Kotawaringin Timur",
+      "label": "Kabupaten Kotawaringin Timur — Kalimantan Tengah",
+      "legacyName": "Kabupaten Kotawaringin Timur"
+    },
+    {
+      "value": "ID:RI:Kabupaten Kuantan Singingi",
+      "label": "Kabupaten Kuantan Singingi — Riau",
+      "legacyName": "Kabupaten Kuantan Singingi"
+    },
+    {
+      "value": "ID:JT:Kabupaten Kudus",
+      "label": "Kabupaten Kudus — Jawa Tengah",
+      "legacyName": "Kabupaten Kudus"
+    },
+    {
+      "value": "ID:YO:Kabupaten Kulon Progo",
+      "label": "Kabupaten Kulon Progo — DI Yogyakarta",
+      "legacyName": "Kabupaten Kulon Progo"
+    },
+    {
+      "value": "ID:JB:Kabupaten Kuningan",
+      "label": "Kabupaten Kuningan — Jawa Barat",
+      "legacyName": "Kabupaten Kuningan"
+    },
+    {
+      "value": "ID:NT:Kabupaten Kupang",
+      "label": "Kabupaten Kupang — Nusa Tenggara Timur",
+      "legacyName": "Kabupaten Kupang"
+    },
+    {
+      "value": "ID:KI:Kabupaten Kutai Barat",
+      "label": "Kabupaten Kutai Barat — Kalimantan Timur",
+      "legacyName": "Kabupaten Kutai Barat"
+    },
+    {
+      "value": "ID:KI:Kabupaten Kutai Kartanegara",
+      "label": "Kabupaten Kutai Kartanegara — Kalimantan Timur",
+      "legacyName": "Kabupaten Kutai Kartanegara"
+    },
+    {
+      "value": "ID:KI:Kabupaten Kutai Timur",
+      "label": "Kabupaten Kutai Timur — Kalimantan Timur",
+      "legacyName": "Kabupaten Kutai Timur"
+    },
+    {
+      "value": "ID:SU:Kabupaten Labuhan Batu",
+      "label": "Kabupaten Labuhan Batu — Sumatera Utara",
+      "legacyName": "Kabupaten Labuhan Batu"
+    },
+    {
+      "value": "ID:SU:Kabupaten Labuhan Batu Selatan",
+      "label": "Kabupaten Labuhan Batu Selatan — Sumatera Utara",
+      "legacyName": "Kabupaten Labuhan Batu Selatan"
+    },
+    {
+      "value": "ID:SU:Kabupaten Labuhan Batu Utara",
+      "label": "Kabupaten Labuhan Batu Utara — Sumatera Utara",
+      "legacyName": "Kabupaten Labuhan Batu Utara"
+    },
+    {
+      "value": "ID:KT:Kabupaten Lamandau",
+      "label": "Kabupaten Lamandau — Kalimantan Tengah",
+      "legacyName": "Kabupaten Lamandau"
+    },
+    {
+      "value": "ID:JI:Kabupaten Lamongan",
+      "label": "Kabupaten Lamongan — Jawa Timur",
+      "legacyName": "Kabupaten Lamongan"
+    },
+    {
+      "value": "ID:LA:Kabupaten Lampung Barat",
+      "label": "Kabupaten Lampung Barat — Lampung",
+      "legacyName": "Kabupaten Lampung Barat"
+    },
+    {
+      "value": "ID:LA:Kabupaten Lampung Selatan",
+      "label": "Kabupaten Lampung Selatan — Lampung",
+      "legacyName": "Kabupaten Lampung Selatan"
+    },
+    {
+      "value": "ID:LA:Kabupaten Lampung Tengah",
+      "label": "Kabupaten Lampung Tengah — Lampung",
+      "legacyName": "Kabupaten Lampung Tengah"
+    },
+    {
+      "value": "ID:LA:Kabupaten Lampung Timur",
+      "label": "Kabupaten Lampung Timur — Lampung",
+      "legacyName": "Kabupaten Lampung Timur"
+    },
+    {
+      "value": "ID:LA:Kabupaten Lampung Utara",
+      "label": "Kabupaten Lampung Utara — Lampung",
+      "legacyName": "Kabupaten Lampung Utara"
+    },
+    {
+      "value": "ID:SU:Kabupaten Langkat",
+      "label": "Kabupaten Langkat — Sumatera Utara",
+      "legacyName": "Kabupaten Langkat"
+    },
+    {
+      "value": "ID:PA:Kabupaten Lanny Jaya",
+      "label": "Kabupaten Lanny Jaya — Papua",
+      "legacyName": "Kabupaten Lanny Jaya"
+    },
+    {
+      "value": "ID:BT:Kabupaten Lebak",
+      "label": "Kabupaten Lebak — Banten",
+      "legacyName": "Kabupaten Lebak"
+    },
+    {
+      "value": "ID:BE:Kabupaten Lebong",
+      "label": "Kabupaten Lebong — Bengkulu",
+      "legacyName": "Kabupaten Lebong"
+    },
+    {
+      "value": "ID:NT:Kabupaten Lembata",
+      "label": "Kabupaten Lembata — Nusa Tenggara Timur",
+      "legacyName": "Kabupaten Lembata"
+    },
+    {
+      "value": "ID:SB:Kabupaten Lima Puluh Kota",
+      "label": "Kabupaten Lima Puluh Kota — Sumatera Barat",
+      "legacyName": "Kabupaten Lima Puluh Kota"
+    },
+    {
+      "value": "ID:KR:Kabupaten Lingga",
+      "label": "Kabupaten Lingga — Kepulauan Riau",
+      "legacyName": "Kabupaten Lingga"
+    },
+    {
+      "value": "ID:NB:Kabupaten Lombok Barat",
+      "label": "Kabupaten Lombok Barat — Nusa Tenggara Barat",
+      "legacyName": "Kabupaten Lombok Barat"
+    },
+    {
+      "value": "ID:NB:Kabupaten Lombok Tengah",
+      "label": "Kabupaten Lombok Tengah — Nusa Tenggara Barat",
+      "legacyName": "Kabupaten Lombok Tengah"
+    },
+    {
+      "value": "ID:NB:Kabupaten Lombok Timur",
+      "label": "Kabupaten Lombok Timur — Nusa Tenggara Barat",
+      "legacyName": "Kabupaten Lombok Timur"
+    },
+    {
+      "value": "ID:NB:Kabupaten Lombok Utara",
+      "label": "Kabupaten Lombok Utara — Nusa Tenggara Barat",
+      "legacyName": "Kabupaten Lombok Utara"
+    },
+    {
+      "value": "ID:JI:Kabupaten Lumajang",
+      "label": "Kabupaten Lumajang — Jawa Timur",
+      "legacyName": "Kabupaten Lumajang"
+    },
+    {
+      "value": "ID:SN:Kabupaten Luwu",
+      "label": "Kabupaten Luwu — Sulawesi Selatan",
+      "legacyName": "Kabupaten Luwu"
+    },
+    {
+      "value": "ID:SN:Kabupaten Luwu Timur",
+      "label": "Kabupaten Luwu Timur — Sulawesi Selatan",
+      "legacyName": "Kabupaten Luwu Timur"
+    },
+    {
+      "value": "ID:SN:Kabupaten Luwu Utara",
+      "label": "Kabupaten Luwu Utara — Sulawesi Selatan",
+      "legacyName": "Kabupaten Luwu Utara"
+    },
+    {
+      "value": "ID:JI:Kabupaten Madiun",
+      "label": "Kabupaten Madiun — Jawa Timur",
+      "legacyName": "Kabupaten Madiun"
+    },
+    {
+      "value": "ID:JT:Kabupaten Magelang",
+      "label": "Kabupaten Magelang — Jawa Tengah",
+      "legacyName": "Kabupaten Magelang"
+    },
+    {
+      "value": "ID:JI:Kabupaten Magetan",
+      "label": "Kabupaten Magetan — Jawa Timur",
+      "legacyName": "Kabupaten Magetan"
+    },
+    {
+      "value": "ID:KI:Kabupaten Mahakam Hulu",
+      "label": "Kabupaten Mahakam Hulu — Kalimantan Timur",
+      "legacyName": "Kabupaten Mahakam Hulu"
+    },
+    {
+      "value": "ID:JB:Kabupaten Majalengka",
+      "label": "Kabupaten Majalengka — Jawa Barat",
+      "legacyName": "Kabupaten Majalengka"
+    },
+    {
+      "value": "ID:SR:Kabupaten Majene",
+      "label": "Kabupaten Majene — Sulawesi Barat",
+      "legacyName": "Kabupaten Majene"
+    },
+    {
+      "value": "ID:NT:Kabupaten Malaka",
+      "label": "Kabupaten Malaka — Nusa Tenggara Timur",
+      "legacyName": "Kabupaten Malaka"
+    },
+    {
+      "value": "ID:JI:Kabupaten Malang",
+      "label": "Kabupaten Malang — Jawa Timur",
+      "legacyName": "Kabupaten Malang"
+    },
+    {
+      "value": "ID:KU:Kabupaten Malinau",
+      "label": "Kabupaten Malinau — Kalimantan Utara",
+      "legacyName": "Kabupaten Malinau"
+    },
+    {
+      "value": "ID:MA:Kabupaten Maluku Barat Daya",
+      "label": "Kabupaten Maluku Barat Daya — Maluku",
+      "legacyName": "Kabupaten Maluku Barat Daya"
+    },
+    {
+      "value": "ID:MA:Kabupaten Maluku Tengah",
+      "label": "Kabupaten Maluku Tengah — Maluku",
+      "legacyName": "Kabupaten Maluku Tengah"
+    },
+    {
+      "value": "ID:MA:Kabupaten Maluku Tenggara",
+      "label": "Kabupaten Maluku Tenggara — Maluku",
+      "legacyName": "Kabupaten Maluku Tenggara"
+    },
+    {
+      "value": "ID:MA:Kabupaten Maluku Tenggara Barat",
+      "label": "Kabupaten Maluku Tenggara Barat — Maluku",
+      "legacyName": "Kabupaten Maluku Tenggara Barat"
+    },
+    {
+      "value": "ID:SR:Kabupaten Mamasa",
+      "label": "Kabupaten Mamasa — Sulawesi Barat",
+      "legacyName": "Kabupaten Mamasa"
+    },
+    {
+      "value": "ID:PA:Kabupaten Mamberamo Raya",
+      "label": "Kabupaten Mamberamo Raya — Papua",
+      "legacyName": "Kabupaten Mamberamo Raya"
+    },
+    {
+      "value": "ID:PA:Kabupaten Mamberamo Tengah",
+      "label": "Kabupaten Mamberamo Tengah — Papua",
+      "legacyName": "Kabupaten Mamberamo Tengah"
+    },
+    {
+      "value": "ID:SR:Kabupaten Mamuju",
+      "label": "Kabupaten Mamuju — Sulawesi Barat",
+      "legacyName": "Kabupaten Mamuju"
+    },
+    {
+      "value": "ID:SR:Kabupaten Mamuju Tengah",
+      "label": "Kabupaten Mamuju Tengah — Sulawesi Barat",
+      "legacyName": "Kabupaten Mamuju Tengah"
+    },
+    {
+      "value": "ID:SR:Kabupaten Mamuju Utara",
+      "label": "Kabupaten Mamuju Utara — Sulawesi Barat",
+      "legacyName": "Kabupaten Mamuju Utara"
+    },
+    {
+      "value": "ID:SU:Kabupaten Mandailing Natal",
+      "label": "Kabupaten Mandailing Natal — Sumatera Utara",
+      "legacyName": "Kabupaten Mandailing Natal"
+    },
+    {
+      "value": "ID:NT:Kabupaten Manggarai",
+      "label": "Kabupaten Manggarai — Nusa Tenggara Timur",
+      "legacyName": "Kabupaten Manggarai"
+    },
+    {
+      "value": "ID:NT:Kabupaten Manggarai Barat",
+      "label": "Kabupaten Manggarai Barat — Nusa Tenggara Timur",
+      "legacyName": "Kabupaten Manggarai Barat"
+    },
+    {
+      "value": "ID:NT:Kabupaten Manggarai Timur",
+      "label": "Kabupaten Manggarai Timur — Nusa Tenggara Timur",
+      "legacyName": "Kabupaten Manggarai Timur"
+    },
+    {
+      "value": "ID:PB:Kabupaten Manokwari",
+      "label": "Kabupaten Manokwari — Papua Barat",
+      "legacyName": "Kabupaten Manokwari"
+    },
+    {
+      "value": "ID:PB:Kabupaten Manokwari Selatan",
+      "label": "Kabupaten Manokwari Selatan — Papua Barat",
+      "legacyName": "Kabupaten Manokwari Selatan"
+    },
+    {
+      "value": "ID:PA:Kabupaten Mappi",
+      "label": "Kabupaten Mappi — Papua",
+      "legacyName": "Kabupaten Mappi"
+    },
+    {
+      "value": "ID:SN:Kabupaten Maros",
+      "label": "Kabupaten Maros — Sulawesi Selatan",
+      "legacyName": "Kabupaten Maros"
+    },
+    {
+      "value": "ID:PB:Kabupaten Maybrat",
+      "label": "Kabupaten Maybrat — Papua Barat",
+      "legacyName": "Kabupaten Maybrat"
+    },
+    {
+      "value": "ID:JA:Kabupaten Merangin",
+      "label": "Kabupaten Merangin — Jambi",
+      "legacyName": "Kabupaten Merangin"
+    },
+    {
+      "value": "ID:PA:Kabupaten Merauke",
+      "label": "Kabupaten Merauke — Papua",
+      "legacyName": "Kabupaten Merauke"
+    },
+    {
+      "value": "ID:LA:Kabupaten Mesuji",
+      "label": "Kabupaten Mesuji — Lampung",
+      "legacyName": "Kabupaten Mesuji"
+    },
+    {
+      "value": "ID:PA:Kabupaten Mimika",
+      "label": "Kabupaten Mimika — Papua",
+      "legacyName": "Kabupaten Mimika"
+    },
+    {
+      "value": "ID:SA:Kabupaten Minahasa",
+      "label": "Kabupaten Minahasa — Sulawesi Utara",
+      "legacyName": "Kabupaten Minahasa"
+    },
+    {
+      "value": "ID:SA:Kabupaten Minahasa Selatan",
+      "label": "Kabupaten Minahasa Selatan — Sulawesi Utara",
+      "legacyName": "Kabupaten Minahasa Selatan"
+    },
+    {
+      "value": "ID:SA:Kabupaten Minahasa Tenggara",
+      "label": "Kabupaten Minahasa Tenggara — Sulawesi Utara",
+      "legacyName": "Kabupaten Minahasa Tenggara"
+    },
+    {
+      "value": "ID:SA:Kabupaten Minahasa Utara",
+      "label": "Kabupaten Minahasa Utara — Sulawesi Utara",
+      "legacyName": "Kabupaten Minahasa Utara"
+    },
+    {
+      "value": "ID:JI:Kabupaten Mojokerto",
+      "label": "Kabupaten Mojokerto — Jawa Timur",
+      "legacyName": "Kabupaten Mojokerto"
+    },
+    {
+      "value": "ID:ST:Kabupaten Morowali Utara",
+      "label": "Kabupaten Morowali Utara — Sulawesi Tengah",
+      "legacyName": "Kabupaten Morowali Utara"
+    },
+    {
+      "value": "ID:SS:Kabupaten Muara Enim",
+      "label": "Kabupaten Muara Enim — Sumatera Selatan",
+      "legacyName": "Kabupaten Muara Enim"
+    },
+    {
+      "value": "ID:JA:Kabupaten Muaro Jambi",
+      "label": "Kabupaten Muaro Jambi — Jambi",
+      "legacyName": "Kabupaten Muaro Jambi"
+    },
+    {
+      "value": "ID:BE:Kabupaten Mukomuko",
+      "label": "Kabupaten Mukomuko — Bengkulu",
+      "legacyName": "Kabupaten Mukomuko"
+    },
+    {
+      "value": "ID:SG:Kabupaten Muna",
+      "label": "Kabupaten Muna — Sulawesi Tenggara",
+      "legacyName": "Kabupaten Muna"
+    },
+    {
+      "value": "ID:SG:Kabupaten Muna Barat",
+      "label": "Kabupaten Muna Barat — Sulawesi Tenggara",
+      "legacyName": "Kabupaten Muna Barat"
+    },
+    {
+      "value": "ID:KT:Kabupaten Murung Raya",
+      "label": "Kabupaten Murung Raya — Kalimantan Tengah",
+      "legacyName": "Kabupaten Murung Raya"
+    },
+    {
+      "value": "ID:SS:Kabupaten Musi Banyuasin",
+      "label": "Kabupaten Musi Banyuasin — Sumatera Selatan",
+      "legacyName": "Kabupaten Musi Banyuasin"
+    },
+    {
+      "value": "ID:SS:Kabupaten Musi Rawas",
+      "label": "Kabupaten Musi Rawas — Sumatera Selatan",
+      "legacyName": "Kabupaten Musi Rawas"
+    },
+    {
+      "value": "ID:SS:Kabupaten Musi Rawas Utara",
+      "label": "Kabupaten Musi Rawas Utara — Sumatera Selatan",
+      "legacyName": "Kabupaten Musi Rawas Utara"
+    },
+    {
+      "value": "ID:PA:Kabupaten Nabire",
+      "label": "Kabupaten Nabire — Papua",
+      "legacyName": "Kabupaten Nabire"
+    },
+    {
+      "value": "ID:AC:Kabupaten Nagan Raya",
+      "label": "Kabupaten Nagan Raya — Aceh",
+      "legacyName": "Kabupaten Nagan Raya"
+    },
+    {
+      "value": "ID:NT:Kabupaten Nagekeo",
+      "label": "Kabupaten Nagekeo — Nusa Tenggara Timur",
+      "legacyName": "Kabupaten Nagekeo"
+    },
+    {
+      "value": "ID:KR:Kabupaten Natuna",
+      "label": "Kabupaten Natuna — Kepulauan Riau",
+      "legacyName": "Kabupaten Natuna"
+    },
+    {
+      "value": "ID:PA:Kabupaten Nduga",
+      "label": "Kabupaten Nduga — Papua",
+      "legacyName": "Kabupaten Nduga"
+    },
+    {
+      "value": "ID:NT:Kabupaten Ngada",
+      "label": "Kabupaten Ngada — Nusa Tenggara Timur",
+      "legacyName": "Kabupaten Ngada"
+    },
+    {
+      "value": "ID:JI:Kabupaten Nganjuk",
+      "label": "Kabupaten Nganjuk — Jawa Timur",
+      "legacyName": "Kabupaten Nganjuk"
+    },
+    {
+      "value": "ID:JI:Kabupaten Ngawi",
+      "label": "Kabupaten Ngawi — Jawa Timur",
+      "legacyName": "Kabupaten Ngawi"
+    },
+    {
+      "value": "ID:SU:Kabupaten Nias",
+      "label": "Kabupaten Nias — Sumatera Utara",
+      "legacyName": "Kabupaten Nias"
+    },
+    {
+      "value": "ID:SU:Kabupaten Nias Barat",
+      "label": "Kabupaten Nias Barat — Sumatera Utara",
+      "legacyName": "Kabupaten Nias Barat"
+    },
+    {
+      "value": "ID:SU:Kabupaten Nias Utara",
+      "label": "Kabupaten Nias Utara — Sumatera Utara",
+      "legacyName": "Kabupaten Nias Utara"
+    },
+    {
+      "value": "ID:KU:Kabupaten Nunukan",
+      "label": "Kabupaten Nunukan — Kalimantan Utara",
+      "legacyName": "Kabupaten Nunukan"
+    },
+    {
+      "value": "ID:SS:Kabupaten Ogan Ilir",
+      "label": "Kabupaten Ogan Ilir — Sumatera Selatan",
+      "legacyName": "Kabupaten Ogan Ilir"
+    },
+    {
+      "value": "ID:SS:Kabupaten Ogan Komering Ilir",
+      "label": "Kabupaten Ogan Komering Ilir — Sumatera Selatan",
+      "legacyName": "Kabupaten Ogan Komering Ilir"
+    },
+    {
+      "value": "ID:SS:Kabupaten Ogan Komering Ulu",
+      "label": "Kabupaten Ogan Komering Ulu — Sumatera Selatan",
+      "legacyName": "Kabupaten Ogan Komering Ulu"
+    },
+    {
+      "value": "ID:SS:Kabupaten Ogan Komering Ulu Selatan",
+      "label": "Kabupaten Ogan Komering Ulu Selatan — Sumatera Selatan",
+      "legacyName": "Kabupaten Ogan Komering Ulu Selatan"
+    },
+    {
+      "value": "ID:SS:Kabupaten Ogan Komering Ulu Timur",
+      "label": "Kabupaten Ogan Komering Ulu Timur — Sumatera Selatan",
+      "legacyName": "Kabupaten Ogan Komering Ulu Timur"
+    },
+    {
+      "value": "ID:JI:Kabupaten Pacitan",
+      "label": "Kabupaten Pacitan — Jawa Timur",
+      "legacyName": "Kabupaten Pacitan"
+    },
+    {
+      "value": "ID:SU:Kabupaten Padang Lawas",
+      "label": "Kabupaten Padang Lawas — Sumatera Utara",
+      "legacyName": "Kabupaten Padang Lawas"
+    },
+    {
+      "value": "ID:SU:Kabupaten Padang Lawas Utara",
+      "label": "Kabupaten Padang Lawas Utara — Sumatera Utara",
+      "legacyName": "Kabupaten Padang Lawas Utara"
+    },
+    {
+      "value": "ID:SB:Kabupaten Padang Pariaman",
+      "label": "Kabupaten Padang Pariaman — Sumatera Barat",
+      "legacyName": "Kabupaten Padang Pariaman"
+    },
+    {
+      "value": "ID:SU:Kabupaten Pakpak Bharat",
+      "label": "Kabupaten Pakpak Bharat — Sumatera Utara",
+      "legacyName": "Kabupaten Pakpak Bharat"
+    },
+    {
+      "value": "ID:JI:Kabupaten Pamekasan",
+      "label": "Kabupaten Pamekasan — Jawa Timur",
+      "legacyName": "Kabupaten Pamekasan"
+    },
+    {
+      "value": "ID:BT:Kabupaten Pandeglang",
+      "label": "Kabupaten Pandeglang — Banten",
+      "legacyName": "Kabupaten Pandeglang"
+    },
+    {
+      "value": "ID:JB:Kabupaten Pangandaran",
+      "label": "Kabupaten Pangandaran — Jawa Barat",
+      "legacyName": "Kabupaten Pangandaran"
+    },
+    {
+      "value": "ID:SN:Kabupaten Pangkajene Dan Kepulauan",
+      "label": "Kabupaten Pangkajene Dan Kepulauan — Sulawesi Selatan",
+      "legacyName": "Kabupaten Pangkajene Dan Kepulauan"
+    },
+    {
+      "value": "ID:PA:Kabupaten Paniai",
+      "label": "Kabupaten Paniai — Papua",
+      "legacyName": "Kabupaten Paniai"
+    },
+    {
+      "value": "ID:ST:Kabupaten Parigi Moutong",
+      "label": "Kabupaten Parigi Moutong — Sulawesi Tengah",
+      "legacyName": "Kabupaten Parigi Moutong"
+    },
+    {
+      "value": "ID:SB:Kabupaten Pasaman",
+      "label": "Kabupaten Pasaman — Sumatera Barat",
+      "legacyName": "Kabupaten Pasaman"
+    },
+    {
+      "value": "ID:SB:Kabupaten Pasaman Barat",
+      "label": "Kabupaten Pasaman Barat — Sumatera Barat",
+      "legacyName": "Kabupaten Pasaman Barat"
+    },
+    {
+      "value": "ID:KI:Kabupaten Paser",
+      "label": "Kabupaten Paser — Kalimantan Timur",
+      "legacyName": "Kabupaten Paser"
+    },
+    {
+      "value": "ID:JI:Kabupaten Pasuruan",
+      "label": "Kabupaten Pasuruan — Jawa Timur",
+      "legacyName": "Kabupaten Pasuruan"
+    },
+    {
+      "value": "ID:JT:Kabupaten Pati",
+      "label": "Kabupaten Pati — Jawa Tengah",
+      "legacyName": "Kabupaten Pati"
+    },
+    {
+      "value": "ID:PA:Kabupaten Pegunungan Bintang",
+      "label": "Kabupaten Pegunungan Bintang — Papua",
+      "legacyName": "Kabupaten Pegunungan Bintang"
+    },
+    {
+      "value": "ID:JT:Kabupaten Pekalongan",
+      "label": "Kabupaten Pekalongan — Jawa Tengah",
+      "legacyName": "Kabupaten Pekalongan"
+    },
+    {
+      "value": "ID:RI:Kabupaten Pelalawan",
+      "label": "Kabupaten Pelalawan — Riau",
+      "legacyName": "Kabupaten Pelalawan"
+    },
+    {
+      "value": "ID:JT:Kabupaten Pemalang",
+      "label": "Kabupaten Pemalang — Jawa Tengah",
+      "legacyName": "Kabupaten Pemalang"
+    },
+    {
+      "value": "ID:KI:Kabupaten Penajam Paser Utara",
+      "label": "Kabupaten Penajam Paser Utara — Kalimantan Timur",
+      "legacyName": "Kabupaten Penajam Paser Utara"
+    },
+    {
+      "value": "ID:SS:Kabupaten Penukal Abab Lematang Ilir",
+      "label": "Kabupaten Penukal Abab Lematang Ilir — Sumatera Selatan",
+      "legacyName": "Kabupaten Penukal Abab Lematang Ilir"
+    },
+    {
+      "value": "ID:LA:Kabupaten Pesawaran",
+      "label": "Kabupaten Pesawaran — Lampung",
+      "legacyName": "Kabupaten Pesawaran"
+    },
+    {
+      "value": "ID:LA:Kabupaten Pesisir Barat",
+      "label": "Kabupaten Pesisir Barat — Lampung",
+      "legacyName": "Kabupaten Pesisir Barat"
+    },
+    {
+      "value": "ID:SB:Kabupaten Pesisir Selatan",
+      "label": "Kabupaten Pesisir Selatan — Sumatera Barat",
+      "legacyName": "Kabupaten Pesisir Selatan"
+    },
+    {
+      "value": "ID:AC:Kabupaten Pidie",
+      "label": "Kabupaten Pidie — Aceh",
+      "legacyName": "Kabupaten Pidie"
+    },
+    {
+      "value": "ID:SN:Kabupaten Pinrang",
+      "label": "Kabupaten Pinrang — Sulawesi Selatan",
+      "legacyName": "Kabupaten Pinrang"
+    },
+    {
+      "value": "ID:GO:Kabupaten Pohuwato",
+      "label": "Kabupaten Pohuwato — Gorontalo",
+      "legacyName": "Kabupaten Pohuwato"
+    },
+    {
+      "value": "ID:SR:Kabupaten Polewali Mandar",
+      "label": "Kabupaten Polewali Mandar — Sulawesi Barat",
+      "legacyName": "Kabupaten Polewali Mandar"
+    },
+    {
+      "value": "ID:JI:Kabupaten Ponorogo",
+      "label": "Kabupaten Ponorogo — Jawa Timur",
+      "legacyName": "Kabupaten Ponorogo"
+    },
+    {
+      "value": "ID:ST:Kabupaten Poso",
+      "label": "Kabupaten Poso — Sulawesi Tengah",
+      "legacyName": "Kabupaten Poso"
+    },
+    {
+      "value": "ID:LA:Kabupaten Pringsewu",
+      "label": "Kabupaten Pringsewu — Lampung",
+      "legacyName": "Kabupaten Pringsewu"
+    },
+    {
+      "value": "ID:JI:Kabupaten Probolinggo",
+      "label": "Kabupaten Probolinggo — Jawa Timur",
+      "legacyName": "Kabupaten Probolinggo"
+    },
+    {
+      "value": "ID:KT:Kabupaten Pulang Pisau",
+      "label": "Kabupaten Pulang Pisau — Kalimantan Tengah",
+      "legacyName": "Kabupaten Pulang Pisau"
+    },
+    {
+      "value": "ID:MU:Kabupaten Pulau Morotai",
+      "label": "Kabupaten Pulau Morotai — Maluku Utara",
+      "legacyName": "Kabupaten Pulau Morotai"
+    },
+    {
+      "value": "ID:MU:Kabupaten Pulau Taliabu",
+      "label": "Kabupaten Pulau Taliabu — Maluku Utara",
+      "legacyName": "Kabupaten Pulau Taliabu"
+    },
+    {
+      "value": "ID:PA:Kabupaten Puncak Jaya",
+      "label": "Kabupaten Puncak Jaya — Papua",
+      "legacyName": "Kabupaten Puncak Jaya"
+    },
+    {
+      "value": "ID:JT:Kabupaten Purbalingga",
+      "label": "Kabupaten Purbalingga — Jawa Tengah",
+      "legacyName": "Kabupaten Purbalingga"
+    },
+    {
+      "value": "ID:JB:Kabupaten Purwakarta",
+      "label": "Kabupaten Purwakarta — Jawa Barat",
+      "legacyName": "Kabupaten Purwakarta"
+    },
+    {
+      "value": "ID:JT:Kabupaten Purworejo",
+      "label": "Kabupaten Purworejo — Jawa Tengah",
+      "legacyName": "Kabupaten Purworejo"
+    },
+    {
+      "value": "ID:PB:Kabupaten Raja Ampat",
+      "label": "Kabupaten Raja Ampat — Papua Barat",
+      "legacyName": "Kabupaten Raja Ampat"
+    },
+    {
+      "value": "ID:BE:Kabupaten Rejang Lebong",
+      "label": "Kabupaten Rejang Lebong — Bengkulu",
+      "legacyName": "Kabupaten Rejang Lebong"
+    },
+    {
+      "value": "ID:JT:Kabupaten Rembang",
+      "label": "Kabupaten Rembang — Jawa Tengah",
+      "legacyName": "Kabupaten Rembang"
+    },
+    {
+      "value": "ID:RI:Kabupaten Rokan Hilir",
+      "label": "Kabupaten Rokan Hilir — Riau",
+      "legacyName": "Kabupaten Rokan Hilir"
+    },
+    {
+      "value": "ID:RI:Kabupaten Rokan Hulu",
+      "label": "Kabupaten Rokan Hulu — Riau",
+      "legacyName": "Kabupaten Rokan Hulu"
+    },
+    {
+      "value": "ID:NT:Kabupaten Rote Ndao",
+      "label": "Kabupaten Rote Ndao — Nusa Tenggara Timur",
+      "legacyName": "Kabupaten Rote Ndao"
+    },
+    {
+      "value": "ID:NT:Kabupaten Sabu Raijua",
+      "label": "Kabupaten Sabu Raijua — Nusa Tenggara Timur",
+      "legacyName": "Kabupaten Sabu Raijua"
+    },
+    {
+      "value": "ID:SU:Kabupaten Samosir",
+      "label": "Kabupaten Samosir — Sumatera Utara",
+      "legacyName": "Kabupaten Samosir"
+    },
+    {
+      "value": "ID:JI:Kabupaten Sampang",
+      "label": "Kabupaten Sampang — Jawa Timur",
+      "legacyName": "Kabupaten Sampang"
+    },
+    {
+      "value": "ID:PA:Kabupaten Sarmi",
+      "label": "Kabupaten Sarmi — Papua",
+      "legacyName": "Kabupaten Sarmi"
+    },
+    {
+      "value": "ID:JA:Kabupaten Sarolangun",
+      "label": "Kabupaten Sarolangun — Jambi",
+      "legacyName": "Kabupaten Sarolangun"
+    },
+    {
+      "value": "ID:BE:Kabupaten Seluma",
+      "label": "Kabupaten Seluma — Bengkulu",
+      "legacyName": "Kabupaten Seluma"
+    },
+    {
+      "value": "ID:JT:Kabupaten Semarang",
+      "label": "Kabupaten Semarang — Jawa Tengah",
+      "legacyName": "Kabupaten Semarang"
+    },
+    {
+      "value": "ID:MA:Kabupaten Seram Bagian Barat",
+      "label": "Kabupaten Seram Bagian Barat — Maluku",
+      "legacyName": "Kabupaten Seram Bagian Barat"
+    },
+    {
+      "value": "ID:MA:Kabupaten Seram Bagian Timur",
+      "label": "Kabupaten Seram Bagian Timur — Maluku",
+      "legacyName": "Kabupaten Seram Bagian Timur"
+    },
+    {
+      "value": "ID:BT:Kabupaten Serang",
+      "label": "Kabupaten Serang — Banten",
+      "legacyName": "Kabupaten Serang"
+    },
+    {
+      "value": "ID:SU:Kabupaten Serdang Bedagai",
+      "label": "Kabupaten Serdang Bedagai — Sumatera Utara",
+      "legacyName": "Kabupaten Serdang Bedagai"
+    },
+    {
+      "value": "ID:KT:Kabupaten Seruyan",
+      "label": "Kabupaten Seruyan — Kalimantan Tengah",
+      "legacyName": "Kabupaten Seruyan"
+    },
+    {
+      "value": "ID:RI:Kabupaten Siak",
+      "label": "Kabupaten Siak — Riau",
+      "legacyName": "Kabupaten Siak"
+    },
+    {
+      "value": "ID:SA:Kabupaten Siau Tagulandang Biaro",
+      "label": "Kabupaten Siau Tagulandang Biaro — Sulawesi Utara",
+      "legacyName": "Kabupaten Siau Tagulandang Biaro"
+    },
+    {
+      "value": "ID:SN:Kabupaten Sidenreng Rappang",
+      "label": "Kabupaten Sidenreng Rappang — Sulawesi Selatan",
+      "legacyName": "Kabupaten Sidenreng Rappang"
+    },
+    {
+      "value": "ID:JI:Kabupaten Sidoarjo",
+      "label": "Kabupaten Sidoarjo — Jawa Timur",
+      "legacyName": "Kabupaten Sidoarjo"
+    },
+    {
+      "value": "ID:ST:Kabupaten Sigi",
+      "label": "Kabupaten Sigi — Sulawesi Tengah",
+      "legacyName": "Kabupaten Sigi"
+    },
+    {
+      "value": "ID:SB:Kabupaten Sijunjung",
+      "label": "Kabupaten Sijunjung — Sumatera Barat",
+      "legacyName": "Kabupaten Sijunjung"
+    },
+    {
+      "value": "ID:NT:Kabupaten Sikka",
+      "label": "Kabupaten Sikka — Nusa Tenggara Timur",
+      "legacyName": "Kabupaten Sikka"
+    },
+    {
+      "value": "ID:SU:Kabupaten Simalungun",
+      "label": "Kabupaten Simalungun — Sumatera Utara",
+      "legacyName": "Kabupaten Simalungun"
+    },
+    {
+      "value": "ID:AC:Kabupaten Simeulue",
+      "label": "Kabupaten Simeulue — Aceh",
+      "legacyName": "Kabupaten Simeulue"
+    },
+    {
+      "value": "ID:SN:Kabupaten Sinjai",
+      "label": "Kabupaten Sinjai — Sulawesi Selatan",
+      "legacyName": "Kabupaten Sinjai"
+    },
+    {
+      "value": "ID:JI:Kabupaten Situbondo",
+      "label": "Kabupaten Situbondo — Jawa Timur",
+      "legacyName": "Kabupaten Situbondo"
+    },
+    {
+      "value": "ID:YO:Kabupaten Sleman",
+      "label": "Kabupaten Sleman — DI Yogyakarta",
+      "legacyName": "Kabupaten Sleman"
+    },
+    {
+      "value": "ID:SB:Kabupaten Solok",
+      "label": "Kabupaten Solok — Sumatera Barat",
+      "legacyName": "Kabupaten Solok"
+    },
+    {
+      "value": "ID:SB:Kabupaten Solok Selatan",
+      "label": "Kabupaten Solok Selatan — Sumatera Barat",
+      "legacyName": "Kabupaten Solok Selatan"
+    },
+    {
+      "value": "ID:SN:Kabupaten Soppeng",
+      "label": "Kabupaten Soppeng — Sulawesi Selatan",
+      "legacyName": "Kabupaten Soppeng"
+    },
+    {
+      "value": "ID:PB:Kabupaten Sorong",
+      "label": "Kabupaten Sorong — Papua Barat",
+      "legacyName": "Kabupaten Sorong"
+    },
+    {
+      "value": "ID:PB:Kabupaten Sorong Selatan",
+      "label": "Kabupaten Sorong Selatan — Papua Barat",
+      "legacyName": "Kabupaten Sorong Selatan"
+    },
+    {
+      "value": "ID:JT:Kabupaten Sragen",
+      "label": "Kabupaten Sragen — Jawa Tengah",
+      "legacyName": "Kabupaten Sragen"
+    },
+    {
+      "value": "ID:JB:Kabupaten Subang",
+      "label": "Kabupaten Subang — Jawa Barat",
+      "legacyName": "Kabupaten Subang"
+    },
+    {
+      "value": "ID:JB:Kabupaten Sukabumi",
+      "label": "Kabupaten Sukabumi — Jawa Barat",
+      "legacyName": "Kabupaten Sukabumi"
+    },
+    {
+      "value": "ID:KT:Kabupaten Sukamara",
+      "label": "Kabupaten Sukamara — Kalimantan Tengah",
+      "legacyName": "Kabupaten Sukamara"
+    },
+    {
+      "value": "ID:JT:Kabupaten Sukoharjo",
+      "label": "Kabupaten Sukoharjo — Jawa Tengah",
+      "legacyName": "Kabupaten Sukoharjo"
+    },
+    {
+      "value": "ID:NT:Kabupaten Sumba Barat",
+      "label": "Kabupaten Sumba Barat — Nusa Tenggara Timur",
+      "legacyName": "Kabupaten Sumba Barat"
+    },
+    {
+      "value": "ID:NT:Kabupaten Sumba Barat Daya",
+      "label": "Kabupaten Sumba Barat Daya — Nusa Tenggara Timur",
+      "legacyName": "Kabupaten Sumba Barat Daya"
+    },
+    {
+      "value": "ID:NT:Kabupaten Sumba Tengah",
+      "label": "Kabupaten Sumba Tengah — Nusa Tenggara Timur",
+      "legacyName": "Kabupaten Sumba Tengah"
+    },
+    {
+      "value": "ID:NT:Kabupaten Sumba Timur",
+      "label": "Kabupaten Sumba Timur — Nusa Tenggara Timur",
+      "legacyName": "Kabupaten Sumba Timur"
+    },
+    {
+      "value": "ID:NB:Kabupaten Sumbawa",
+      "label": "Kabupaten Sumbawa — Nusa Tenggara Barat",
+      "legacyName": "Kabupaten Sumbawa"
+    },
+    {
+      "value": "ID:NB:Kabupaten Sumbawa Barat",
+      "label": "Kabupaten Sumbawa Barat — Nusa Tenggara Barat",
+      "legacyName": "Kabupaten Sumbawa Barat"
+    },
+    {
+      "value": "ID:JB:Kabupaten Sumedang",
+      "label": "Kabupaten Sumedang — Jawa Barat",
+      "legacyName": "Kabupaten Sumedang"
+    },
+    {
+      "value": "ID:JI:Kabupaten Sumenep",
+      "label": "Kabupaten Sumenep — Jawa Timur",
+      "legacyName": "Kabupaten Sumenep"
+    },
+    {
+      "value": "ID:PA:Kabupaten Supiori",
+      "label": "Kabupaten Supiori — Papua",
+      "legacyName": "Kabupaten Supiori"
+    },
+    {
+      "value": "ID:KS:Kabupaten Tabalong",
+      "label": "Kabupaten Tabalong — Kalimantan Selatan",
+      "legacyName": "Kabupaten Tabalong"
+    },
+    {
+      "value": "ID:BA:Kabupaten Tabanan",
+      "label": "Kabupaten Tabanan — Bali",
+      "legacyName": "Kabupaten Tabanan"
+    },
+    {
+      "value": "ID:SN:Kabupaten Takalar",
+      "label": "Kabupaten Takalar — Sulawesi Selatan",
+      "legacyName": "Kabupaten Takalar"
+    },
+    {
+      "value": "ID:PB:Kabupaten Tambrauw",
+      "label": "Kabupaten Tambrauw — Papua Barat",
+      "legacyName": "Kabupaten Tambrauw"
+    },
+    {
+      "value": "ID:KU:Kabupaten Tana Tidung",
+      "label": "Kabupaten Tana Tidung — Kalimantan Utara",
+      "legacyName": "Kabupaten Tana Tidung"
+    },
+    {
+      "value": "ID:SN:Kabupaten Tana Toraja",
+      "label": "Kabupaten Tana Toraja — Sulawesi Selatan",
+      "legacyName": "Kabupaten Tana Toraja"
+    },
+    {
+      "value": "ID:KS:Kabupaten Tanah Bumbu",
+      "label": "Kabupaten Tanah Bumbu — Kalimantan Selatan",
+      "legacyName": "Kabupaten Tanah Bumbu"
+    },
+    {
+      "value": "ID:SB:Kabupaten Tanah Datar",
+      "label": "Kabupaten Tanah Datar — Sumatera Barat",
+      "legacyName": "Kabupaten Tanah Datar"
+    },
+    {
+      "value": "ID:KS:Kabupaten Tanah Laut",
+      "label": "Kabupaten Tanah Laut — Kalimantan Selatan",
+      "legacyName": "Kabupaten Tanah Laut"
+    },
+    {
+      "value": "ID:BT:Kabupaten Tangerang",
+      "label": "Kabupaten Tangerang — Banten",
+      "legacyName": "Kabupaten Tangerang"
+    },
+    {
+      "value": "ID:LA:Kabupaten Tanggamus",
+      "label": "Kabupaten Tanggamus — Lampung",
+      "legacyName": "Kabupaten Tanggamus"
+    },
+    {
+      "value": "ID:JA:Kabupaten Tanjung Jabung Barat",
+      "label": "Kabupaten Tanjung Jabung Barat — Jambi",
+      "legacyName": "Kabupaten Tanjung Jabung Barat"
+    },
+    {
+      "value": "ID:JA:Kabupaten Tanjung Jabung Timur",
+      "label": "Kabupaten Tanjung Jabung Timur — Jambi",
+      "legacyName": "Kabupaten Tanjung Jabung Timur"
+    },
+    {
+      "value": "ID:SU:Kabupaten Tapanuli Selatan",
+      "label": "Kabupaten Tapanuli Selatan — Sumatera Utara",
+      "legacyName": "Kabupaten Tapanuli Selatan"
+    },
+    {
+      "value": "ID:SU:Kabupaten Tapanuli Tengah",
+      "label": "Kabupaten Tapanuli Tengah — Sumatera Utara",
+      "legacyName": "Kabupaten Tapanuli Tengah"
+    },
+    {
+      "value": "ID:SU:Kabupaten Tapanuli Utara",
+      "label": "Kabupaten Tapanuli Utara — Sumatera Utara",
+      "legacyName": "Kabupaten Tapanuli Utara"
+    },
+    {
+      "value": "ID:KS:Kabupaten Tapin",
+      "label": "Kabupaten Tapin — Kalimantan Selatan",
+      "legacyName": "Kabupaten Tapin"
+    },
+    {
+      "value": "ID:JB:Kabupaten Tasikmalaya",
+      "label": "Kabupaten Tasikmalaya — Jawa Barat",
+      "legacyName": "Kabupaten Tasikmalaya"
+    },
+    {
+      "value": "ID:JA:Kabupaten Tebo",
+      "label": "Kabupaten Tebo — Jambi",
+      "legacyName": "Kabupaten Tebo"
+    },
+    {
+      "value": "ID:JT:Kabupaten Tegal",
+      "label": "Kabupaten Tegal — Jawa Tengah",
+      "legacyName": "Kabupaten Tegal"
+    },
+    {
+      "value": "ID:PB:Kabupaten Teluk Bintuni",
+      "label": "Kabupaten Teluk Bintuni — Papua Barat",
+      "legacyName": "Kabupaten Teluk Bintuni"
+    },
+    {
+      "value": "ID:PB:Kabupaten Teluk Wondama",
+      "label": "Kabupaten Teluk Wondama — Papua Barat",
+      "legacyName": "Kabupaten Teluk Wondama"
+    },
+    {
+      "value": "ID:JT:Kabupaten Temanggung",
+      "label": "Kabupaten Temanggung — Jawa Tengah",
+      "legacyName": "Kabupaten Temanggung"
+    },
+    {
+      "value": "ID:NT:Kabupaten Timor Tengah Selatan",
+      "label": "Kabupaten Timor Tengah Selatan — Nusa Tenggara Timur",
+      "legacyName": "Kabupaten Timor Tengah Selatan"
+    },
+    {
+      "value": "ID:NT:Kabupaten Timor Tengah Utara",
+      "label": "Kabupaten Timor Tengah Utara — Nusa Tenggara Timur",
+      "legacyName": "Kabupaten Timor Tengah Utara"
+    },
+    {
+      "value": "ID:ST:Kabupaten Toli-Toli",
+      "label": "Kabupaten Toli-Toli — Sulawesi Tengah",
+      "legacyName": "Kabupaten Toli-Toli"
+    },
+    {
+      "value": "ID:PA:Kabupaten Tolikara",
+      "label": "Kabupaten Tolikara — Papua",
+      "legacyName": "Kabupaten Tolikara"
+    },
+    {
+      "value": "ID:SN:Kabupaten Toraja Utara",
+      "label": "Kabupaten Toraja Utara — Sulawesi Selatan",
+      "legacyName": "Kabupaten Toraja Utara"
+    },
+    {
+      "value": "ID:JI:Kabupaten Trenggalek",
+      "label": "Kabupaten Trenggalek — Jawa Timur",
+      "legacyName": "Kabupaten Trenggalek"
+    },
+    {
+      "value": "ID:JI:Kabupaten Tuban",
+      "label": "Kabupaten Tuban — Jawa Timur",
+      "legacyName": "Kabupaten Tuban"
+    },
+    {
+      "value": "ID:LA:Kabupaten Tulangbawang",
+      "label": "Kabupaten Tulangbawang — Lampung",
+      "legacyName": "Kabupaten Tulangbawang"
+    },
+    {
+      "value": "ID:JI:Kabupaten Tulungagung",
+      "label": "Kabupaten Tulungagung — Jawa Timur",
+      "legacyName": "Kabupaten Tulungagung"
+    },
+    {
+      "value": "ID:SN:Kabupaten Wajo",
+      "label": "Kabupaten Wajo — Sulawesi Selatan",
+      "legacyName": "Kabupaten Wajo"
+    },
+    {
+      "value": "ID:PA:Kabupaten Waropen",
+      "label": "Kabupaten Waropen — Papua",
+      "legacyName": "Kabupaten Waropen"
+    },
+    {
+      "value": "ID:LA:Kabupaten Way Kanan",
+      "label": "Kabupaten Way Kanan — Lampung",
+      "legacyName": "Kabupaten Way Kanan"
+    },
+    {
+      "value": "ID:JT:Kabupaten Wonogiri",
+      "label": "Kabupaten Wonogiri — Jawa Tengah",
+      "legacyName": "Kabupaten Wonogiri"
+    },
+    {
+      "value": "ID:JT:Kabupaten Wonosobo",
+      "label": "Kabupaten Wonosobo — Jawa Tengah",
+      "legacyName": "Kabupaten Wonosobo"
+    },
+    {
+      "value": "ID:PA:Kabupaten Yahukimo",
+      "label": "Kabupaten Yahukimo — Papua",
+      "legacyName": "Kabupaten Yahukimo"
+    },
+    {
+      "value": "ID:PA:Kabupaten Yalimo",
+      "label": "Kabupaten Yalimo — Papua",
+      "legacyName": "Kabupaten Yalimo"
+    },
+    {
+      "value": "ID:JI:Kalianget",
+      "label": "Kalianget — Jawa Timur",
+      "legacyName": "Kalianget"
+    },
+    {
+      "value": "ID:JI:Kamal",
+      "label": "Kamal — Jawa Timur",
+      "legacyName": "Kamal"
+    },
+    {
+      "value": "ID:JB:Karangampel",
+      "label": "Karangampel — Jawa Barat",
+      "legacyName": "Karangampel"
+    },
+    {
+      "value": "ID:JT:Karanganom",
+      "label": "Karanganom — Jawa Tengah",
+      "legacyName": "Karanganom"
+    },
+    {
+      "value": "ID:JB:Karangsembung",
+      "label": "Karangsembung — Jawa Barat",
+      "legacyName": "Karangsembung"
+    },
+    {
+      "value": "ID:JT:Kartasura",
+      "label": "Kartasura — Jawa Tengah",
+      "legacyName": "Kartasura"
+    },
+    {
+      "value": "ID:YO:Kasihan",
+      "label": "Kasihan — DI Yogyakarta",
+      "legacyName": "Kasihan"
+    },
+    {
+      "value": "ID:SG:Katabu",
+      "label": "Katabu — Sulawesi Tenggara",
+      "legacyName": "Katabu"
+    },
+    {
+      "value": "ID:JB:Kawalu",
+      "label": "Kawalu — Jawa Barat",
+      "legacyName": "Kawalu"
+    },
+    {
+      "value": "ID:JI:Kebomas",
+      "label": "Kebomas — Jawa Timur",
+      "legacyName": "Kebomas"
+    },
+    {
+      "value": "ID:JT:Kebonarun",
+      "label": "Kebonarun — Jawa Tengah",
+      "legacyName": "Kebonarun"
+    },
+    {
+      "value": "ID:JI:Kediri",
+      "label": "Kediri — Jawa Timur",
+      "legacyName": "Kediri"
+    },
+    {
+      "value": "ID:JI:Kedungwaru",
+      "label": "Kedungwaru — Jawa Timur",
+      "legacyName": "Kedungwaru"
+    },
+    {
+      "value": "ID:JT:Kedungwuni",
+      "label": "Kedungwuni — Jawa Tengah",
+      "legacyName": "Kedungwuni"
+    },
+    {
+      "value": "ID:NT:Kefamenanu",
+      "label": "Kefamenanu — Nusa Tenggara Timur",
+      "legacyName": "Kefamenanu"
+    },
+    {
+      "value": "ID:JI:Kencong",
+      "label": "Kencong — Jawa Timur",
+      "legacyName": "Kencong"
+    },
+    {
+      "value": "ID:SG:Kendari",
+      "label": "Kendari — Sulawesi Tenggara",
+      "legacyName": "Kendari"
+    },
+    {
+      "value": "ID:JI:Kepanjen",
+      "label": "Kepanjen — Jawa Timur",
+      "legacyName": "Kepanjen"
+    },
+    {
+      "value": "ID:JI:Kertosono",
+      "label": "Kertosono — Jawa Timur",
+      "legacyName": "Kertosono"
+    },
+    {
+      "value": "ID:JT:Ketanggungan",
+      "label": "Ketanggungan — Jawa Tengah",
+      "legacyName": "Ketanggungan"
+    },
+    {
+      "value": "ID:KR:Kijang",
+      "label": "Kijang — Kepulauan Riau",
+      "legacyName": "Kijang"
+    },
+    {
+      "value": "ID:SU:Kisaran",
+      "label": "Kisaran — Sumatera Utara",
+      "legacyName": "Kisaran"
+    },
+    {
+      "value": "ID:JB:Klangenan",
+      "label": "Klangenan — Jawa Barat",
+      "legacyName": "Klangenan"
+    },
+    {
+      "value": "ID:JT:Klaten",
+      "label": "Klaten — Jawa Tengah",
+      "legacyName": "Klaten"
+    },
+    {
+      "value": "ID:BA:Klungkung",
+      "label": "Klungkung — Bali",
+      "legacyName": "Klungkung"
+    },
+    {
+      "value": "ID:NT:Komodo",
+      "label": "Komodo — Nusa Tenggara Timur",
+      "legacyName": "Komodo"
+    },
+    {
+      "value": "ID:JK:Kota Administrasi Jakarta Barat",
+      "label": "Kota Administrasi Jakarta Barat — DKI Jakarta",
+      "legacyName": "Kota Administrasi Jakarta Barat"
+    },
+    {
+      "value": "ID:JK:Kota Administrasi Jakarta Pusat",
+      "label": "Kota Administrasi Jakarta Pusat — DKI Jakarta",
+      "legacyName": "Kota Administrasi Jakarta Pusat"
+    },
+    {
+      "value": "ID:JK:Kota Administrasi Jakarta Selatan",
+      "label": "Kota Administrasi Jakarta Selatan — DKI Jakarta",
+      "legacyName": "Kota Administrasi Jakarta Selatan"
+    },
+    {
+      "value": "ID:JK:Kota Administrasi Jakarta Timur",
+      "label": "Kota Administrasi Jakarta Timur — DKI Jakarta",
+      "legacyName": "Kota Administrasi Jakarta Timur"
+    },
+    {
+      "value": "ID:JK:Kota Administrasi Jakarta Utara",
+      "label": "Kota Administrasi Jakarta Utara — DKI Jakarta",
+      "legacyName": "Kota Administrasi Jakarta Utara"
+    },
+    {
+      "value": "ID:MA:Kota Ambon",
+      "label": "Kota Ambon — Maluku",
+      "legacyName": "Kota Ambon"
+    },
+    {
+      "value": "ID:KI:Kota Balikpapan",
+      "label": "Kota Balikpapan — Kalimantan Timur",
+      "legacyName": "Kota Balikpapan"
+    },
+    {
+      "value": "ID:AC:Kota Banda Aceh",
+      "label": "Kota Banda Aceh — Aceh",
+      "legacyName": "Kota Banda Aceh"
+    },
+    {
+      "value": "ID:LA:Kota Bandar Lampung",
+      "label": "Kota Bandar Lampung — Lampung",
+      "legacyName": "Kota Bandar Lampung"
+    },
+    {
+      "value": "ID:JB:Kota Bandung",
+      "label": "Kota Bandung — Jawa Barat",
+      "legacyName": "Kota Bandung"
+    },
+    {
+      "value": "ID:JB:Kota Banjar",
+      "label": "Kota Banjar — Jawa Barat",
+      "legacyName": "Kota Banjar"
+    },
+    {
+      "value": "ID:KS:Kota Banjar Baru",
+      "label": "Kota Banjar Baru — Kalimantan Selatan",
+      "legacyName": "Kota Banjar Baru"
+    },
+    {
+      "value": "ID:KS:Kota Banjarmasin",
+      "label": "Kota Banjarmasin — Kalimantan Selatan",
+      "legacyName": "Kota Banjarmasin"
+    },
+    {
+      "value": "ID:KR:Kota Batam",
+      "label": "Kota Batam — Kepulauan Riau",
+      "legacyName": "Kota Batam"
+    },
+    {
+      "value": "ID:JI:Kota Batu",
+      "label": "Kota Batu — Jawa Timur",
+      "legacyName": "Kota Batu"
+    },
+    {
+      "value": "ID:SG:Kota Baubau",
+      "label": "Kota Baubau — Sulawesi Tenggara",
+      "legacyName": "Kota Baubau"
+    },
+    {
+      "value": "ID:JB:Kota Bekasi",
+      "label": "Kota Bekasi — Jawa Barat",
+      "legacyName": "Kota Bekasi"
+    },
+    {
+      "value": "ID:BE:Kota Bengkulu",
+      "label": "Kota Bengkulu — Bengkulu",
+      "legacyName": "Kota Bengkulu"
+    },
+    {
+      "value": "ID:NB:Kota Bima",
+      "label": "Kota Bima — Nusa Tenggara Barat",
+      "legacyName": "Kota Bima"
+    },
+    {
+      "value": "ID:SU:Kota Binjai",
+      "label": "Kota Binjai — Sumatera Utara",
+      "legacyName": "Kota Binjai"
+    },
+    {
+      "value": "ID:SA:Kota Bitung",
+      "label": "Kota Bitung — Sulawesi Utara",
+      "legacyName": "Kota Bitung"
+    },
+    {
+      "value": "ID:JI:Kota Blitar",
+      "label": "Kota Blitar — Jawa Timur",
+      "legacyName": "Kota Blitar"
+    },
+    {
+      "value": "ID:JB:Kota Bogor",
+      "label": "Kota Bogor — Jawa Barat",
+      "legacyName": "Kota Bogor"
+    },
+    {
+      "value": "ID:KI:Kota Bontang",
+      "label": "Kota Bontang — Kalimantan Timur",
+      "legacyName": "Kota Bontang"
+    },
+    {
+      "value": "ID:SB:Kota Bukittinggi",
+      "label": "Kota Bukittinggi — Sumatera Barat",
+      "legacyName": "Kota Bukittinggi"
+    },
+    {
+      "value": "ID:BT:Kota Cilegon",
+      "label": "Kota Cilegon — Banten",
+      "legacyName": "Kota Cilegon"
+    },
+    {
+      "value": "ID:JB:Kota Cimahi",
+      "label": "Kota Cimahi — Jawa Barat",
+      "legacyName": "Kota Cimahi"
+    },
+    {
+      "value": "ID:JB:Kota Cirebon",
+      "label": "Kota Cirebon — Jawa Barat",
+      "legacyName": "Kota Cirebon"
+    },
+    {
+      "value": "ID:BA:Kota Denpasar",
+      "label": "Kota Denpasar — Bali",
+      "legacyName": "Kota Denpasar"
+    },
+    {
+      "value": "ID:JB:Kota Depok",
+      "label": "Kota Depok — Jawa Barat",
+      "legacyName": "Kota Depok"
+    },
+    {
+      "value": "ID:RI:Kota Dumai",
+      "label": "Kota Dumai — Riau",
+      "legacyName": "Kota Dumai"
+    },
+    {
+      "value": "ID:GO:Kota Gorontalo",
+      "label": "Kota Gorontalo — Gorontalo",
+      "legacyName": "Kota Gorontalo"
+    },
+    {
+      "value": "ID:SU:Kota Gunungsitoli",
+      "label": "Kota Gunungsitoli — Sumatera Utara",
+      "legacyName": "Kota Gunungsitoli"
+    },
+    {
+      "value": "ID:JA:Kota Jambi",
+      "label": "Kota Jambi — Jambi",
+      "legacyName": "Kota Jambi"
+    },
+    {
+      "value": "ID:PA:Kota Jayapura",
+      "label": "Kota Jayapura — Papua",
+      "legacyName": "Kota Jayapura"
+    },
+    {
+      "value": "ID:JI:Kota Kediri",
+      "label": "Kota Kediri — Jawa Timur",
+      "legacyName": "Kota Kediri"
+    },
+    {
+      "value": "ID:SG:Kota Kendari",
+      "label": "Kota Kendari — Sulawesi Tenggara",
+      "legacyName": "Kota Kendari"
+    },
+    {
+      "value": "ID:SA:Kota Kotamobagu",
+      "label": "Kota Kotamobagu — Sulawesi Utara",
+      "legacyName": "Kota Kotamobagu"
+    },
+    {
+      "value": "ID:NT:Kota Kupang",
+      "label": "Kota Kupang — Nusa Tenggara Timur",
+      "legacyName": "Kota Kupang"
+    },
+    {
+      "value": "ID:AC:Kota Langsa",
+      "label": "Kota Langsa — Aceh",
+      "legacyName": "Kota Langsa"
+    },
+    {
+      "value": "ID:AC:Kota Lhokseumawe",
+      "label": "Kota Lhokseumawe — Aceh",
+      "legacyName": "Kota Lhokseumawe"
+    },
+    {
+      "value": "ID:SS:Kota Lubuklinggau",
+      "label": "Kota Lubuklinggau — Sumatera Selatan",
+      "legacyName": "Kota Lubuklinggau"
+    },
+    {
+      "value": "ID:JI:Kota Madiun",
+      "label": "Kota Madiun — Jawa Timur",
+      "legacyName": "Kota Madiun"
+    },
+    {
+      "value": "ID:JT:Kota Magelang",
+      "label": "Kota Magelang — Jawa Tengah",
+      "legacyName": "Kota Magelang"
+    },
+    {
+      "value": "ID:SN:Kota Makassar",
+      "label": "Kota Makassar — Sulawesi Selatan",
+      "legacyName": "Kota Makassar"
+    },
+    {
+      "value": "ID:JI:Kota Malang",
+      "label": "Kota Malang — Jawa Timur",
+      "legacyName": "Kota Malang"
+    },
+    {
+      "value": "ID:SA:Kota Manado",
+      "label": "Kota Manado — Sulawesi Utara",
+      "legacyName": "Kota Manado"
+    },
+    {
+      "value": "ID:NB:Kota Mataram",
+      "label": "Kota Mataram — Nusa Tenggara Barat",
+      "legacyName": "Kota Mataram"
+    },
+    {
+      "value": "ID:SU:Kota Medan",
+      "label": "Kota Medan — Sumatera Utara",
+      "legacyName": "Kota Medan"
+    },
+    {
+      "value": "ID:LA:Kota Metro",
+      "label": "Kota Metro — Lampung",
+      "legacyName": "Kota Metro"
+    },
+    {
+      "value": "ID:JI:Kota Mojokerto",
+      "label": "Kota Mojokerto — Jawa Timur",
+      "legacyName": "Kota Mojokerto"
+    },
+    {
+      "value": "ID:SB:Kota Padang",
+      "label": "Kota Padang — Sumatera Barat",
+      "legacyName": "Kota Padang"
+    },
+    {
+      "value": "ID:SB:Kota Padang Panjang",
+      "label": "Kota Padang Panjang — Sumatera Barat",
+      "legacyName": "Kota Padang Panjang"
+    },
+    {
+      "value": "ID:SU:Kota Padangsidimpuan",
+      "label": "Kota Padangsidimpuan — Sumatera Utara",
+      "legacyName": "Kota Padangsidimpuan"
+    },
+    {
+      "value": "ID:SS:Kota Pagar Alam",
+      "label": "Kota Pagar Alam — Sumatera Selatan",
+      "legacyName": "Kota Pagar Alam"
+    },
+    {
+      "value": "ID:KT:Kota Palangka Raya",
+      "label": "Kota Palangka Raya — Kalimantan Tengah",
+      "legacyName": "Kota Palangka Raya"
+    },
+    {
+      "value": "ID:SS:Kota Palembang",
+      "label": "Kota Palembang — Sumatera Selatan",
+      "legacyName": "Kota Palembang"
+    },
+    {
+      "value": "ID:SN:Kota Palopo",
+      "label": "Kota Palopo — Sulawesi Selatan",
+      "legacyName": "Kota Palopo"
+    },
+    {
+      "value": "ID:ST:Kota Palu",
+      "label": "Kota Palu — Sulawesi Tengah",
+      "legacyName": "Kota Palu"
+    },
+    {
+      "value": "ID:BB:Kota Pangkal Pinang",
+      "label": "Kota Pangkal Pinang — Kepulauan Bangka Belitung",
+      "legacyName": "Kota Pangkal Pinang"
+    },
+    {
+      "value": "ID:SN:Kota Parepare",
+      "label": "Kota Parepare — Sulawesi Selatan",
+      "legacyName": "Kota Parepare"
+    },
+    {
+      "value": "ID:SB:Kota Pariaman",
+      "label": "Kota Pariaman — Sumatera Barat",
+      "legacyName": "Kota Pariaman"
+    },
+    {
+      "value": "ID:JI:Kota Pasuruan",
+      "label": "Kota Pasuruan — Jawa Timur",
+      "legacyName": "Kota Pasuruan"
+    },
+    {
+      "value": "ID:SB:Kota Payakumbuh",
+      "label": "Kota Payakumbuh — Sumatera Barat",
+      "legacyName": "Kota Payakumbuh"
+    },
+    {
+      "value": "ID:JT:Kota Pekalongan",
+      "label": "Kota Pekalongan — Jawa Tengah",
+      "legacyName": "Kota Pekalongan"
+    },
+    {
+      "value": "ID:RI:Kota Pekanbaru",
+      "label": "Kota Pekanbaru — Riau",
+      "legacyName": "Kota Pekanbaru"
+    },
+    {
+      "value": "ID:SU:Kota Pematang Siantar",
+      "label": "Kota Pematang Siantar — Sumatera Utara",
+      "legacyName": "Kota Pematang Siantar"
+    },
+    {
+      "value": "ID:SS:Kota Prabumulih",
+      "label": "Kota Prabumulih — Sumatera Selatan",
+      "legacyName": "Kota Prabumulih"
+    },
+    {
+      "value": "ID:JI:Kota Probolinggo",
+      "label": "Kota Probolinggo — Jawa Timur",
+      "legacyName": "Kota Probolinggo"
+    },
+    {
+      "value": "ID:AC:Kota Sabang",
+      "label": "Kota Sabang — Aceh",
+      "legacyName": "Kota Sabang"
+    },
+    {
+      "value": "ID:JT:Kota Salatiga",
+      "label": "Kota Salatiga — Jawa Tengah",
+      "legacyName": "Kota Salatiga"
+    },
+    {
+      "value": "ID:KI:Kota Samarinda",
+      "label": "Kota Samarinda — Kalimantan Timur",
+      "legacyName": "Kota Samarinda"
+    },
+    {
+      "value": "ID:SB:Kota Sawah Lunto",
+      "label": "Kota Sawah Lunto — Sumatera Barat",
+      "legacyName": "Kota Sawah Lunto"
+    },
+    {
+      "value": "ID:JT:Kota Semarang",
+      "label": "Kota Semarang — Jawa Tengah",
+      "legacyName": "Kota Semarang"
+    },
+    {
+      "value": "ID:BT:Kota Serang",
+      "label": "Kota Serang — Banten",
+      "legacyName": "Kota Serang"
+    },
+    {
+      "value": "ID:SU:Kota Sibolga",
+      "label": "Kota Sibolga — Sumatera Utara",
+      "legacyName": "Kota Sibolga"
+    },
+    {
+      "value": "ID:SB:Kota Solok",
+      "label": "Kota Solok — Sumatera Barat",
+      "legacyName": "Kota Solok"
+    },
+    {
+      "value": "ID:PB:Kota Sorong",
+      "label": "Kota Sorong — Papua Barat",
+      "legacyName": "Kota Sorong"
+    },
+    {
+      "value": "ID:AC:Kota Subulussalam",
+      "label": "Kota Subulussalam — Aceh",
+      "legacyName": "Kota Subulussalam"
+    },
+    {
+      "value": "ID:JB:Kota Sukabumi",
+      "label": "Kota Sukabumi — Jawa Barat",
+      "legacyName": "Kota Sukabumi"
+    },
+    {
+      "value": "ID:JA:Kota Sungai Penuh",
+      "label": "Kota Sungai Penuh — Jambi",
+      "legacyName": "Kota Sungai Penuh"
+    },
+    {
+      "value": "ID:JI:Kota Surabaya",
+      "label": "Kota Surabaya — Jawa Timur",
+      "legacyName": "Kota Surabaya"
+    },
+    {
+      "value": "ID:JT:Kota Surakarta",
+      "label": "Kota Surakarta — Jawa Tengah",
+      "legacyName": "Kota Surakarta"
+    },
+    {
+      "value": "ID:BT:Kota Tangerang",
+      "label": "Kota Tangerang — Banten",
+      "legacyName": "Kota Tangerang"
+    },
+    {
+      "value": "ID:BT:Kota Tangerang Selatan",
+      "label": "Kota Tangerang Selatan — Banten",
+      "legacyName": "Kota Tangerang Selatan"
+    },
+    {
+      "value": "ID:SU:Kota Tanjung Balai",
+      "label": "Kota Tanjung Balai — Sumatera Utara",
+      "legacyName": "Kota Tanjung Balai"
+    },
+    {
+      "value": "ID:KR:Kota Tanjung Pinang",
+      "label": "Kota Tanjung Pinang — Kepulauan Riau",
+      "legacyName": "Kota Tanjung Pinang"
+    },
+    {
+      "value": "ID:JB:Kota Tasikmalaya",
+      "label": "Kota Tasikmalaya — Jawa Barat",
+      "legacyName": "Kota Tasikmalaya"
+    },
+    {
+      "value": "ID:SU:Kota Tebing Tinggi",
+      "label": "Kota Tebing Tinggi — Sumatera Utara",
+      "legacyName": "Kota Tebing Tinggi"
+    },
+    {
+      "value": "ID:JT:Kota Tegal",
+      "label": "Kota Tegal — Jawa Tengah",
+      "legacyName": "Kota Tegal"
+    },
+    {
+      "value": "ID:MU:Kota Ternate",
+      "label": "Kota Ternate — Maluku Utara",
+      "legacyName": "Kota Ternate"
+    },
+    {
+      "value": "ID:MU:Kota Tidore Kepulauan",
+      "label": "Kota Tidore Kepulauan — Maluku Utara",
+      "legacyName": "Kota Tidore Kepulauan"
+    },
+    {
+      "value": "ID:SA:Kota Tomohon",
+      "label": "Kota Tomohon — Sulawesi Utara",
+      "legacyName": "Kota Tomohon"
+    },
+    {
+      "value": "ID:MA:Kota Tual",
+      "label": "Kota Tual — Maluku",
+      "legacyName": "Kota Tual"
+    },
+    {
+      "value": "ID:YO:Kota Yogyakarta",
+      "label": "Kota Yogyakarta — DI Yogyakarta",
+      "legacyName": "Kota Yogyakarta"
+    },
+    {
+      "value": "ID:LA:Kotabumi",
+      "label": "Kotabumi — Lampung",
+      "legacyName": "Kotabumi"
+    },
+    {
+      "value": "ID:JI:Kraksaan",
+      "label": "Kraksaan — Jawa Timur",
+      "legacyName": "Kraksaan"
+    },
+    {
+      "value": "ID:JB:Kresek",
+      "label": "Kresek — Jawa Barat",
+      "legacyName": "Kresek"
+    },
+    {
+      "value": "ID:JI:Krian",
+      "label": "Krian — Jawa Timur",
+      "legacyName": "Krian"
+    },
+    {
+      "value": "ID:JT:Kroya",
+      "label": "Kroya — Jawa Tengah",
+      "legacyName": "Kroya"
+    },
+    {
+      "value": "ID:JA:Kuala Tungkal",
+      "label": "Kuala Tungkal — Jambi",
+      "legacyName": "Kuala Tungkal"
+    },
+    {
+      "value": "ID:KT:Kualakapuas",
+      "label": "Kualakapuas — Kalimantan Tengah",
+      "legacyName": "Kualakapuas"
+    },
+    {
+      "value": "ID:JT:Kudus",
+      "label": "Kudus — Jawa Tengah",
+      "legacyName": "Kudus"
+    },
+    {
+      "value": "ID:JB:Kuningan",
+      "label": "Kuningan — Jawa Barat",
+      "legacyName": "Kuningan"
+    },
+    {
+      "value": "ID:NT:Kupang",
+      "label": "Kupang — Nusa Tenggara Timur",
+      "legacyName": "Kupang"
+    },
+    {
+      "value": "ID:BA:Kuta",
+      "label": "Kuta — Bali",
+      "legacyName": "Kuta"
+    },
+    {
+      "value": "ID:JT:Kutoarjo",
+      "label": "Kutoarjo — Jawa Tengah",
+      "legacyName": "Kutoarjo"
+    },
+    {
+      "value": "ID:BT:Labuan",
+      "label": "Labuan — Banten",
+      "legacyName": "Labuan"
+    },
+    {
+      "value": "ID:NT:Labuan Bajo",
+      "label": "Labuan Bajo — Nusa Tenggara Timur",
+      "legacyName": "Labuan Bajo"
+    },
+    {
+      "value": "ID:NB:Labuan Lombok",
+      "label": "Labuan Lombok — Nusa Tenggara Barat",
+      "legacyName": "Labuan Lombok"
+    },
+    {
+      "value": "ID:SU:Labuhan Deli",
+      "label": "Labuhan Deli — Sumatera Utara",
+      "legacyName": "Labuhan Deli"
+    },
+    {
+      "value": "ID:SS:Lahat",
+      "label": "Lahat — Sumatera Selatan",
+      "legacyName": "Lahat"
+    },
+    {
+      "value": "ID:SS:Lahat Regency",
+      "label": "Lahat Regency — Sumatera Selatan",
+      "legacyName": "Lahat Regency"
+    },
+    {
+      "value": "ID:SA:Laikit, Laikit II (Dimembe)",
+      "label": "Laikit, Laikit II (Dimembe) — Sulawesi Utara",
+      "legacyName": "Laikit, Laikit II (Dimembe)"
+    },
+    {
+      "value": "ID:JI:Lamongan",
+      "label": "Lamongan — Jawa Timur",
+      "legacyName": "Lamongan"
+    },
+    {
+      "value": "ID:AC:Langsa",
+      "label": "Langsa — Aceh",
+      "legacyName": "Langsa"
+    },
+    {
+      "value": "ID:JT:Lasem",
+      "label": "Lasem — Jawa Tengah",
+      "legacyName": "Lasem"
+    },
+    {
+      "value": "ID:JI:Lawang",
+      "label": "Lawang — Jawa Timur",
+      "legacyName": "Lawang"
+    },
+    {
+      "value": "ID:JT:Lebaksiu",
+      "label": "Lebaksiu — Jawa Tengah",
+      "legacyName": "Lebaksiu"
+    },
+    {
+      "value": "ID:BA:Legian",
+      "label": "Legian — Bali",
+      "legacyName": "Legian"
+    },
+    {
+      "value": "ID:JB:Lembang",
+      "label": "Lembang — Jawa Barat",
+      "legacyName": "Lembang"
+    },
+    {
+      "value": "ID:NB:Lembar",
+      "label": "Lembar — Nusa Tenggara Barat",
+      "legacyName": "Lembar"
+    },
+    {
+      "value": "ID:AC:Lhokseumawe",
+      "label": "Lhokseumawe — Aceh",
+      "legacyName": "Lhokseumawe"
+    },
+    {
+      "value": "ID:KI:Loa Janan",
+      "label": "Loa Janan — Kalimantan Timur",
+      "legacyName": "Loa Janan"
+    },
+    {
+      "value": "ID:BA:Lovina",
+      "label": "Lovina — Bali",
+      "legacyName": "Lovina"
+    },
+    {
+      "value": "ID:SS:Lubuklinggau",
+      "label": "Lubuklinggau — Sumatera Selatan",
+      "legacyName": "Lubuklinggau"
+    },
+    {
+      "value": "ID:JI:Lumajang",
+      "label": "Lumajang — Jawa Timur",
+      "legacyName": "Lumajang"
+    },
+    {
+      "value": "ID:ST:Luwuk",
+      "label": "Luwuk — Sulawesi Tengah",
+      "legacyName": "Luwuk"
+    },
+    {
+      "value": "ID:JI:Madiun",
+      "label": "Madiun — Jawa Timur",
+      "legacyName": "Madiun"
+    },
+    {
+      "value": "ID:JT:Magelang",
+      "label": "Magelang — Jawa Tengah",
+      "legacyName": "Magelang"
+    },
+    {
+      "value": "ID:JB:Majalengka",
+      "label": "Majalengka — Jawa Barat",
+      "legacyName": "Majalengka"
+    },
+    {
+      "value": "ID:JT:Majenang",
+      "label": "Majenang — Jawa Tengah",
+      "legacyName": "Majenang"
+    },
+    {
+      "value": "ID:SR:Majene",
+      "label": "Majene — Sulawesi Barat",
+      "legacyName": "Majene"
+    },
+    {
+      "value": "ID:SN:Makassar",
+      "label": "Makassar — Sulawesi Selatan",
+      "legacyName": "Makassar"
+    },
+    {
+      "value": "ID:JI:Malang",
+      "label": "Malang — Jawa Timur",
+      "legacyName": "Malang"
+    },
+    {
+      "value": "ID:SR:Mamuju",
+      "label": "Mamuju — Sulawesi Barat",
+      "legacyName": "Mamuju"
+    },
+    {
+      "value": "ID:SA:Manado",
+      "label": "Manado — Sulawesi Utara",
+      "legacyName": "Manado"
+    },
+    {
+      "value": "ID:BB:Manggar",
+      "label": "Manggar — Kepulauan Bangka Belitung",
+      "legacyName": "Manggar"
+    },
+    {
+      "value": "ID:PB:Manokwari",
+      "label": "Manokwari — Papua Barat",
+      "legacyName": "Manokwari"
+    },
+    {
+      "value": "ID:JB:Margahayukencana",
+      "label": "Margahayukencana — Jawa Barat",
+      "legacyName": "Margahayukencana"
+    },
+    {
+      "value": "ID:JT:Margasari",
+      "label": "Margasari — Jawa Tengah",
+      "legacyName": "Margasari"
+    },
+    {
+      "value": "ID:SN:Maros",
+      "label": "Maros — Sulawesi Selatan",
+      "legacyName": "Maros"
+    },
+    {
+      "value": "ID:KS:Martapura",
+      "label": "Martapura — Kalimantan Selatan",
+      "legacyName": "Martapura"
+    },
+    {
+      "value": "ID:NB:Mataram",
+      "label": "Mataram — Nusa Tenggara Barat",
+      "legacyName": "Mataram"
+    },
+    {
+      "value": "ID:NT:Maumere",
+      "label": "Maumere — Nusa Tenggara Timur",
+      "legacyName": "Maumere"
+    },
+    {
+      "value": "ID:SU:Medan",
+      "label": "Medan — Sumatera Utara",
+      "legacyName": "Medan"
+    },
+    {
+      "value": "ID:YO:Melati",
+      "label": "Melati — DI Yogyakarta",
+      "legacyName": "Melati"
+    },
+    {
+      "value": "ID:JA:Mendaha",
+      "label": "Mendaha — Jambi",
+      "legacyName": "Mendaha"
+    },
+    {
+      "value": "ID:JT:Mertoyudan",
+      "label": "Mertoyudan — Jawa Tengah",
+      "legacyName": "Mertoyudan"
+    },
+    {
+      "value": "ID:LA:Metro",
+      "label": "Metro — Lampung",
+      "legacyName": "Metro"
+    },
+    {
+      "value": "ID:AC:Meulaboh",
+      "label": "Meulaboh — Aceh",
+      "legacyName": "Meulaboh"
+    },
+    {
+      "value": "ID:JT:Mlonggo",
+      "label": "Mlonggo — Jawa Tengah",
+      "legacyName": "Mlonggo"
+    },
+    {
+      "value": "ID:JI:Mojoagung",
+      "label": "Mojoagung — Jawa Timur",
+      "legacyName": "Mojoagung"
+    },
+    {
+      "value": "ID:JI:Mojokerto",
+      "label": "Mojokerto — Jawa Timur",
+      "legacyName": "Mojokerto"
+    },
+    {
+      "value": "ID:ST:Morowali Regency",
+      "label": "Morowali Regency — Sulawesi Tengah",
+      "legacyName": "Morowali Regency"
+    },
+    {
+      "value": "ID:JT:Mranggen",
+      "label": "Mranggen — Jawa Tengah",
+      "legacyName": "Mranggen"
+    },
+    {
+      "value": "ID:JI:Muncar",
+      "label": "Muncar — Jawa Timur",
+      "legacyName": "Muncar"
+    },
+    {
+      "value": "ID:BA:Munduk",
+      "label": "Munduk — Bali",
+      "legacyName": "Munduk"
+    },
+    {
+      "value": "ID:JT:Muntilan",
+      "label": "Muntilan — Jawa Tengah",
+      "legacyName": "Muntilan"
+    },
+    {
+      "value": "ID:BB:Muntok",
+      "label": "Muntok — Kepulauan Bangka Belitung",
+      "legacyName": "Muntok"
+    },
+    {
+      "value": "ID:PA:Nabire",
+      "label": "Nabire — Papua",
+      "legacyName": "Nabire"
+    },
+    {
+      "value": "ID:NT:Naisano Dua",
+      "label": "Naisano Dua — Nusa Tenggara Timur",
+      "legacyName": "Naisano Dua"
+    },
+    {
+      "value": "ID:BA:Negara",
+      "label": "Negara — Bali",
+      "legacyName": "Negara"
+    },
+    {
+      "value": "ID:JI:Nganjuk",
+      "label": "Nganjuk — Jawa Timur",
+      "legacyName": "Nganjuk"
+    },
+    {
+      "value": "ID:JB:Ngawi",
+      "label": "Ngawi — Jawa Barat",
+      "legacyName": "Ngawi"
+    },
+    {
+      "value": "ID:JT:Ngemplak",
+      "label": "Ngemplak — Jawa Tengah",
+      "legacyName": "Ngemplak"
+    },
+    {
+      "value": "ID:JI:Ngoro",
+      "label": "Ngoro — Jawa Timur",
+      "legacyName": "Ngoro"
+    },
+    {
+      "value": "ID:JI:Ngunut",
+      "label": "Ngunut — Jawa Timur",
+      "legacyName": "Ngunut"
+    },
+    {
+      "value": "ID:BA:Nusa Dua",
+      "label": "Nusa Dua — Bali",
+      "legacyName": "Nusa Dua"
+    },
+    {
+      "value": "ID:JI:Paciran",
+      "label": "Paciran — Jawa Timur",
+      "legacyName": "Paciran"
+    },
+    {
+      "value": "ID:JB:Padalarang",
+      "label": "Padalarang — Jawa Barat",
+      "legacyName": "Padalarang"
+    },
+    {
+      "value": "ID:SB:Padang",
+      "label": "Padang — Sumatera Barat",
+      "legacyName": "Padang"
+    },
+    {
+      "value": "ID:SU:Padangsidempuan",
+      "label": "Padangsidempuan — Sumatera Utara",
+      "legacyName": "Padangsidempuan"
+    },
+    {
+      "value": "ID:SS:Pagar Alam",
+      "label": "Pagar Alam — Sumatera Selatan",
+      "legacyName": "Pagar Alam"
+    },
+    {
+      "value": "ID:JI:Pakisaji",
+      "label": "Pakisaji — Jawa Timur",
+      "legacyName": "Pakisaji"
+    },
+    {
+      "value": "ID:KT:Palangkaraya",
+      "label": "Palangkaraya — Kalimantan Tengah",
+      "legacyName": "Palangkaraya"
+    },
+    {
+      "value": "ID:SS:Palembang",
+      "label": "Palembang — Sumatera Selatan",
+      "legacyName": "Palembang"
+    },
+    {
+      "value": "ID:JB:Palimanan",
+      "label": "Palimanan — Jawa Barat",
+      "legacyName": "Palimanan"
+    },
+    {
+      "value": "ID:SN:Palopo",
+      "label": "Palopo — Sulawesi Selatan",
+      "legacyName": "Palopo"
+    },
+    {
+      "value": "ID:ST:Palu",
+      "label": "Palu — Sulawesi Tengah",
+      "legacyName": "Palu"
+    },
+    {
+      "value": "ID:JB:Pamanukan",
+      "label": "Pamanukan — Jawa Barat",
+      "legacyName": "Pamanukan"
+    },
+    {
+      "value": "ID:JI:Pamekasan",
+      "label": "Pamekasan — Jawa Timur",
+      "legacyName": "Pamekasan"
+    },
+    {
+      "value": "ID:JB:Pameungpeuk",
+      "label": "Pameungpeuk — Jawa Barat",
+      "legacyName": "Pameungpeuk"
+    },
+    {
+      "value": "ID:JB:Pamulang",
+      "label": "Pamulang — Jawa Barat",
+      "legacyName": "Pamulang"
+    },
+    {
+      "value": "ID:JI:Panarukan",
+      "label": "Panarukan — Jawa Timur",
+      "legacyName": "Panarukan"
+    },
+    {
+      "value": "ID:JI:Pandaan",
+      "label": "Pandaan — Jawa Timur",
+      "legacyName": "Pandaan"
+    },
+    {
+      "value": "ID:YO:Pandak",
+      "label": "Pandak — DI Yogyakarta",
+      "legacyName": "Pandak"
+    },
+    {
+      "value": "ID:BT:Pandeglang",
+      "label": "Pandeglang — Banten",
+      "legacyName": "Pandeglang"
+    },
+    {
+      "value": "ID:SU:Pangkalan Brandan",
+      "label": "Pangkalan Brandan — Sumatera Utara",
+      "legacyName": "Pangkalan Brandan"
+    },
+    {
+      "value": "ID:KT:Pangkalanbuun",
+      "label": "Pangkalanbuun — Kalimantan Tengah",
+      "legacyName": "Pangkalanbuun"
+    },
+    {
+      "value": "ID:BB:Pangkalpinang",
+      "label": "Pangkalpinang — Kepulauan Bangka Belitung",
+      "legacyName": "Pangkalpinang"
+    },
+    {
+      "value": "ID:JI:Panji",
+      "label": "Panji — Jawa Timur",
+      "legacyName": "Panji"
+    },
+    {
+      "value": "ID:SU:Parapat",
+      "label": "Parapat — Sumatera Utara",
+      "legacyName": "Parapat"
+    },
+    {
+      "value": "ID:JI:Pare",
+      "label": "Pare — Jawa Timur",
+      "legacyName": "Pare"
+    },
+    {
+      "value": "ID:SN:Parepare",
+      "label": "Parepare — Sulawesi Selatan",
+      "legacyName": "Parepare"
+    },
+    {
+      "value": "ID:SB:Pariaman",
+      "label": "Pariaman — Sumatera Barat",
+      "legacyName": "Pariaman"
+    },
+    {
+      "value": "ID:JB:Parung",
+      "label": "Parung — Jawa Barat",
+      "legacyName": "Parung"
+    },
+    {
+      "value": "ID:JB:Pasarkemis",
+      "label": "Pasarkemis — Jawa Barat",
+      "legacyName": "Pasarkemis"
+    },
+    {
+      "value": "ID:JB:Paseh",
+      "label": "Paseh — Jawa Barat",
+      "legacyName": "Paseh"
+    },
+    {
+      "value": "ID:JI:Pasuruan",
+      "label": "Pasuruan — Jawa Timur",
+      "legacyName": "Pasuruan"
+    },
+    {
+      "value": "ID:JT:Pati",
+      "label": "Pati — Jawa Tengah",
+      "legacyName": "Pati"
+    },
+    {
+      "value": "ID:SB:Payakumbuh",
+      "label": "Payakumbuh — Sumatera Barat",
+      "legacyName": "Payakumbuh"
+    },
+    {
+      "value": "ID:JT:Pecangaan",
+      "label": "Pecangaan — Jawa Tengah",
+      "legacyName": "Pecangaan"
+    },
+    {
+      "value": "ID:JT:Pekalongan",
+      "label": "Pekalongan — Jawa Tengah",
+      "legacyName": "Pekalongan"
+    },
+    {
+      "value": "ID:SU:Pekan Bahapal",
+      "label": "Pekan Bahapal — Sumatera Utara",
+      "legacyName": "Pekan Bahapal"
+    },
+    {
+      "value": "ID:RI:Pekanbaru",
+      "label": "Pekanbaru — Riau",
+      "legacyName": "Pekanbaru"
+    },
+    {
+      "value": "ID:JB:Pelabuhanratu",
+      "label": "Pelabuhanratu — Jawa Barat",
+      "legacyName": "Pelabuhanratu"
+    },
+    {
+      "value": "ID:JT:Pemalang",
+      "label": "Pemalang — Jawa Tengah",
+      "legacyName": "Pemalang"
+    },
+    {
+      "value": "ID:SU:Pematangsiantar",
+      "label": "Pematangsiantar — Sumatera Utara",
+      "legacyName": "Pematangsiantar"
+    },
+    {
+      "value": "ID:NB:Pemenang",
+      "label": "Pemenang — Nusa Tenggara Barat",
+      "legacyName": "Pemenang"
+    },
+    {
+      "value": "ID:SU:Perbaungan",
+      "label": "Perbaungan — Sumatera Utara",
+      "legacyName": "Perbaungan"
+    },
+    {
+      "value": "ID:SU:Percut",
+      "label": "Percut — Sumatera Utara",
+      "legacyName": "Percut"
+    },
+    {
+      "value": "ID:JB:Plumbon",
+      "label": "Plumbon — Jawa Barat",
+      "legacyName": "Plumbon"
+    },
+    {
+      "value": "ID:SR:Polewali",
+      "label": "Polewali — Sulawesi Barat",
+      "legacyName": "Polewali"
+    },
+    {
+      "value": "ID:JI:Ponorogo",
+      "label": "Ponorogo — Jawa Timur",
+      "legacyName": "Ponorogo"
+    },
+    {
+      "value": "ID:ST:Poso",
+      "label": "Poso — Sulawesi Tengah",
+      "legacyName": "Poso"
+    },
+    {
+      "value": "ID:NB:Pototano",
+      "label": "Pototano — Nusa Tenggara Barat",
+      "legacyName": "Pototano"
+    },
+    {
+      "value": "ID:SS:Prabumulih",
+      "label": "Prabumulih — Sumatera Selatan",
+      "legacyName": "Prabumulih"
+    },
+    {
+      "value": "ID:NB:Praya",
+      "label": "Praya — Nusa Tenggara Barat",
+      "legacyName": "Praya"
+    },
+    {
+      "value": "ID:JI:Prigen",
+      "label": "Prigen — Jawa Timur",
+      "legacyName": "Prigen"
+    },
+    {
+      "value": "ID:JI:Probolinggo",
+      "label": "Probolinggo — Jawa Timur",
+      "legacyName": "Probolinggo"
+    },
+    {
+      "value": "ID:YO:Pundong",
+      "label": "Pundong — DI Yogyakarta",
+      "legacyName": "Pundong"
+    },
+    {
+      "value": "ID:JT:Purbalingga",
+      "label": "Purbalingga — Jawa Tengah",
+      "legacyName": "Purbalingga"
+    },
+    {
+      "value": "ID:JB:Purwakarta",
+      "label": "Purwakarta — Jawa Barat",
+      "legacyName": "Purwakarta"
+    },
+    {
+      "value": "ID:JT:Purwodadi",
+      "label": "Purwodadi — Jawa Tengah",
+      "legacyName": "Purwodadi"
+    },
+    {
+      "value": "ID:JT:Purwokerto",
+      "label": "Purwokerto — Jawa Tengah",
+      "legacyName": "Purwokerto"
+    },
+    {
+      "value": "ID:JB:Rajapolah",
+      "label": "Rajapolah — Jawa Barat",
+      "legacyName": "Rajapolah"
+    },
+    {
+      "value": "ID:JT:Randudongkal",
+      "label": "Randudongkal — Jawa Tengah",
+      "legacyName": "Randudongkal"
+    },
+    {
+      "value": "ID:BT:Rangkasbitung",
+      "label": "Rangkasbitung — Banten",
+      "legacyName": "Rangkasbitung"
+    },
+    {
+      "value": "ID:SU:Rantauprapat",
+      "label": "Rantauprapat — Sumatera Utara",
+      "legacyName": "Rantauprapat"
+    },
+    {
+      "value": "ID:SN:Rantepao",
+      "label": "Rantepao — Sulawesi Selatan",
+      "legacyName": "Rantepao"
+    },
+    {
+      "value": "ID:JT:Rembangan",
+      "label": "Rembangan — Jawa Tengah",
+      "legacyName": "Rembangan"
+    },
+    {
+      "value": "ID:JB:Rengasdengklok",
+      "label": "Rengasdengklok — Jawa Barat",
+      "legacyName": "Rengasdengklok"
+    },
+    {
+      "value": "ID:AC:Reuleuet",
+      "label": "Reuleuet — Aceh",
+      "legacyName": "Reuleuet"
+    },
+    {
+      "value": "ID:NT:Ruteng",
+      "label": "Ruteng — Nusa Tenggara Timur",
+      "legacyName": "Ruteng"
+    },
+    {
+      "value": "ID:AC:Sabang",
+      "label": "Sabang — Aceh",
+      "legacyName": "Sabang"
+    },
+    {
+      "value": "ID:JT:Salatiga",
+      "label": "Salatiga — Jawa Tengah",
+      "legacyName": "Salatiga"
+    },
+    {
+      "value": "ID:KI:Samarinda",
+      "label": "Samarinda — Kalimantan Timur",
+      "legacyName": "Samarinda"
+    },
+    {
+      "value": "ID:JI:Sampang",
+      "label": "Sampang — Jawa Timur",
+      "legacyName": "Sampang"
+    },
+    {
+      "value": "ID:KT:Sampit",
+      "label": "Sampit — Kalimantan Tengah",
+      "legacyName": "Sampit"
+    },
+    {
+      "value": "ID:JB:Sawangan",
+      "label": "Sawangan — Jawa Barat",
+      "legacyName": "Sawangan"
+    },
+    {
+      "value": "ID:SN:Selayar Islands Regency",
+      "label": "Selayar Islands Regency — Sulawesi Selatan",
+      "legacyName": "Selayar Islands Regency"
+    },
+    {
+      "value": "ID:JT:Selogiri",
+      "label": "Selogiri — Jawa Tengah",
+      "legacyName": "Selogiri"
+    },
+    {
+      "value": "ID:JT:Semarang",
+      "label": "Semarang — Jawa Tengah",
+      "legacyName": "Semarang"
+    },
+    {
+      "value": "ID:NB:Senggigi",
+      "label": "Senggigi — Nusa Tenggara Barat",
+      "legacyName": "Senggigi"
+    },
+    {
+      "value": "ID:SN:Sengkang",
+      "label": "Sengkang — Sulawesi Selatan",
+      "legacyName": "Sengkang"
+    },
+    {
+      "value": "ID:JB:Sepatan",
+      "label": "Sepatan — Jawa Barat",
+      "legacyName": "Sepatan"
+    },
+    {
+      "value": "ID:BT:Serang",
+      "label": "Serang — Banten",
+      "legacyName": "Serang"
+    },
+    {
+      "value": "ID:BA:Seririt",
+      "label": "Seririt — Bali",
+      "legacyName": "Seririt"
+    },
+    {
+      "value": "ID:JB:Serpong",
+      "label": "Serpong — Jawa Barat",
+      "legacyName": "Serpong"
+    },
+    {
+      "value": "ID:YO:Sewon",
+      "label": "Sewon — DI Yogyakarta",
+      "legacyName": "Sewon"
+    },
+    {
+      "value": "ID:SU:Sibolga",
+      "label": "Sibolga — Sumatera Utara",
+      "legacyName": "Sibolga"
+    },
+    {
+      "value": "ID:JT:Sidareja",
+      "label": "Sidareja — Jawa Tengah",
+      "legacyName": "Sidareja"
+    },
+    {
+      "value": "ID:JI:Sidoarjo",
+      "label": "Sidoarjo — Jawa Timur",
+      "legacyName": "Sidoarjo"
+    },
+    {
+      "value": "ID:AC:Sigli",
+      "label": "Sigli — Aceh",
+      "legacyName": "Sigli"
+    },
+    {
+      "value": "ID:SB:Sijunjung",
+      "label": "Sijunjung — Sumatera Barat",
+      "legacyName": "Sijunjung"
+    },
+    {
+      "value": "ID:JA:Simpang",
+      "label": "Simpang — Jambi",
+      "legacyName": "Simpang"
+    },
+    {
+      "value": "ID:AC:Sinabang",
+      "label": "Sinabang — Aceh",
+      "legacyName": "Sinabang"
+    },
+    {
+      "value": "ID:JB:Singaparna",
+      "label": "Singaparna — Jawa Barat",
+      "legacyName": "Singaparna"
+    },
+    {
+      "value": "ID:BA:Singaraja",
+      "label": "Singaraja — Bali",
+      "legacyName": "Singaraja"
+    },
+    {
+      "value": "ID:AC:Singkil",
+      "label": "Singkil — Aceh",
+      "legacyName": "Singkil"
+    },
+    {
+      "value": "ID:JI:Singojuruh",
+      "label": "Singojuruh — Jawa Timur",
+      "legacyName": "Singojuruh"
+    },
+    {
+      "value": "ID:JI:Singosari",
+      "label": "Singosari — Jawa Timur",
+      "legacyName": "Singosari"
+    },
+    {
+      "value": "ID:SN:Sinjai",
+      "label": "Sinjai — Sulawesi Selatan",
+      "legacyName": "Sinjai"
+    },
+    {
+      "value": "ID:JI:Situbondo",
+      "label": "Situbondo — Jawa Timur",
+      "legacyName": "Situbondo"
+    },
+    {
+      "value": "ID:JT:Slawi",
+      "label": "Slawi — Jawa Tengah",
+      "legacyName": "Slawi"
+    },
+    {
+      "value": "ID:YO:Sleman",
+      "label": "Sleman — DI Yogyakarta",
+      "legacyName": "Sleman"
+    },
+    {
+      "value": "ID:NT:Soe",
+      "label": "Soe — Nusa Tenggara Timur",
+      "legacyName": "Soe"
+    },
+    {
+      "value": "ID:MU:Sofifi",
+      "label": "Sofifi — Maluku Utara",
+      "legacyName": "Sofifi"
+    },
+    {
+      "value": "ID:JT:Sokaraja",
+      "label": "Sokaraja — Jawa Tengah",
+      "legacyName": "Sokaraja"
+    },
+    {
+      "value": "ID:JI:Soko",
+      "label": "Soko — Jawa Timur",
+      "legacyName": "Soko"
+    },
+    {
+      "value": "ID:SB:Solok",
+      "label": "Solok — Sumatera Barat",
+      "legacyName": "Solok"
+    },
+    {
+      "value": "ID:JB:Soreang",
+      "label": "Soreang — Jawa Barat",
+      "legacyName": "Soreang"
+    },
+    {
+      "value": "ID:PB:Sorong",
+      "label": "Sorong — Papua Barat",
+      "legacyName": "Sorong"
+    },
+    {
+      "value": "ID:BT:South Tangerang",
+      "label": "South Tangerang — Banten",
+      "legacyName": "South Tangerang"
+    },
+    {
+      "value": "ID:JT:Sragen",
+      "label": "Sragen — Jawa Tengah",
+      "legacyName": "Sragen"
+    },
+    {
+      "value": "ID:YO:Srandakan",
+      "label": "Srandakan — DI Yogyakarta",
+      "legacyName": "Srandakan"
+    },
+    {
+      "value": "ID:JI:Srono",
+      "label": "Srono — Jawa Timur",
+      "legacyName": "Srono"
+    },
+    {
+      "value": "ID:SU:Stabat",
+      "label": "Stabat — Sumatera Utara",
+      "legacyName": "Stabat"
+    },
+    {
+      "value": "ID:JB:Sukabumi",
+      "label": "Sukabumi — Jawa Barat",
+      "legacyName": "Sukabumi"
+    },
+    {
+      "value": "ID:NB:Sumbawa Besar",
+      "label": "Sumbawa Besar — Nusa Tenggara Barat",
+      "legacyName": "Sumbawa Besar"
+    },
+    {
+      "value": "ID:JB:Sumber",
+      "label": "Sumber — Jawa Barat",
+      "legacyName": "Sumber"
+    },
+    {
+      "value": "ID:JI:Sumberpucung",
+      "label": "Sumberpucung — Jawa Timur",
+      "legacyName": "Sumberpucung"
+    },
+    {
+      "value": "ID:JB:Sumedang",
+      "label": "Sumedang — Jawa Barat",
+      "legacyName": "Sumedang"
+    },
+    {
+      "value": "ID:JB:Sumedang Utara",
+      "label": "Sumedang Utara — Jawa Barat",
+      "legacyName": "Sumedang Utara"
+    },
+    {
+      "value": "ID:JI:Sumenep",
+      "label": "Sumenep — Jawa Timur",
+      "legacyName": "Sumenep"
+    },
+    {
+      "value": "ID:JA:Sungai Penuh",
+      "label": "Sungai Penuh — Jambi",
+      "legacyName": "Sungai Penuh"
+    },
+    {
+      "value": "ID:BB:Sungailiat",
+      "label": "Sungailiat — Kepulauan Bangka Belitung",
+      "legacyName": "Sungailiat"
+    },
+    {
+      "value": "ID:SU:Sunggal",
+      "label": "Sunggal — Sumatera Utara",
+      "legacyName": "Sunggal"
+    },
+    {
+      "value": "ID:JI:Surabaya",
+      "label": "Surabaya — Jawa Timur",
+      "legacyName": "Surabaya"
+    },
+    {
+      "value": "ID:JT:Surakarta",
+      "label": "Surakarta — Jawa Tengah",
+      "legacyName": "Surakarta"
+    },
+    {
+      "value": "ID:BA:Tabanan",
+      "label": "Tabanan — Bali",
+      "legacyName": "Tabanan"
+    },
+    {
+      "value": "ID:BT:Tangerang",
+      "label": "Tangerang — Banten",
+      "legacyName": "Tangerang"
+    },
+    {
+      "value": "ID:JI:Tanggul",
+      "label": "Tanggul — Jawa Timur",
+      "legacyName": "Tanggul"
+    },
+    {
+      "value": "ID:JI:Tanggulangin",
+      "label": "Tanggulangin — Jawa Timur",
+      "legacyName": "Tanggulangin"
+    },
+    {
+      "value": "ID:BB:Tanjung Pandan",
+      "label": "Tanjung Pandan — Kepulauan Bangka Belitung",
+      "legacyName": "Tanjung Pandan"
+    },
+    {
+      "value": "ID:KR:Tanjung Pinang",
+      "label": "Tanjung Pinang — Kepulauan Riau",
+      "legacyName": "Tanjung Pinang"
+    },
+    {
+      "value": "ID:KU:Tanjung Selor",
+      "label": "Tanjung Selor — Kalimantan Utara",
+      "legacyName": "Tanjung Selor"
+    },
+    {
+      "value": "ID:SS:Tanjungagung",
+      "label": "Tanjungagung — Sumatera Selatan",
+      "legacyName": "Tanjungagung"
+    },
+    {
+      "value": "ID:SU:Tanjungbalai",
+      "label": "Tanjungbalai — Sumatera Utara",
+      "legacyName": "Tanjungbalai"
+    },
+    {
+      "value": "ID:SU:Tanjungtiram",
+      "label": "Tanjungtiram — Sumatera Utara",
+      "legacyName": "Tanjungtiram"
+    },
+    {
+      "value": "ID:KU:Tarakan",
+      "label": "Tarakan — Kalimantan Utara",
+      "legacyName": "Tarakan"
+    },
+    {
+      "value": "ID:JT:Tarub",
+      "label": "Tarub — Jawa Tengah",
+      "legacyName": "Tarub"
+    },
+    {
+      "value": "ID:JB:Tasikmalaya",
+      "label": "Tasikmalaya — Jawa Barat",
+      "legacyName": "Tasikmalaya"
+    },
+    {
+      "value": "ID:JT:Tayu",
+      "label": "Tayu — Jawa Tengah",
+      "legacyName": "Tayu"
+    },
+    {
+      "value": "ID:SU:Tebingtinggi",
+      "label": "Tebingtinggi — Sumatera Utara",
+      "legacyName": "Tebingtinggi"
+    },
+    {
+      "value": "ID:JT:Tegal",
+      "label": "Tegal — Jawa Tengah",
+      "legacyName": "Tegal"
+    },
+    {
+      "value": "ID:SU:Teluk Nibung",
+      "label": "Teluk Nibung — Sumatera Utara",
+      "legacyName": "Teluk Nibung"
+    },
+    {
+      "value": "ID:JB:Teluknaga",
+      "label": "Teluknaga — Jawa Barat",
+      "legacyName": "Teluknaga"
+    },
+    {
+      "value": "ID:LA:Terbanggi Besar",
+      "label": "Terbanggi Besar — Lampung",
+      "legacyName": "Terbanggi Besar"
+    },
+    {
+      "value": "ID:MU:Ternate",
+      "label": "Ternate — Maluku Utara",
+      "legacyName": "Ternate"
+    },
+    {
+      "value": "ID:MU:Tobelo",
+      "label": "Tobelo — Maluku Utara",
+      "legacyName": "Tobelo"
+    },
+    {
+      "value": "ID:ST:Tojo Una-Una Regency",
+      "label": "Tojo Una-Una Regency — Sulawesi Tengah",
+      "legacyName": "Tojo Una-Una Regency"
+    },
+    {
+      "value": "ID:SA:Tomohon",
+      "label": "Tomohon — Sulawesi Utara",
+      "legacyName": "Tomohon"
+    },
+    {
+      "value": "ID:SU:Tomok Bolon",
+      "label": "Tomok Bolon — Sumatera Utara",
+      "legacyName": "Tomok Bolon"
+    },
+    {
+      "value": "ID:SA:Tondano",
+      "label": "Tondano — Sulawesi Utara",
+      "legacyName": "Tondano"
+    },
+    {
+      "value": "ID:SU:Tongging",
+      "label": "Tongging — Sumatera Utara",
+      "legacyName": "Tongging"
+    },
+    {
+      "value": "ID:JI:Trenggalek",
+      "label": "Trenggalek — Jawa Timur",
+      "legacyName": "Trenggalek"
+    },
+    {
+      "value": "ID:JT:Trucuk",
+      "label": "Trucuk — Jawa Tengah",
+      "legacyName": "Trucuk"
+    },
+    {
+      "value": "ID:MA:Tual",
+      "label": "Tual — Maluku",
+      "legacyName": "Tual"
+    },
+    {
+      "value": "ID:JI:Tuban",
+      "label": "Tuban — Jawa Timur",
+      "legacyName": "Tuban"
+    },
+    {
+      "value": "ID:SU:Tuktuk Sonak",
+      "label": "Tuktuk Sonak — Sumatera Utara",
+      "legacyName": "Tuktuk Sonak"
+    },
+    {
+      "value": "ID:JI:Tulangan Utara",
+      "label": "Tulangan Utara — Jawa Timur",
+      "legacyName": "Tulangan Utara"
+    },
+    {
+      "value": "ID:JI:Tulungagung",
+      "label": "Tulungagung — Jawa Timur",
+      "legacyName": "Tulungagung"
+    },
+    {
+      "value": "ID:BA:Ubud",
+      "label": "Ubud — Bali",
+      "legacyName": "Ubud"
+    },
+    {
+      "value": "ID:JT:Ungaran",
+      "label": "Ungaran — Jawa Tengah",
+      "legacyName": "Ungaran"
+    },
+    {
+      "value": "ID:NT:Waingapu",
+      "label": "Waingapu — Nusa Tenggara Timur",
+      "legacyName": "Waingapu"
+    },
+    {
+      "value": "ID:SG:Wakatobi Regency",
+      "label": "Wakatobi Regency — Sulawesi Tenggara",
+      "legacyName": "Wakatobi Regency"
+    },
+    {
+      "value": "ID:JB:Wanaraja",
+      "label": "Wanaraja — Jawa Barat",
+      "legacyName": "Wanaraja"
+    },
+    {
+      "value": "ID:JT:Wangon",
+      "label": "Wangon — Jawa Tengah",
+      "legacyName": "Wangon"
+    },
+    {
+      "value": "ID:SN:Watampone",
+      "label": "Watampone — Sulawesi Selatan",
+      "legacyName": "Watampone"
+    },
+    {
+      "value": "ID:JT:Wedi",
+      "label": "Wedi — Jawa Tengah",
+      "legacyName": "Wedi"
+    },
+    {
+      "value": "ID:JT:Welahan",
+      "label": "Welahan — Jawa Tengah",
+      "legacyName": "Welahan"
+    },
+    {
+      "value": "ID:JT:Weleri",
+      "label": "Weleri — Jawa Tengah",
+      "legacyName": "Weleri"
+    },
+    {
+      "value": "ID:JB:Weru",
+      "label": "Weru — Jawa Barat",
+      "legacyName": "Weru"
+    },
+    {
+      "value": "ID:JT:Wiradesa",
+      "label": "Wiradesa — Jawa Tengah",
+      "legacyName": "Wiradesa"
+    },
+    {
+      "value": "ID:JI:Wongsorejo",
+      "label": "Wongsorejo — Jawa Timur",
+      "legacyName": "Wongsorejo"
+    },
+    {
+      "value": "ID:JT:Wonopringgo",
+      "label": "Wonopringgo — Jawa Tengah",
+      "legacyName": "Wonopringgo"
+    },
+    {
+      "value": "ID:JT:Wonosobo",
+      "label": "Wonosobo — Jawa Tengah",
+      "legacyName": "Wonosobo"
+    },
+    {
+      "value": "ID:YO:Yogyakarta",
+      "label": "Yogyakarta — DI Yogyakarta",
+      "legacyName": "Yogyakarta"
+    }
+  ]
+}

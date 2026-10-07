@@ -1,3 +1,5 @@
+import { readLocationValues, validLocationValues } from "./locations";
+import { encodeLocationList } from "./location-list";
 import { getAccess } from "../authorization/permissions.server";
 import { profileRepository } from "../db/profile.repository.server";
 import { parseInput, profileInput } from "../http/validation";
@@ -9,7 +11,21 @@ export async function readProfile(request: Request, env: Env) {
   if (!["approved", "suspended"].includes(access.membership.status))
     throw new Response("Profil tersedia setelah keanggotaan disetujui.", { status: 403 });
   const own = await profileRepository(env.DB).own(access.account.id);
-  const profile = own.profile ?? emptyProfile;
+  const stored = own.profile;
+  const profile = stored
+    ? {
+        displayName: stored.displayName,
+        introduction: stored.introduction,
+        availabilityNote: stored.availabilityNote,
+        expertiseTags: stored.expertiseTags,
+        helpTypes: stored.helpTypes,
+        availability: stored.availability,
+        participation: stored.participation,
+        confirmedAt: stored.confirmedAt,
+        city: readLocationValues(stored.city, stored.locationFormat, "city"),
+        country: readLocationValues(stored.country, stored.locationFormat, "country"),
+      }
+    : emptyProfile;
   const anniversary = profile.confirmedAt ? new Date(profile.confirmedAt) : null;
   if (anniversary) {
     const month = anniversary.getUTCMonth();
@@ -52,7 +68,27 @@ export async function saveProfile(request: Request, env: Env, input: unknown, co
       input,
       "Lengkapi pilihan keahlian, bentuk bantuan, ketersediaan, dan persetujuan partisipasi."
     );
-    const rows = await repository.save(access.account.id, { ...profile, confirmedAt });
+    const own = await repository.own(access.account.id);
+    const existingCity = own.profile
+      ? readLocationValues(own.profile.city, own.profile.locationFormat, "city")
+      : [];
+    const existingCountry = own.profile
+      ? readLocationValues(own.profile.country, own.profile.locationFormat, "country")
+      : [];
+    if (
+      !validLocationValues(profile.city, existingCity, "city") ||
+      !validLocationValues(profile.country, existingCountry, "country")
+    )
+      throw new Response("Pilih kota Indonesia dan negara dari daftar yang tersedia.", {
+        status: 400,
+      });
+    const rows = await repository.save(access.account.id, {
+      ...profile,
+      city: encodeLocationList(profile.city),
+      country: encodeLocationList(profile.country),
+      locationFormat: 1,
+      confirmedAt,
+    });
     if (!rows.length)
       throw new Response("Status keanggotaan berubah. Muat ulang profil.", { status: 409 });
   }

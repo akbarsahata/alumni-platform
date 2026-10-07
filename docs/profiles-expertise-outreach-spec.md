@@ -81,6 +81,8 @@ in the pilot; automated deletion and anonymization are outside this scope.
   approval and privileged role assignment remain separate. Suspension removes
   eligibility as an outreach recipient; existing separately assigned coordinator
   permissions retain the current role policy until revoked.
+- Profile saves and reconfirmation show a prominent dismissible success toast;
+  each participation checkbox explains the effect of ticking and unticking it.
 - Product copy is Bahasa Indonesia; technical identifiers are English. Use the
   existing email abstraction and synthetic local capture. No live delivery or
   production configuration is part of this work.
@@ -90,7 +92,12 @@ in the pilot; automated deletion and anonymization are outside this scope.
 - Membership facts supply name while attending school, house, graduation year or
   attendance years. Profile editing cannot modify those facts.
 - Optional profile fields: current/display name, professional introduction,
-  general city/country location, and availability note. Members select multiple
+  general city/country locations, and availability note. Per the 2026-10-07 form
+  refinement, locations use searchable multi-selects: cities are limited to
+  Indonesia, with province labels; countries are worldwide. Persist canonical
+  selections as escaped comma-separated identifiers, expose arrays to forms/API,
+  and test the parsing/encoding helpers. Preserve existing free-text locations
+  until the member replaces or removes them. Members select multiple
   expertise tags and ways they can help. Do not collect phone numbers, exact
   addresses, employer details, or profile photos as dedicated fields.
 - Participation is off by default. Opt-in requires at least one expertise tag,

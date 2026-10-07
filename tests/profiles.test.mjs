@@ -7,8 +7,8 @@ const path = "/api/profile";
 const profile = {
   displayName: "PRIVATE profile name",
   introduction: "Keahlian robotika",
-  city: "Palembang",
-  country: "Indonesia",
+  city: ["ID:SS:Palembang", "ID:JK:Jakarta"],
+  country: ["ID", "AU"],
   availabilityNote: "Akhir pekan",
   expertiseTags: ["technology"],
   helpTypes: ["mentoring"],
@@ -41,6 +41,11 @@ test("member privately creates and confirms a profile with verified identity and
   assert.equal(state.identity.schoolName, application.schoolName);
   assert.equal(state.identity.house, "Komodo");
   assert.ok(state.profile.confirmedAt);
+  assert.deepEqual(state.profile.city, profile.city);
+  assert.deepEqual(state.profile.country, profile.country);
+  const reloaded = await (await call(member, path)).json();
+  assert.deepEqual(reloaded.profile.city, profile.city);
+  assert.deepEqual(reloaded.profile.country, profile.country);
   assert.equal(
     (await call(member, path, { ...profile, userId: "forged", house: "Lion" })).status,
     400
@@ -135,6 +140,11 @@ test("profiles deny nonmembers and never project another member through API, pag
     { expertiseTags: ["invalid"] },
     { participation: "true" },
     { confirmedAt: "2000-01-01T00:00:00Z" },
+    { city: ["SG:Singapore"] },
+    { country: ["Imaginary"] },
+    { city: ["legacy:forged"] },
+    { city: "Palembang" },
+    { country: "Indonesia" },
   ])
     assert.equal((await call(member, path, { ...profile, ...field })).status, 400);
   assert.equal((await call(outsider, "/api/profile/confirm", {})).status, 409);
@@ -218,4 +228,50 @@ test("suspension removes recipient eligibility immediately while separate roles 
   assert.equal(access.permissions.directory, true);
   for (const endpoint of ["/profile", "/profile.data"])
     assert.equal((await call(member, endpoint)).status, 200);
+});
+
+test("legacy locations normalize when known, retain unmapped values, and can be explicitly removed", async () => {
+  const member = await approved("profile-legacy-location");
+  await call(member, path, profile);
+  assert.ok(process.env.ALUMNI_TEST_STATE?.includes("integration-state-"));
+  assert.match(member.id, /^[a-zA-Z0-9-]+$/);
+  const { execFileSync } = await import("node:child_process");
+  const fixture = (city) =>
+    execFileSync(
+      "node_modules/.bin/wrangler",
+      [
+        "d1",
+        "execute",
+        "alumni_local",
+        "--local",
+        "--persist-to",
+        process.env.ALUMNI_TEST_STATE,
+        "--command",
+        `UPDATE expertise_profile SET city = '${city}', country = 'Indonesia', location_format = 0 WHERE user_id = '${member.id}'`,
+      ],
+      { stdio: "pipe" }
+    );
+  fixture("Palembang");
+  let state = await (await call(member, path)).json();
+  assert.deepEqual(state.profile.city, ["ID:SS:Palembang"]);
+  assert.deepEqual(state.profile.country, ["ID"]);
+  assert.equal(
+    (
+      await call(member, path, {
+        ...profile,
+        city: state.profile.city,
+        country: state.profile.country,
+      })
+    ).status,
+    200
+  );
+  fixture("Paris");
+  state = await (await call(member, path)).json();
+  assert.deepEqual(state.profile.city, ["legacy:Paris"]);
+  assert.equal((await call(member, path, { ...profile, city: state.profile.city })).status, 200);
+  assert.deepEqual((await (await call(member, path)).json()).profile.city, ["legacy:Paris"]);
+  assert.equal((await call(member, path, { ...profile, city: [], country: [] })).status, 200);
+  state = await (await call(member, path)).json();
+  assert.deepEqual(state.profile.city, []);
+  assert.deepEqual(state.profile.country, []);
 });
