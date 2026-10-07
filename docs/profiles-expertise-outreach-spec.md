@@ -257,8 +257,9 @@ tests. The user confirmed this seam during local specification synthesis.
 
 ## Further Notes
 
-- This is a settled product scope, not evidence of implementation. No GitHub issues
-  are created by this local specification step.
+- This is a settled product scope, not evidence of implementation. Eight flat
+  implementation issues were subsequently published after breakdown approval;
+  see [implementation issue index](profiles-expertise-outreach-issues.md).
 - Future implementation issues refer to this specification and carry their own
   acceptance criteria and blocker links. The historical roadmap numbering is a
   planning reference, not a parent/subticket structure for new issues.

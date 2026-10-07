@@ -39,7 +39,7 @@ Acceptance: the login/application/endorsement/review screens support an end-to-e
 
 ## 2 — Profiles, expertise search, and contact requests
 
-The agreed scope now lives in [Profiles, expertise discovery, and school outreach](profiles-expertise-outreach-spec.md). That specification supersedes this section's earlier summary. It covers explicit opt-in, coordinator-only discovery, staff-validated needs, separate sharing consent, bounded outreach, profile confirmation, and manually processed directory deletion. Automated deletion is out of scope. Implementation issues have not been created for this scope.
+The agreed scope now lives in [Profiles, expertise discovery, and school outreach](profiles-expertise-outreach-spec.md). That specification supersedes this section's earlier summary. It covers explicit opt-in, coordinator-only discovery, staff-validated needs, separate sharing consent, bounded outreach, profile confirmation, and manually processed directory deletion. Automated deletion is out of scope. See the [flat implementation issue index](profiles-expertise-outreach-issues.md) for published tasks and blockers.
 
 Acceptance and testing decisions are defined in the local specification, using the confirmed real Worker/D1/captured-email HTTP and Chromium seam.
 

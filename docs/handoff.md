@@ -457,3 +457,11 @@ Settled the profiles, expertise discovery, and school outreach scope through the
 Updated AGENTS.md and docs/agents/issue-tracker.md to persist the project's new workflow: local specifications first, then flat descriptive implementation issues with specification references and explicit blockers. Parent specification issues, sub-issues, and decimal pseudo-subtickets are not used for new work. Existing issue structures remain historical references. Updated the document index and roadmap to point to the settled local specification.
 
 This session changes documentation only. No implementation, GitHub issue creation, existing-issue restructuring, deployment, or live email occurred. Changes remain local and uncommitted. Next: review the local specification and, when requested, decompose it into flat implementation issues.
+
+## Profiles and school outreach issue publication — 2026-10-07
+
+The user approved the eight tracer-bullet slices and authorized publication. Checked existing issues for duplicates, then created flat GitHub issues #13–#20 through the GitHub plugin, all open and labeled ready-for-agent. Each body references the local specification, carries complete acceptance criteria, and names explicit blocking issue links. The plugin exposes no native dependency operation, so no native blocking edges were created. No parent issue was created or modified.
+
+Index: docs/profiles-expertise-outreach-issues.md. Dependencies: #14 requires #13; #16 requires #14 and #15; #17 and #18 require #16; #19 requires #17; #20 requires #18 and #19. Initial runnable frontier: #13 (private expertise profile) and #15 (school needs and independent approval). Updated the specification, roadmap and document index to reference the published issues.
+
+GitHub creation responses confirmed all issue bodies and ready-for-agent labels. No feature implementation, application tests, commit, push, deployment, or live email occurred. Documentation changes remain local and uncommitted. Next: implement a frontier issue when requested.
