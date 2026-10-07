@@ -1,7 +1,26 @@
 # Profile layout decision
 
-Selected variant B on 2026-10-07: three parallel groups (about, expertise and help, participation) reduce desktop scrolling. At tablet widths use two columns, and at small screen widths stack all groups. Keep a sticky save control and collapsible identity, privacy, and confirmation explanations.
+Selected variant B on 2026-10-07 and adopted it in `008a4d3` on
+`codex/profile-layout`. The page, home link and browser title now use
+“Profil & Keahlian” (`79d4801`).
 
-The professional introduction is required on save, including whitespace validation on the server. Availability notes remain optional. Both use visible writing lines and example placeholders.
+- Three parallel groups: “Tentang Anda”, “Keahlian & bantuan” and “Partisipasi”.
+  The page uses a maximum width of 1240px to reduce desktop scrolling.
+- At widths up to 1000px, use two columns with participation spanning both;
+  at widths up to 700px, stack all groups and the status section into one column.
+- Keep a sticky save control, small-screen spacing and collapsible identity,
+  privacy and confirmation explanations.
+- Professional introduction is required on all saves, including server-side
+  whitespace validation. Existing blank introductions must be filled before
+  explicit reconfirmation. Availability notes remain optional. Both text areas
+  use visible writing lines and example placeholders.
+- A single “Aktifkan partisipasi” checkbox grants participation consent. The
+  separate “Konfirmasi profil masih benar” action is inside “Status relevansi
+  profil” (`4a1e9f6`). Email sharing still needs separate introduction consent.
 
-Prototype primary source: local branch `codex/profile-layout-prototype`, commit `eba3947`. The variants remain there; the production page has no switcher or in-memory save stub.
+Prototype source: local branch `codex/profile-layout-prototype`, commit `eba3947`.
+The three variants remain there. The current application uses its real loaders,
+validation and database saves, with no switcher or in-memory save stub.
+
+See the [current handoff](handoff.md) for commit and verification evidence, and the
+[profile specification](profiles-expertise-outreach-spec.md) for domain rules.

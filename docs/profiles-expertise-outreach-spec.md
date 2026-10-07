@@ -91,11 +91,21 @@ in the pilot; automated deletion and anonymization are outside this scope.
 
 ### Profiles and discovery
 
+- The member page is titled “Profil & Keahlian” consistently in the home link,
+  heading and browser title. The selected responsive layout uses three parallel
+  desktop panels, two columns on tablets and one column on small screens, with
+  sticky save controls and collapsible explanations. See the
+  [profile layout decision](profile-layout.md) for breakpoints and prototype provenance.
+
 - Membership facts supply name while attending school, house, graduation year or
   attendance years. Profile editing cannot modify those facts.
-- Optional profile fields: current/display name, professional introduction,
-  general city/country locations, and availability note. Per the 2026-10-07 form
-  refinement, locations use searchable multi-selects: cities are limited to
+- Professional introduction is required on every save, including when participation
+  is off. Trim and reject missing, empty or whitespace-only text on the server.
+  Existing profiles with a blank introduction must be edited and saved before
+  explicit reconfirmation. Use writing lines and example placeholders for this
+  field and the optional availability note.
+- Optional profile fields: current/display name, general city/country locations,
+  and availability note. Per the 2026-10-07 form refinement, locations use searchable multi-selects: cities are limited to
   Indonesia, with province labels; countries are worldwide. Persist canonical
   selections as escaped comma-separated identifiers, expose arrays to forms/API,
   and test the parsing/encoding helpers. Preserve existing free-text locations
@@ -104,6 +114,9 @@ in the pilot; automated deletion and anonymization are outside this scope.
   addresses, employer details, or profile photos as dedicated fields.
 - Participation is off by default. Opt-in requires at least one expertise tag,
   one help type, an availability selection, and explicit participation consent.
+  The single HTML “Aktifkan partisipasi” checkbox supplies both participation and
+  explicit consent; JSON API callers still provide the consent flag separately.
+  Preserve existing participation on edits unless the member unchecks it.
   Only the member edits, confirms, or opts in their profile.
 - Availability is available, limited availability, or temporarily unavailable.
   Temporarily unavailable members are excluded from outreach search and cannot

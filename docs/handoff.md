@@ -1,3 +1,64 @@
+# Current handoff — profile refinements — 2026-10-07
+
+The four local commits reviewed for this handoff are on `codex/profile-layout`,
+ahead of the local `origin/master` ref. The branch has no configured upstream.
+They have not been pushed or deployed.
+
+| Commit    | Result                                                                                                                                                       |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `eba3947` | Compared three responsive profile prototypes; retained the experiment on `codex/profile-layout-prototype`.                                                   |
+| `008a4d3` | Adopted variant B, with three desktop columns, two tablet columns, a single mobile column and sticky save controls; made professional introduction required. |
+| `4a1e9f6` | Combined participation and consent into one form checkbox and moved confirmation into “Status relevansi profil”.                                             |
+| `79d4801` | Aligned the home link, page heading and browser title to “Profil & Keahlian”, including the browser-test link selector.                                      |
+
+## Current profile behavior
+
+- `/profile` uses the real authenticated loader and persistence workflow. The
+  chosen layout has “Tentang Anda”, “Keahlian & bantuan” and “Partisipasi” panels,
+  a maximum width of 1240px, two columns at widths up to 1000px, and one column at
+  widths up to 700px. Identity, privacy and confirmation explanations collapse.
+  The current page contains no prototype switcher or in-memory save stub.
+- Professional introduction is required for every save, including when opted out.
+  The server trims it and rejects missing, empty or whitespace-only values.
+  Existing profiles with a blank introduction must be edited and saved before
+  explicit reconfirmation. Availability notes, display name and locations remain
+  optional. Introduction and availability notes have writing lines and examples.
+- The single “Aktifkan partisipasi” checkbox explicitly consents to discovery and
+  school requests. Saving maps it to both `participation` and `participationConsent`;
+  JSON API callers still provide explicit consent separately. Existing checked
+  participation persists on edits. Unchecking opts out. Email-sharing consent is
+  separate for each introduction.
+- “Konfirmasi profil masih benar” is a separate form inside “Status relevansi
+  profil”, available only to approved members with an existing saved profile.
+  Saves also confirm the profile. The existing 12-month rule and suspended-member
+  read-only access remain in force.
+- Searchable locations retain Indonesia-only cities and worldwide countries,
+  escaped comma-separated storage and legacy-location preservation. No new schema
+  migration or environment configuration is introduced by these four commits.
+
+## Verification and next work
+
+At `4a1e9f6`, the full suite passed: 4 helper tests, 59 HTTP tests and 10 Chromium
+journeys; typecheck, production build, lint, formatting and pre-commit passed.
+Standards and Spec reviews had zero actionable findings. The browser regression
+covers initial save, edits while participating, immediate feedback, values after
+reload, locations, availability, opt-out and confirmation placement. The rejected
+save without the former second checkbox was reproduced; a separate database
+persistence failure was not reproduced.
+
+`79d4801` changes product copy and the matching browser-test selector. The recorded
+full-suite result above predates that commit; this documentation alignment does not
+claim a new test run. Issue #13 is complete; #14 and #15 are the next runnable
+issues. See [profile layout decision](profile-layout.md),
+[current specification](profiles-expertise-outreach-spec.md) and
+[implementation issue index](profiles-expertise-outreach-issues.md).
+
+The entries below preserve earlier implementation and verification history. Their
+older field requirements, checkbox descriptions and branch names are superseded
+by this current summary.
+
+---
+
 ## Issue #9 — administrator-assisted email changes — 2026-10-06
 
 Implemented Ticket 1.8 against the current `master` branch.

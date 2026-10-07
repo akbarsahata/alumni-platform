@@ -17,7 +17,9 @@ frontier. These are flat issues, without parent issues or decimal subtickets.
 | [#20](https://github.com/akbarsahata/alumni-platform/issues/20) | Process directory deletion and manual retention        | [#18](https://github.com/akbarsahata/alumni-platform/issues/18), [#19](https://github.com/akbarsahata/alumni-platform/issues/19) |
 
 The initial frontier was **#13** and **#15**. Issue #13 is implemented and locally
-verified; see the 2026-10-07 private-profile entry in [handoff.md](handoff.md).
+verified, including the responsive “Profil & Keahlian” editor, required professional
+introduction and single participation-consent checkbox. See the current summary in
+[handoff.md](handoff.md) and the [layout decision](profile-layout.md).
 The next runnable issues are **#14** and **#15**. Each issue includes its own end-to-end
 acceptance criteria, synthetic Worker/D1/captured-email HTTP and Chromium verification,
 and build/typecheck requirements. Automated deletion and anonymization remain out of scope.
@@ -26,6 +28,7 @@ The GitHub plugin exposes no native blocking-link operation; dependency edges ar
 explicit issue links in each issue's `Blocked by` section. No parent issue was
 created or modified. Existing historical membership issue structures were not changed.
 
-The specification and this index are local working-tree documents. Issue publication
-does not imply that documentation has been committed or pushed. No implementation
-was started by this publication step.
+The specification and this index are committed local documents. The four profile
+refinement commits reviewed on `codex/profile-layout` have not been pushed or
+deployed; see the handoff for verification boundaries. Publication of the issues
+itself did not start their implementation.
