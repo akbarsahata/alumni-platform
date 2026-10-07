@@ -15,6 +15,17 @@ export default defineConfig({
     tailwindcss(),
     reactRouter(),
   ],
+  optimizeDeps: {
+    include: [
+      "react-select",
+      "sonner",
+      "lucide-react",
+      "radix-ui",
+      "class-variance-authority",
+      "clsx",
+      "tailwind-merge",
+    ],
+  },
   resolve: {
     tsconfigPaths: true,
   },
