@@ -46,7 +46,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
             </Link>
             {["approved", "suspended"].includes(loaderData.access?.membership.status ?? "") && (
               <Link className="action-link" to="/profile">
-                Profil keahlian →
+                Profil keahlian <span aria-hidden="true">→</span>
               </Link>
             )}
             {loaderData.access?.permissions.reviewMembership && (
