@@ -1,71 +1,69 @@
-# Current handoff — navigation and guest login — 2026-10-07
+# Current handoff — school needs and independent approval — 2026-10-07
 
-Current checkout: `master`, based on `0fa0c91` (directory location normalization).
-The navigation and guest-home changes are **local and uncommitted**. Preserve the
-working tree when starting the next issue. No push, PR, deployment, remote
-migration or live email occurred in this UI session.
+Current checkout: `copilot/submit-and-approve-school-needs`, implementing issue
+#15 in open PR #23. The implementation has been committed and pushed through the
+progress tool. No deployment, remote migration, live email or normal localhost D1
+data change occurred.
 
-## Current UI baseline
+## Current behavior
 
-- Guests use the email-code form directly on `/`, alongside the welcome typography
-  and school introduction. `/login` uses the same component/action and preserves
-  invitation return and email-change messaging. Guests have no menu bar.
-- Signed-in pages use option B: grouped navigation in
-  `app/components/site-navigation.tsx`, mounted in `app/root.tsx`. It scrolls with
-  the page. Home and account triggers are icons; the account target is a true
-  44×44px circle. Email and sign-out are inside the account dropdown.
-- Menu visibility comes from current server-loaded access. Group/account dropdowns
-  are mutually exclusive and close on outside click, Escape and navigation. Each
-  group shows one caret. Page-level Beranda links are removed; related-feature and
-  parent-list links remain. Breadcrumbs are deferred.
-- The real primary administrator alone can enable “Pratinjau peran” from the account
-  menu. The panel starts hidden and simulates combined menu roles only. It never
-  grants page/API permissions. Preview state is in memory; reload resets it.
-- Signed-in home has a brief welcome; its duplicate hero and feature-link list are
-  removed. A home dashboard with actionable items is **deferred**, not part of the
-  next issue by default.
-- The exploratory variants are captured on local `codex/navigation-prototype` at
-  `b31b386f1c64b1b29add9b33d8f3333d7dc4940d`. They are absent from `master`.
+- Guests retain the email-code form on `/`; signed-in pages use the shared,
+  current-role grouped navigation in `app/components/site-navigation.tsx`.
+  Staff, student and directory-coordinator roles see “Kebutuhan sekolah”; the
+  primary administrator’s role preview changes menu appearance only and never
+  grants server authorization.
+- `/school-needs` accepts only school activity and student mentoring requests.
+  Staff, students and directory coordinators can submit without alumni membership
+  or an alumni profile. Each request records a required named contact linked to a
+  currently email-verified staff account. No contact email is included in need or
+  reviewer projections.
+- The named staff representative validates their current need version. A separate
+  directory coordinator approves only after staff validation. Database conditional
+  writes and triggers recheck current roles, version, contact assignment and
+  independence at the write boundary; a dual-role actor cannot supply both stages.
+- Submitters see only their needs and approval status. The named staff contact and
+  directory coordinators see only the appropriate review detail/queue; unrelated
+  submitters and other school roles are denied. API, page and React Router data
+  responses are private/no-store; mutations retain origin protection.
+- Editing creates an immutable version snapshot, preserves prior approvals and
+  creates minimal audit events containing actor ID, action, version and time only.
+  Both current approvals are then required again. The workflow does not send
+  outreach or email; broad alumni networking, jobs, business and event outreach
+  remain excluded.
 
-Details and accepted decisions: [shared navigation and guest homepage](navigation-prototype.md).
+## Migration and local configuration
 
-## Latest verification boundary
+Migration `migrations/0013_school_needs.sql` creates the version, approval and
+minimal audit tables plus write-boundary triggers. There are no new environment
+variables or credentials. Standard local setup remains:
 
-Typecheck, lint, formatting and production build pass. Guest `/` and `/login`
-were inspected at 1280px/390px with no horizontal overflow. The final full
-`npm test` run passes six helper tests, 64 HTTP tests and 13 Chromium journeys
-through the isolated Worker/D1/captured-mail seam, including real 301-second OTP
-expiry. No tests failed or were skipped.
+```sh
+npm run local:setup
+npm run db:migrate
+npm run dev
+```
 
-The recent pushed CI run failed browser interactions before hydration finished.
-A delayed-script reproduction confirmed form selections reset at hydration;
-browser helpers now wait for the root hydration marker before interacting, and
-a permanent slow-start regression covers this race. Email-change and profile
-journeys also open the new dropdowns before checking their contents. Local Python
-`.venv/` dependencies are excluded from repository formatting checks.
-These fixes are local and uncommitted; the remote pipeline has not been rerun.
-Earlier results below retain their original dates and change boundaries.
+The integration runner applies migrations to disposable D1 state. To use this
+feature in ordinary local data, run the existing `npm run db:migrate`; this session
+did not alter the ordinary local database. Synthetic Better Auth sign-in uses the
+existing captured-mail adapter; the school-needs workflow itself sends no mail.
 
-## Next issue
+## Verification boundary
 
-Local implementation records show #13 (profiles) and #14 (directory discovery)
-complete. The next unblocked task is **#15 — school needs and independent
-approval**. #16 still requires #15; later outreach tasks retain their published
-dependencies. See the [implementation index](profiles-expertise-outreach-issues.md).
-Before implementing, fetch #15’s current body, labels and comments through the
-GitHub plugin and recheck its state/dependencies; this docs-only alignment did not
-query or modify the tracker.
+- Focused `node scripts/test.mjs tests/school-needs.test.mjs tests/browser/school-needs.spec.ts`:
+  four real Worker/D1/Better Auth HTTP journeys and one Chromium journey pass.
+- Full `npm test`: six helper tests, 68 HTTP tests and 14 Chromium journeys pass,
+  with no failures or skips. Existing real five-minute OTP expiry is included.
+- `npm run typecheck`, `npm run build`, `npm run lint`, and `npm run format:check`
+  pass. CodeQL reports zero alerts. The parallel validation’s code-review backend
+  was unavailable in this environment; no review comments were returned.
+- The secret scan found no secrets in changed code/tests. No live email, deployment
+  or hosted CI result is claimed.
 
-Read the current pilot, architecture, roadmap, outreach specification and this
-summary. Use the agreed needs/approval policy in
-[profiles-expertise-outreach-spec.md](profiles-expertise-outreach-spec.md). Add
-implemented destinations to the shared menu for their explicit roles, including
-accounts with several roles, and keep role preview aligned with those menu rules.
-Do not restore homepage-only menu access, guest navigation, breadcrumbs or an
-account strip. Retain useful feature/parent links within new pages. Exercise
-current-role revocation and independent approval through the real isolated
-Worker/D1/captured-email HTTP and Chromium seam; keep localhost available for
-manual testing. No live credentials or production rollout are needed.
+Issue #15’s implementation is on PR #23; issue #16 still depends on #15. See the
+[flat implementation index](profiles-expertise-outreach-issues.md) and the agreed
+[profiles, expertise and school outreach specification](profiles-expertise-outreach-spec.md).
+Earlier entries below retain their historical dates and change boundaries.
 
 ---
 

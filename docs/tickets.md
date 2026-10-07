@@ -5,8 +5,8 @@ The numbered sections below are the historical pilot roadmap, not the naming or 
 ## Current continuation baseline
 
 Local records show profiles (#13) and directory discovery (#14) complete. School
-needs and independent approval (#15) is the next unblocked task; check its current
-tracker state before implementation. Follow the
+needs and independent approval (#15) is being implemented on PR #23; issue #16
+remains blocked until #15 is complete. Follow the
 [implementation index](profiles-expertise-outreach-issues.md) and
 [shared navigation decision](navigation-prototype.md): role-based grouped menus,
 guest login on `/`, no breadcrumbs, and a deferred actionable home dashboard.

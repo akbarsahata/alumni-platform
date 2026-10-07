@@ -9,8 +9,8 @@ English.
 
 **Currently implemented:** the local Cloudflare application, email-code login, private administrator
 bootstrap, role management, membership applications/manual review, same-house references, reviewed
-house corrections, school invitations, and audit history. Profiles, initiatives, finance, and engagement
-workflows remain planned. The latest entries in the
+house corrections, school invitations, profiles, expertise discovery, and independently approved
+school needs. Initiatives, finance, and broader engagement workflows remain planned. The latest entries in the
 [session handoff](docs/handoff.md) describe implementation and verification; earlier planning statuses
 are historical.
 
@@ -44,10 +44,13 @@ the development origin. See the [environment example](.dev.vars.example) and
 
 ## Accounts and administration
 
-The main pages are `/`, `/login`, `/logout`, `/membership`, `/admin/membership`, `/admin/roles`, and `/admin/audit`. All accounts use emailed
-login codes. Email ownership, alumni membership, and privileged roles are separate; role revocation
-applies to existing sessions. Membership or school roles do not automatically grant directory/finance
-access.
+The main pages are `/`, `/login`, `/logout`, `/membership`, `/school-needs`, `/admin/membership`,
+`/admin/roles`, and `/admin/audit`. All accounts use emailed login codes. Email ownership, alumni
+membership, and privileged roles are separate; role revocation applies to existing sessions.
+Membership or school roles do not automatically grant directory/finance access. Staff, student
+representatives, and directory coordinators can submit school activity or student mentoring needs
+without an alumni profile. Each need requires validation by its named verified staff representative
+and separate directory-coordinator approval.
 
 The primary administrator is appointed privately and alone manages privileged roles and their audit
 history. Bootstrap is local-only, runs once, and requires verified account IDs, an operator, a reason,
@@ -67,6 +70,11 @@ retained versions/history. See the [membership review guide](docs/membership-rev
 The primary administrator issues seven-day, single-use staff/student invitations at
 `/admin/invitations`. Recipients verify the invited email and accept without an alumni application.
 See the [school invitation guide](docs/school-invitations.md) for local capture and audit history.
+
+School needs use migration `0013_school_needs.sql`, applied by the standard
+`npm run db:migrate` local setup command. No additional environment variables are required. Editing a
+need creates a new version and clears its current approvals; captured mail is used for test sign-in,
+not sent by this needs workflow.
 
 ## Development and verification
 
