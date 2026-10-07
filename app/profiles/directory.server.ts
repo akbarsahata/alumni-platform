@@ -9,7 +9,15 @@ export async function searchDirectory(request: Request, env: Env, profileId?: st
   const params = new URL(request.url).searchParams;
   const query = parseInput(
     directorySearchInput,
-    Object.fromEntries([...params].filter(([, v]) => v !== "")),
+    {
+      ...Object.fromEntries([...params].filter(([, v]) => v !== "")),
+      ...(params.getAll("city").filter(Boolean).length
+        ? { city: params.getAll("city").filter(Boolean) }
+        : {}),
+      ...(params.getAll("country").filter(Boolean).length
+        ? { country: params.getAll("country").filter(Boolean) }
+        : {}),
+    },
     "Filter pencarian tidak valid."
   );
   const includes = (value: string, needle?: string) =>
@@ -37,8 +45,17 @@ export async function searchDirectory(request: Request, env: Env, profileId?: st
     (p) =>
       (!query.expertise || p.expertiseTags.includes(query.expertise)) &&
       includes(p.introduction, query.introduction) &&
-      includes(p.city.join(" "), query.city) &&
-      includes(p.country.join(" "), query.country) &&
+      (!query.city?.length ||
+        selectedLocationOptions(query.city, "city").some((o) =>
+          includes(p.city.join(" "), o.label.startsWith("Lokasi sebelumnya: ") ? o.value : o.label)
+        )) &&
+      (!query.country?.length ||
+        selectedLocationOptions(query.country, "country").some((o) =>
+          includes(
+            p.country.join(" "),
+            o.label.startsWith("Lokasi sebelumnya: ") ? o.value : o.label
+          )
+        )) &&
       (!query.helpType || p.helpTypes.includes(query.helpType)) &&
       (!query.availability || p.availability === query.availability) &&
       (query.graduationFrom === undefined ||

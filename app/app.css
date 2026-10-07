@@ -4,10 +4,10 @@
   --color-foreground: var(--ink);
   --color-card: #fffefa;
   --color-card-foreground: var(--ink);
-  --color-primary: var(--red);
+  --color-primary: #17665e;
   --color-primary-foreground: #ffffff;
-  --color-secondary: var(--teal);
-  --color-secondary-foreground: #ffffff;
+  --color-secondary: #f8efd9;
+  --color-secondary-foreground: #77551c;
   --color-muted: #f1f3ed;
   --color-muted-foreground: var(--muted-ink);
   --color-accent: #f5ead0;
@@ -120,11 +120,11 @@ button:focus-visible {
 .app-shell > main {
   width: 100%;
   margin: 3rem auto 1rem;
-  padding: clamp(1.5rem, 4vw, 3rem);
+  padding: clamp(1rem, 2.5vw, 1.75rem);
   border: 1px solid var(--line);
-  border-top: 3px solid var(--gold);
+  border-top: 3px solid #24786e;
   border-radius: 5px 5px 18px 18px;
-  background: #fffefa;
+  background: linear-gradient(135deg, #f1f8f6 0, #fffefa 45%);
   box-shadow: 0 8px 30px #173a4405;
 }
 main h1 {
@@ -147,12 +147,12 @@ main form > p {
   font-size: 0.9rem;
 }
 main a:not(.primary-link):not(.action-link) {
-  color: var(--red);
+  color: #17665e;
   text-decoration-thickness: 1px;
   text-underline-offset: 4px;
 }
 main a:hover {
-  color: var(--red-hover);
+  color: #104c46;
 }
 main nav {
   flex-wrap: wrap;
@@ -168,11 +168,11 @@ main :is(input:not([type="hidden"]), select, textarea) {
   background: white;
   border: 1px solid #ccd3ce;
   border-radius: 8px;
-  padding: 0.75rem 0.85rem;
-  margin-top: 0.45rem;
+  padding: 0.55rem 0.75rem;
+  margin-top: 0.3rem;
   font-size: 0.9rem;
   font-weight: 400;
-  min-height: 46px;
+  min-height: 42px;
   width: 100%;
 }
 main :is(input, select, textarea):focus {
@@ -190,11 +190,11 @@ main button:not([data-slot="button"]),
   align-items: center;
   justify-content: center;
   gap: 0.7rem;
-  background: var(--red);
-  border: 1px solid var(--red);
+  background: #17665e;
+  border: 1px solid #17665e;
   color: white;
-  padding: 0.75rem 1.25rem;
-  min-height: 46px;
+  padding: 0.55rem 0.9rem;
+  min-height: 42px;
   font-weight: 600;
   font-size: 0.85rem;
   border-radius: 8px;
@@ -203,9 +203,9 @@ main button:not([data-slot="button"]),
 }
 main button:not([data-slot="button"]):hover,
 .primary-link:hover {
-  background: var(--red-hover);
+  background: #104c46;
   color: white;
-  border-color: var(--red-hover);
+  border-color: #104c46;
 }
 main button:disabled {
   opacity: 0.5;
@@ -324,7 +324,7 @@ main dd {
 .home-account {
   background: #fffefa;
   border: 1px solid var(--line);
-  border-top: 3px solid var(--gold);
+  border-top: 3px solid #24786e;
   border-radius: 5px 5px 18px 18px;
   padding: clamp(1.5rem, 4vw, 2.7rem);
   box-shadow: 0 10px 40px #183b4507;
@@ -421,10 +421,10 @@ main dd {
 }
 
 main [data-slot="button"] {
-  min-height: 46px;
+  min-height: 42px;
   white-space: normal;
   height: auto;
-  padding-block: 0.75rem;
+  padding-block: 0.55rem;
   cursor: pointer;
 }
 main [data-slot="input"][type="hidden"] {
@@ -474,7 +474,7 @@ main [data-slot="input"][type="hidden"] {
   margin: 0;
   padding: 0;
 }
-main .profile-location-select input {
+main .profile-location-select input:not([type="hidden"]) {
   margin: 0;
   padding: 0;
   min-height: 0;
@@ -486,7 +486,7 @@ main .profile-location-select input:focus {
   outline: none;
 }
 .profile-location-select .location__control {
-  min-height: 46px;
+  min-height: 42px;
   border-radius: 8px;
 }
 .profile-location-select .location__control--is-focused {
@@ -677,7 +677,7 @@ main.profile-page textarea {
   border-color: #bfd4cd;
   background-color: #fbfdfc;
 }
-.directory-page select[name] {
+main select[name] {
   appearance: none;
   padding-right: 2.4rem;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2324786e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
@@ -871,4 +871,124 @@ main.profile-page textarea {
   .directory-filters {
     grid-template-columns: 1fr;
   }
+}
+
+/* Shared form language across existing workflows. */
+main form > label {
+  display: block;
+}
+main form > label + label {
+  margin-top: 0.7rem;
+}
+main form > label + button,
+main form > label + [data-slot="button"] {
+  margin-top: 0.65rem;
+}
+main form > button + button {
+  margin-left: 0.5rem;
+}
+main button[value="revoke"],
+main button[value="rejected"],
+main button[value="suspended"] {
+  background: #fff4f2;
+  border-color: #ecc8c5;
+  color: #a22e35;
+}
+main button[value="revoke"]:hover,
+main button[value="rejected"]:hover,
+main button[value="suspended"]:hover {
+  background: #fae3df;
+  border-color: #dca8a3;
+  color: #87242b;
+}
+main :is(input:not([type="hidden"]), select, textarea) {
+  border-color: #bfd4cd;
+  background-color: #fbfdfc;
+}
+.profile-panel {
+  border-color: #dce8e3;
+  border-left: 3px solid #cba34c;
+}
+.profile-location-select .location__control {
+  background-color: #fbfdfc;
+  border-color: #bfd4cd;
+  min-height: 42px;
+}
+.profile-location-select .location__multi-value {
+  background-color: #e4f1eb;
+  border-radius: 6px;
+  margin: 3px;
+}
+.profile-location-select .location__multi-value__label {
+  color: #21594e;
+}
+.directory-filters > label + label {
+  margin-top: 0;
+}
+@media (max-width: 580px) {
+  .app-shell {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+}
+
+main .profile-location-select input:not([type="hidden"]) {
+  background: transparent;
+}
+
+.directory-result-heading {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.directory-result-heading h3 {
+  font-size: 1rem;
+  line-height: 1.4;
+  font-weight: 650;
+}
+.directory-result .directory-result-heading h3 a {
+  color: var(--red);
+}
+.directory-result .directory-result-heading h3 a:hover {
+  color: var(--red-hover);
+}
+.directory-availability {
+  display: inline-flex;
+  padding: 0.3rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: #e4f1eb;
+  color: #24705b;
+}
+.directory-availability.limited {
+  background: #f8efd9;
+  color: #8b671e;
+}
+.directory-result p.directory-introduction {
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: #697577;
+  margin: 0.6rem 0 0.75rem;
+}
+.directory-places {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.directory-places > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: #f1f3f5;
+  color: #627078;
+  border: 1px solid #e5e9ea;
+  border-radius: 6px;
+  padding: 0.2rem 0.45rem;
+  font-size: 0.72rem;
+}
+.directory-result p.directory-cohort {
+  font-size: 0.75rem;
+  color: #7a8586;
+  margin-top: 0.6rem;
 }

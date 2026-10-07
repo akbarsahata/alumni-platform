@@ -1,4 +1,6 @@
-import { Search, RotateCcw } from "lucide-react";
+import { LocationSelect } from "../profiles/location-select";
+import { cityOptions, countryOptions } from "../profiles/locations";
+import { Search, RotateCcw, CircleCheck, Clock, MapPin, Globe } from "lucide-react";
 import { env } from "cloudflare:workers";
 import { Form, Link, useSearchParams } from "react-router";
 import type { Route } from "./+types/directory";
@@ -37,16 +39,24 @@ export default function Directory({ loaderData }: Route.ComponentProps) {
             ))}
           </select>
         </label>
-        {[
-          ["introduction", "Perkenalan profesional"],
-          ["city", "Kota"],
-          ["country", "Negara"],
-        ].map(([name, label]) => (
+        {[["introduction", "Perkenalan profesional"]].map(([name, label]) => (
           <label key={name}>
             {label}
             <input name={name} defaultValue={params.get(name) ?? ""} maxLength={200} />
           </label>
         ))}
+        <LocationSelect
+          kind="city"
+          label="Kota"
+          options={cityOptions}
+          initialValues={params.getAll("city").filter(Boolean)}
+        />
+        <LocationSelect
+          kind="country"
+          label="Negara"
+          options={countryOptions}
+          initialValues={params.getAll("country").filter(Boolean)}
+        />
         <label>
           Bentuk bantuan
           <select name="helpType" defaultValue={params.get("helpType") ?? ""}>
@@ -108,23 +118,49 @@ export default function Directory({ loaderData }: Route.ComponentProps) {
         <div className="directory-results-grid">
           {profiles.map((p) => (
             <article key={p.id} className="directory-result">
-              <h3>
-                <Link to={`/directory/${p.id}`}>{p.displayName || p.schoolName || "Alumni"}</Link>
-              </h3>
-              <p>{p.introduction}</p>
-              <p>
-                {p.city.join(", ")} · {p.country.join(", ")}
-              </p>
+              <div className="directory-result-heading">
+                <h3>
+                  <Link to={`/directory/${p.id}`}>{p.displayName || p.schoolName || "Alumni"}</Link>
+                </h3>
+                {p.availability && (
+                  <span
+                    className={`directory-availability ${p.availability}`}
+                    role="img"
+                    aria-label={availabilityLabels[p.availability]}
+                    title={availabilityLabels[p.availability]}
+                  >
+                    {p.availability === "available" ? (
+                      <CircleCheck size={19} aria-hidden="true" />
+                    ) : (
+                      <Clock size={19} aria-hidden="true" />
+                    )}
+                  </span>
+                )}
+              </div>
+              <p className="directory-introduction">{p.introduction}</p>
+              <div className="directory-places">
+                {p.city.map((city) => (
+                  <span key={city}>
+                    <MapPin size={13} aria-hidden="true" />
+                    {city}
+                  </span>
+                ))}
+                {p.country.map((country) => (
+                  <span key={country}>
+                    <Globe size={13} aria-hidden="true" />
+                    {country}
+                  </span>
+                ))}
+              </div>
               <div className="directory-badges">
                 {p.expertiseTags.map((id) => (
                   <span key={id}>{tags.find((t) => t.id === id)?.label ?? id}</span>
                 ))}
               </div>
-              <p>{p.availability ? availabilityLabels[p.availability] : ""}</p>
               {p.studentType === "graduate" ? (
-                <p>Kelulusan: {p.graduationYear}</p>
+                <p className="directory-cohort">Kelulusan: {p.graduationYear}</p>
               ) : p.studentType === "former-student" ? (
-                <p>
+                <p className="directory-cohort">
                   Bersekolah: {p.attendanceStart}–{p.attendanceEnd}
                 </p>
               ) : null}

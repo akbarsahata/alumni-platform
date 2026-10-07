@@ -62,6 +62,8 @@ test("coordinator finds eligible profiles by skills, introduction, locations, he
     "introduction=robotika",
     "city=Palembang",
     "country=Indonesia",
+    "city=ID%3ASS%3APalembang&city=ID%3AJK%3AJakarta",
+    "country=ID&country=AU",
     "helpType=mentoring",
     "availability=limited",
     "graduationFrom=2008&graduationTo=2008",

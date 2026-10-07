@@ -14,7 +14,22 @@ test("coordinator searches private alumni and maintains shared expertise in Baha
     await page.goto("/");
     await page.getByRole("link", { name: "Direktori keahlian" }).click();
     await page.getByLabel("Perkenalan profesional", { exact: true }).fill("robotika");
+    await page.getByRole("combobox", { name: "Kota", exact: true }).click();
+    await page.getByRole("combobox", { name: "Kota", exact: true }).fill("Palembang");
+    await page.getByRole("combobox", { name: "Kota", exact: true }).press("ArrowDown");
+    await page.getByRole("option", { name: "Palembang — Sumatera Selatan", exact: true }).click();
+    await page.getByRole("combobox", { name: "Kota", exact: true }).press("Escape");
+    await page.getByRole("combobox", { name: "Negara", exact: true }).click();
+    await page.getByRole("combobox", { name: "Negara", exact: true }).fill("Indonesia");
+    await page.getByRole("combobox", { name: "Negara", exact: true }).press("ArrowDown");
+    await page.getByRole("option", { name: "Indonesia", exact: true }).click();
+    await page.getByRole("combobox", { name: "Negara", exact: true }).press("Escape");
     await page.getByRole("button", { name: "Cari alumni" }).click();
+    await expect(page).toHaveURL(/city=ID%3ASS%3APalembang/);
+    await expect(page).toHaveURL(/country=ID/);
+    await expect(
+      page.locator("form").getByText("Palembang — Sumatera Selatan", { exact: true })
+    ).toBeVisible();
     await expect(page.getByLabel("Hasil pencarian")).toContainText("Ahli Robotika");
     await page.goto(`/directory/${browserMember.id}`);
     await expect(page.getByRole("heading", { name: "Profil alumni" })).toBeVisible();

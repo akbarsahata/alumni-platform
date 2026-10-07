@@ -708,3 +708,35 @@ results use two columns or one on phones. The coordinator container expands up t
 1180px. Checked 1440px, 820px and 390px Chromium layouts and absence of horizontal
 overflow using temporary capture/assertion instrumentation, then removed it.
 Focused five HTTP journeys and one Chromium journey pass.
+
+## Shared form styling and directory locations — 2026-10-07
+
+Directory Kota/Negara reuse the profile searchable multi-select controls, with
+canonical repeated GET parameters and any-choice matching within each location
+filter. Existing text filters remain supported for HTTP clients. Location selections
+persist in the URL and survive search/reload. Directory fields omit helper subtitles;
+profile descriptions remain available. Shared location component descriptions are
+optional without dangling aria-describedby references.
+
+Applied the compact teal/gold form language across existing pages via shared CSS
+and UI color tokens: primary teal, secondary gold, destructive red, inset native
+select arrows, compact inputs/button spacing, tinted page surfaces and separated
+profile selection chips. Changes preserve current route/form behavior. Focused
+five HTTP journeys and the Chromium directory journey pass, including location
+selection and canonical filter parameters. Existing API tests also cover repeated
+city/country choices. Final full `npm test` passes four helper tests, 64 HTTP tests and 11 Chromium
+journeys, including the real 301-second OTP expiry check. Typecheck, build, lint
+and formatting pass.
+
+Result-card refinement retains red names with stronger emphasis, smaller grey
+introductions and cohort text, individual grey city/country badges, and green-check
+or amber-clock availability icons with accessible labels and hover titles. Checked
+profile, role administration and login at 1280px/390px, plus directory results at
+both widths; no horizontal overflow. Synthetic screenshot fixtures stay in ignored
+test artifacts; no real account/session is used.
+
+Final directory-focused verification after result-card refinements passes all five
+HTTP journeys and the Chromium journey. Scoped the selected-location assertion to
+the filter form because result badges now repeat the same location text. Native
+input styles are excluded from the searchable control's inner text input so empty
+location controls align with surrounding fields. All changes remain local.

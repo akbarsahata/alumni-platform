@@ -171,12 +171,16 @@ export const profileInput = z
   );
 
 const optionalYear = year.optional();
+const directoryLocations = z
+  .union([z.string().max(500), z.array(z.string().min(1).max(500)).max(20)])
+  .transform((value) => (typeof value === "string" ? [value] : value))
+  .optional();
 export const directorySearchInput = z
   .object({
     expertise: z.string().min(1).max(100).optional(),
     introduction: z.string().max(200).optional(),
-    city: z.string().max(200).optional(),
-    country: z.string().max(200).optional(),
+    city: directoryLocations,
+    country: directoryLocations,
     helpType: z.enum(helpTypes).optional(),
     availability: z.enum(["available", "limited"]).optional(),
     graduationFrom: optionalYear,

@@ -29,6 +29,9 @@ Filters: `expertise` (stable tag ID), `introduction`, `city`, `country`, `helpTy
 `availability` (`available` or `limited`), `graduationFrom`, `graduationTo`,
 `attendanceFrom`, `attendanceTo`. Text filters match case-insensitive substrings;
 location text matches human-readable catalogue labels, including legacy locations.
+The directory UI reuses profile searchable city/country multi-selects without helper
+subtitles. Repeated `city` and `country` parameters accept canonical location IDs;
+choices within one field match any selected location, while different filters intersect.
 Combined filters intersect. Former-student attendance filters match overlapping
 attendance ranges, while graduation ranges apply only to graduates. Do not assign
 a graduation cohort to former students or bootstrapped records without identity.

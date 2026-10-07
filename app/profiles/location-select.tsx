@@ -22,7 +22,7 @@ export function LocationSelect({
 }: {
   kind: LocationKind;
   label: string;
-  description: string;
+  description?: string;
   options: LocationOption[];
   initialValues: string[];
 }) {
@@ -31,13 +31,15 @@ export function LocationSelect({
   return (
     <div className="profile-location-select">
       <label htmlFor={id}>{label}</label>
-      <p id={`${id}-description`} className="text-sm text-muted-foreground">
-        {description}
-      </p>
+      {description && (
+        <p id={`${id}-description`} className="text-sm text-muted-foreground">
+          {description}
+        </p>
+      )}
       <Select<LocationOption, true>
         instanceId={id}
         inputId={id}
-        aria-describedby={`${id}-description`}
+        aria-describedby={description ? `${id}-description` : undefined}
         name={kind}
         options={options}
         components={{ MultiValueRemove: RemoveLocation }}
