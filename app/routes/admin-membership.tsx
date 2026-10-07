@@ -15,12 +15,14 @@ export default function MembershipQueue({ loaderData }: Route.ComponentProps) {
   return (
     <main className="mx-auto max-w-3xl p-8 space-y-6">
       <h1 className="text-2xl font-semibold">Tinjau keanggotaan</h1>
-      <Link to="/" className="underline">
-        Beranda
-      </Link>
-      <Link to="/admin/email-changes" className="underline">
-        Bantu perubahan email
-      </Link>
+      <div className="space-x-4">
+        <Link to="/" className="underline">
+          Beranda
+        </Link>
+        <Link to="/admin/email-changes" className="underline">
+          Bantu perubahan email
+        </Link>
+      </div>
       <p>
         Pengajuan menunggu tinjauan manual. Keputusan memerlukan pemeriksaan independen melalui
         alumni tepercaya atau staf sekolah.
