@@ -82,7 +82,9 @@ in the pilot; automated deletion and anonymization are outside this scope.
   eligibility as an outreach recipient; existing separately assigned coordinator
   permissions retain the current role policy until revoked.
 - Profile saves and reconfirmation show a prominent dismissible success toast;
-  each participation checkbox explains the effect of ticking and unticking it.
+  one participation checkbox explicitly grants participation consent and explains
+  the effect of ticking and unticking it. Editing an opted-in profile does not
+  require a second consent checkbox. Confirmation sits in “Status relevansi profil”.
 - Product copy is Bahasa Indonesia; technical identifiers are English. Use the
   existing email abstraction and synthetic local capture. No live delivery or
   production configuration is part of this work.

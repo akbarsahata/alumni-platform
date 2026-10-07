@@ -40,7 +40,7 @@ export async function action({ request }: Route.ActionArgs) {
           helpTypes: form.getAll("helpTypes"),
           availability: form.get("availability") || null,
           participation: form.get("participation") === "on",
-          participationConsent: form.get("participationConsent") === "on",
+          participationConsent: form.get("participation") === "on",
         };
     await saveProfile(request, env, input, confirm);
     return {
@@ -111,9 +111,9 @@ export default function Profile({ loaderData, actionData }: Route.ComponentProps
             <p>Perubahan identitas sekolah memerlukan tinjauan administrator keanggotaan.</p>
           </section>
         </details>
-        <div className="profile-status">
+        <section className="profile-status" aria-label="Status relevansi profil">
           <p>
-            Kelayakan penjangkauan:{" "}
+            Status relevansi profil:{" "}
             {eligibility.eligible ? "Memenuhi syarat" : reasons[eligibility.reason!]}
           </p>
           <p>Konfirmasi terakhir (UTC): {profile.confirmedAt ?? "Belum dikonfirmasi"}</p>
@@ -124,7 +124,14 @@ export default function Profile({ loaderData, actionData }: Route.ComponentProps
               permintaan baru. Menyimpan profil juga mengonfirmasi informasinya.
             </p>
           </details>
-        </div>
+
+          {membershipStatus === "approved" && profile.confirmedAt && (
+            <Form method="post">
+              <input type="hidden" name="intent" value="confirm" />
+              <Button disabled={busy}>Konfirmasi profil masih benar</Button>
+            </Form>
+          )}
+        </section>
         {actionData?.message && (
           <noscript>
             <p role="status">{actionData.message}</p>
@@ -243,24 +250,10 @@ export default function Profile({ loaderData, actionData }: Route.ComponentProps
                   Aktifkan partisipasi
                 </label>
                 <p id="participation-help" className="text-sm text-muted-foreground">
-                  Centang agar profil dapat ditemukan dan menerima permintaan bantuan sekolah. Hapus
-                  centang untuk menghentikan pencarian dan permintaan baru; profil tetap tersimpan
-                  dan bisa diedit.
-                </p>
-                <label className="block">
-                  <input
-                    type="checkbox"
-                    style={{ width: "auto", minHeight: "auto", marginRight: "0.5rem" }}
-                    aria-describedby="participation-consent-help"
-                    name="participationConsent"
-                  />{" "}
-                  Saya menyetujui profil ditemukan koordinator direktori dan menerima permintaan
-                  bantuan sekolah.
-                </label>
-                <p id="participation-consent-help" className="text-sm text-muted-foreground">
-                  Centang untuk menyetujui partisipasi aktif saat menyimpan. Jika tidak menyetujui,
-                  hapus centang dan matikan “Aktifkan partisipasi” terlebih dahulu. Ini tidak
-                  membagikan email; perkenalan perlu persetujuan terpisah.
+                  Centang untuk menyetujui profil ditemukan koordinator direktori dan menerima
+                  permintaan bantuan sekolah. Hapus centang untuk menghentikan pencarian dan
+                  permintaan baru; profil tetap tersimpan dan bisa diedit. Email hanya dibagikan
+                  setelah persetujuan terpisah untuk perkenalan.
                 </p>
               </section>
             </Form>
@@ -270,12 +263,6 @@ export default function Profile({ loaderData, actionData }: Route.ComponentProps
                 {busy ? "Menyimpan…" : "Simpan profil"}
               </Button>
             </div>
-            {profile.confirmedAt && (
-              <Form method="post">
-                <input type="hidden" name="intent" value="confirm" />
-                <Button disabled={busy}>Konfirmasi profil masih benar</Button>
-              </Form>
-            )}
           </>
         ) : (
           <p>Anda dapat melihat profil sendiri. Perbarui setelah keanggotaan dipulihkan.</p>

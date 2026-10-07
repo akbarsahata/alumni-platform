@@ -565,3 +565,10 @@ survives save and reload. The final typecheck, build, lint and formatting pass.
 Changes are committed locally on `master`, with no push. A pre-existing homepage
 link edit is outside this follow-up commit. No remote migration, deployment or live
 email is part of this change.
+
+### Profile participation follow-up (2026-10-07)
+
+- Reproduced an HTML profile save rejected when participation was checked but the second consent checkbox was unchecked. The single “Aktifkan partisipasi” checkbox now explicitly grants discovery/outreach consent and submits both existing workflow flags; API callers still require explicit consent. Existing opt-in choices persist on edits.
+- Renamed the status section to “Status relevansi profil” and moved the separate “Konfirmasi profil masih benar” form inside it. Suspended members cannot confirm.
+- Browser regression covers first save, opted-in edits (display name, introduction, availability note), immediate feedback and values after reload, locations, availability, opt-out and confirmation placement. A separate storage failure was not reproduced in the real local Worker/D1 flow.
+- Focused verification passed: `npm run test -- tests/profiles.test.mjs tests/browser/profiles.spec.ts` (4 helper tests, 5 HTTP journeys, 1 Chromium journey). Typecheck, build and lint passed. Standards and Spec reviews: zero findings. Final full `npm run test` passed: 4 helper tests, 59 HTTP tests, and 10 Chromium journeys. Formatting also passed. No deployment or live email.
