@@ -1,3 +1,4 @@
+import { Plus, Pencil, ArrowRightLeft, Archive } from "lucide-react";
 import { env } from "cloudflare:workers";
 import { Form, Link, data, useNavigation } from "react-router";
 import type { Route } from "./+types/directory-tags";
@@ -30,7 +31,7 @@ const actionLabels: Record<string, string> = {
 export default function Tags({ loaderData, actionData }: Route.ComponentProps) {
   const busy = useNavigation().state !== "idle";
   return (
-    <main className="mx-auto max-w-3xl p-8 space-y-6">
+    <main className="directory-page taxonomy-page mx-auto max-w-3xl space-y-5">
       <h1>Kelola keahlian</h1>
       <Link to="/directory">Direktori keahlian</Link>
       <p>
@@ -39,16 +40,23 @@ export default function Tags({ loaderData, actionData }: Route.ComponentProps) {
       </p>
       {actionData?.error && <p role="alert">{actionData.error}</p>}
       {actionData?.message && <p role="status">{actionData.message}</p>}
-      <Form method="post">
+      <Form method="post" className="taxonomy-form">
         <input type="hidden" name="action" value="add" />
         <label>
           Keahlian baru
           <input name="label" required maxLength={100} />
         </label>
-        <button disabled={busy}>Tambah keahlian</button>
+        <button
+          className="directory-icon-action"
+          aria-label="Tambah keahlian"
+          title="Tambah keahlian"
+          disabled={busy}
+        >
+          <Plus size={18} aria-hidden="true" />
+        </button>
       </Form>
       {loaderData.tags.map((tag) => (
-        <section key={`${tag.id}-${tag.version}`} aria-label={tag.label} className="border-b py-4">
+        <section key={`${tag.id}-${tag.version}`} aria-label={tag.label} className="taxonomy-card">
           <h2>
             {tag.label}
             {tag.retired ? " (dihentikan)" : ""}
@@ -57,28 +65,53 @@ export default function Tags({ loaderData, actionData }: Route.ComponentProps) {
             <p>Pengganti: {loaderData.tags.find((t) => t.id === tag.replacementId)?.label}</p>
           )}
           {!tag.retired && (
-            <>
-              <Form method="post">
+            <div className="taxonomy-editor">
+              <Form method="post" id={`tag-edit-${tag.id}`}>
                 <input type="hidden" name="id" value={tag.id} />
                 <input type="hidden" name="expectedVersion" value={tag.version} />
                 <label>
                   Label keahlian
                   <input name="label" defaultValue={tag.label} required maxLength={100} />
                 </label>
-                <button disabled={busy} name="action" value="rename">
-                  Ubah label
-                </button>
-                <button disabled={busy} name="action" value="replace">
-                  Buat pengganti
-                </button>
               </Form>
-              <Form method="post">
-                <input type="hidden" name="id" value={tag.id} />
-                <input type="hidden" name="expectedVersion" value={tag.version} />
-                <input type="hidden" name="action" value="retire" />
-                <button disabled={busy}>Hentikan keahlian</button>
-              </Form>
-            </>
+              <div className="taxonomy-actions">
+                <button
+                  className="directory-icon-action"
+                  form={`tag-edit-${tag.id}`}
+                  disabled={busy}
+                  name="action"
+                  value="rename"
+                  aria-label="Ubah label"
+                  title="Ubah label"
+                >
+                  <Pencil size={18} aria-hidden="true" />
+                </button>
+                <button
+                  className="directory-icon-action"
+                  form={`tag-edit-${tag.id}`}
+                  disabled={busy}
+                  name="action"
+                  value="replace"
+                  aria-label="Buat pengganti"
+                  title="Buat pengganti"
+                >
+                  <ArrowRightLeft size={18} aria-hidden="true" />
+                </button>
+                <Form method="post">
+                  <input type="hidden" name="id" value={tag.id} />
+                  <input type="hidden" name="expectedVersion" value={tag.version} />
+                  <input type="hidden" name="action" value="retire" />
+                  <button
+                    className="directory-icon-action taxonomy-retire"
+                    disabled={busy}
+                    aria-label="Hentikan keahlian"
+                    title="Hentikan keahlian"
+                  >
+                    <Archive size={18} aria-hidden="true" />
+                  </button>
+                </Form>
+              </div>
+            </div>
           )}
         </section>
       ))}

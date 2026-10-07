@@ -647,3 +647,180 @@ main.profile-page textarea {
     line-height: 1.4;
   }
 }
+
+/* Compact coordinator tools, with distinct action priorities. */
+.app-shell > main.directory-page {
+  padding: clamp(1rem, 2.5vw, 1.75rem);
+  background: linear-gradient(135deg, #f1f8f6 0, #fffefa 45%);
+  border-top-color: #24786e;
+}
+.directory-page h1 {
+  font-size: clamp(1.65rem, 2.5vw, 2rem);
+}
+.directory-page > p {
+  max-width: 70ch;
+  line-height: 1.6;
+}
+.directory-filters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem 1rem;
+  padding: 1rem;
+  background: #fff;
+  border: 1px solid #dce8e3;
+  border-radius: 12px;
+}
+.directory-page :is(input:not([type="hidden"]), select) {
+  min-height: 42px;
+  padding: 0.55rem 0.75rem;
+  margin-top: 0.3rem;
+  border-color: #bfd4cd;
+  background-color: #fbfdfc;
+}
+.directory-page select[name] {
+  appearance: none;
+  padding-right: 2.4rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2324786e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.85rem center;
+}
+.directory-page button:not([data-slot="button"]) {
+  min-height: 42px;
+  padding: 0.55rem 0.9rem;
+  background: #17665e;
+  border-color: #17665e;
+}
+.directory-page button:not([data-slot="button"]):hover {
+  background: #104c46;
+  border-color: #104c46;
+}
+.directory-search-actions,
+.taxonomy-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+}
+.directory-search-actions {
+  grid-column: 1 / -1;
+  margin-top: 0.2rem;
+}
+.taxonomy-form {
+  display: grid;
+  gap: 0.65rem;
+  padding: 1rem;
+  background: #e8f3ef;
+  border-radius: 12px;
+}
+.taxonomy-form > button {
+  justify-self: start;
+}
+.taxonomy-card,
+.directory-result {
+  border: 1px solid #dce8e3;
+  border-left: 3px solid #cba34c;
+  border-radius: 10px;
+  padding: 1rem;
+  background: #fff;
+}
+.taxonomy-card h2 {
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+.taxonomy-card label {
+  display: block;
+}
+.taxonomy-actions {
+  margin-top: 0.65rem;
+}
+.taxonomy-card > form,
+.taxonomy-card > form:last-child {
+  margin-top: 0.65rem;
+}
+.directory-page button[value="replace"] {
+  background: #f8efd9;
+  border-color: #e1cd97;
+  color: #77551c;
+}
+.directory-page button[value="replace"]:hover {
+  background: #f0e1b9;
+  border-color: #cba34c;
+  color: #604212;
+}
+.directory-page button.taxonomy-retire {
+  background: #fff4f2;
+  color: #a22e35;
+  border-color: #ecc8c5;
+}
+.directory-page button.taxonomy-retire:hover {
+  background: #fae3df;
+  color: #87242b;
+  border-color: #dca8a3;
+}
+.directory-result {
+  margin-top: 0.75rem;
+}
+.directory-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.6rem 0;
+}
+.directory-badges > span {
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: #e4f1eb;
+  color: #21594e;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+@media (max-width: 580px) {
+  .directory-filters {
+    grid-template-columns: 1fr;
+    padding: 0.8rem;
+  }
+  .taxonomy-card {
+    padding: 0.85rem;
+  }
+}
+
+.directory-page button.directory-icon-action {
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  flex: 0 0 42px;
+}
+.taxonomy-form {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+}
+.taxonomy-editor {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 0.75rem;
+}
+.taxonomy-editor .taxonomy-actions {
+  margin: 0;
+  flex-wrap: nowrap;
+}
+.directory-page a.directory-reset {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  color: #17665e;
+  border: 1px solid #bfd4cd;
+  background: #f1f8f6;
+}
+.directory-page a.directory-reset:hover {
+  background: #e4f1eb;
+}
+@media (max-width: 580px) {
+  .taxonomy-editor {
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+  }
+}

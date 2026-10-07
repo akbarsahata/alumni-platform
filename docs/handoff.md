@@ -686,3 +686,18 @@ on `codex/profile-layout`, with no push. Typecheck and formatting were verified
 again after exact snapshot recovery. Final handoff evidence was amended into that
 local feature commit. Issue #14 is updated and closed through the GitHub plugin
 after verification.
+
+## Directory UI refinement — 2026-10-07
+
+Inset native-select carets with a custom decorative arrow, tightened coordinator
+page/filter/input spacing, separated expertise chips and action controls, and
+introduced teal, gold and soft-red action priorities. Added pinned `lucide-react`
+icons for add, rename, replacement, retirement, search and reset. Icon controls
+retain Bahasa Indonesia accessible names and hover titles, keyboard submission,
+42px targets and current pending-state disabling. Desktop tag actions align beside
+the label; mobile actions wrap below it. Retirement retains its separate form.
+
+Focused Worker/D1/Better Auth/captured-email suite passes five HTTP journeys and
+one Chromium journey; typecheck, build and lint pass. Desktop and 390px mobile
+screenshots were visually checked under ignored `test-results/directory*-ui.png`;
+temporary capture lines were removed from the existing browser test afterward.

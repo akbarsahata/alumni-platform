@@ -1,3 +1,4 @@
+import { Search, RotateCcw } from "lucide-react";
 import { env } from "cloudflare:workers";
 import { Form, Link, useSearchParams } from "react-router";
 import type { Route } from "./+types/directory";
@@ -16,14 +17,14 @@ export default function Directory({ loaderData }: Route.ComponentProps) {
   const next = new URLSearchParams(params);
   if (nextCursor) next.set("cursor", nextCursor);
   return (
-    <main className="mx-auto max-w-4xl p-8 space-y-6">
+    <main className="directory-page mx-auto max-w-4xl space-y-5">
       <h1>Direktori keahlian</h1>
       <Link to="/">Beranda</Link> · <Link to="/directory/tags">Kelola keahlian</Link>
       <p>
         Hanya alumni yang menyetujui partisipasi, tersedia, dan mengonfirmasi profil dalam 12 bulan
         terakhir. Tahun bersekolah terpisah dari tahun kelulusan.
       </p>
-      <Form method="get" key={params.toString()} className="grid gap-4 sm:grid-cols-2">
+      <Form method="get" key={params.toString()} className="directory-filters">
         <label>
           Keahlian
           <select name="expertise" defaultValue={params.get("expertise") ?? ""}>
@@ -82,13 +83,30 @@ export default function Directory({ loaderData }: Route.ComponentProps) {
             />
           </label>
         ))}
-        <button type="submit">Cari alumni</button>
+        <div className="directory-search-actions">
+          <button
+            className="directory-icon-action"
+            type="submit"
+            aria-label="Cari alumni"
+            title="Cari alumni"
+          >
+            <Search size={18} aria-hidden="true" />
+          </button>
+          <Link
+            className="directory-reset"
+            to="/directory"
+            aria-label="Reset filter"
+            title="Reset filter"
+          >
+            <RotateCcw size={18} aria-hidden="true" />
+          </Link>
+        </div>
       </Form>
       <section aria-label="Hasil pencarian">
         <h2>Hasil pencarian</h2>
         {!profiles.length && <p>Tidak ada profil yang sesuai.</p>}
         {profiles.map((p) => (
-          <article key={p.id} className="border-b py-4">
+          <article key={p.id} className="directory-result">
             <h3>
               <Link to={`/directory/${p.id}`}>{p.displayName || p.schoolName || "Alumni"}</Link>
             </h3>
@@ -96,9 +114,11 @@ export default function Directory({ loaderData }: Route.ComponentProps) {
             <p>
               {p.city.join(", ")} · {p.country.join(", ")}
             </p>
-            <p>
-              {p.expertiseTags.map((id) => tags.find((t) => t.id === id)?.label ?? id).join(", ")}
-            </p>
+            <div className="directory-badges">
+              {p.expertiseTags.map((id) => (
+                <span key={id}>{tags.find((t) => t.id === id)?.label ?? id}</span>
+              ))}
+            </div>
             <p>{p.availability ? availabilityLabels[p.availability] : ""}</p>
             {p.studentType === "graduate" ? (
               <p>Kelulusan: {p.graduationYear}</p>
