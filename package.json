@@ -23,7 +23,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "locations:generate": "node scripts/generate-profile-locations.mjs",
-    "test:unit": "node --test tests/location-list.test.mjs"
+    "test:unit": "node --test tests/location-list.test.mjs",
+    "prototype:profile": "react-router dev"
   },
   "dependencies": {
     "better-auth": "1.7.7",

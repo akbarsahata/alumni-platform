@@ -1,0 +1,237 @@
+/* Throwaway styles, scoped to profile layout exploration. */
+.app-shell > main.profile-prototype {
+  max-width: 1240px;
+  padding: clamp(1rem, 2.5vw, 2rem);
+  margin-bottom: 6rem;
+}
+.profile-prototype > * + * {
+  margin-top: 1rem;
+}
+.profile-prototype > p {
+  max-width: 85ch;
+}
+.prototype-identity {
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+.prototype-identity summary,
+.prototype-state summary {
+  cursor: pointer;
+  min-height: 24px;
+}
+.prototype-identity section {
+  padding-top: 0.7rem;
+}
+.prototype-status {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.25rem 1.5rem;
+  padding: 1rem;
+  background: var(--paper);
+  border-radius: 8px;
+  font-size: 0.8rem;
+}
+.prototype-status p:last-child {
+  grid-column: 1 / -1;
+  color: var(--muted-ink);
+}
+.prototype-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+.prototype-panel {
+  min-width: 0;
+  padding: 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: white;
+}
+.prototype-panel > * + * {
+  margin-top: 1rem;
+}
+.prototype-panel h2 {
+  font-family: Georgia, serif;
+  font-size: 1.4rem;
+}
+.prototype-panel p {
+  color: var(--muted-ink);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+.prototype-panel legend {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+}
+.prototype-panel fieldset label {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  gap: 0.5rem;
+  font-weight: 400;
+}
+.prototype-panel input[type="checkbox"] {
+  flex-shrink: 0;
+}
+.profile-prototype-A .prototype-about {
+  grid-row: span 2;
+}
+.profile-prototype-B .prototype-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.profile-prototype-B .prototype-skills fieldset label {
+  border-bottom: 1px solid var(--line);
+}
+.prototype-sections {
+  display: none;
+}
+.profile-prototype-C .prototype-sections {
+  display: flex;
+  gap: 0.5rem;
+}
+.profile-prototype-C .prototype-sections button {
+  background: white;
+  color: var(--teal);
+  border-color: var(--line);
+  flex: 1;
+}
+.profile-prototype-C .prototype-sections button[aria-pressed="true"] {
+  background: var(--teal);
+  color: white;
+}
+.profile-prototype-C .prototype-grid {
+  display: block;
+}
+.profile-prototype-C .prototype-panel {
+  display: none;
+}
+.profile-prototype-C[data-section="about"] .prototype-about,
+.profile-prototype-C[data-section="skills"] .prototype-skills,
+.profile-prototype-C[data-section="availability"] .prototype-availability {
+  display: block;
+}
+.profile-prototype-C .prototype-about {
+  display: none;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem 2rem;
+}
+.profile-prototype-C[data-section="about"] .prototype-about {
+  display: grid;
+}
+.profile-prototype-C .prototype-about h2 {
+  grid-column: 1 / -1;
+}
+.profile-prototype-C .prototype-skills {
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem 2rem;
+}
+.profile-prototype-C[data-section="skills"] .prototype-skills {
+  display: grid;
+}
+.profile-prototype-C .prototype-skills h2 {
+  grid-column: 1 / -1;
+}
+.prototype-save {
+  position: sticky;
+  bottom: 5.5rem;
+  z-index: 5;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: #fffefa;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 4px 20px #183b4515;
+}
+.prototype-save p {
+  font-size: 0.75rem;
+  color: var(--muted-ink);
+}
+.prototype-state {
+  font-size: 0.75rem;
+  color: var(--muted-ink);
+}
+.prototype-state pre {
+  overflow: auto;
+  max-height: 240px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.prototype-switcher {
+  position: fixed;
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.4rem;
+  background: #183b45;
+  color: white;
+  border-radius: 99px;
+  box-shadow: 0 6px 25px #183b4530;
+  white-space: nowrap;
+  font-size: 0.8rem;
+}
+.prototype-switcher button {
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  border-radius: 50%;
+  background: #ffffff20;
+}
+@media (max-width: 1000px) {
+  .profile-prototype-B .prototype-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .profile-prototype-B .prototype-availability {
+    grid-column: 1 / -1;
+  }
+}
+@media (max-width: 700px) {
+  .app-shell:has(.profile-prototype) {
+    padding-inline: 0.75rem;
+  }
+  .prototype-grid,
+  .profile-prototype-B .prototype-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .profile-prototype-A .prototype-about {
+    grid-row: auto;
+  }
+  .prototype-status {
+    grid-template-columns: 1fr;
+  }
+  .prototype-panel {
+    padding: 1rem;
+  }
+  .profile-prototype-C[data-section="about"] .prototype-about,
+  .profile-prototype-C[data-section="skills"] .prototype-skills {
+    display: block;
+  }
+  .profile-prototype-C .prototype-sections {
+    flex-wrap: nowrap;
+    gap: 0.25rem;
+  }
+  .profile-prototype-C .prototype-sections button {
+    padding: 0.6rem 0.35rem;
+    min-width: 0;
+    font-size: 0.7rem;
+  }
+  .prototype-save {
+    bottom: 5.5rem;
+    padding: 0.6rem;
+  }
+  .prototype-save p {
+    max-width: 45%;
+    font-size: 0.65rem;
+    line-height: 1.4;
+  }
+}

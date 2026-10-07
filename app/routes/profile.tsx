@@ -1,9 +1,10 @@
+import { ProfileLayoutPrototype } from "./profile-layout.prototype";
 import { useEffect } from "react";
 import { Toaster, toast } from "sonner";
 import { LocationSelect } from "../profiles/location-select";
 import { cityOptions, countryOptions } from "../profiles/locations";
 import { env } from "cloudflare:workers";
-import { Form, Link, data, useNavigation } from "react-router";
+import { Form, Link, data, useNavigation, useSearchParams } from "react-router";
 import type { Route } from "./+types/profile";
 import { readProfile, saveProfile } from "../profiles/profiles.server";
 import {
@@ -62,12 +63,15 @@ const reasons: Record<string, string> = {
 export default function Profile({ loaderData, actionData }: Route.ComponentProps) {
   const { profile, identity, eligibility, membershipStatus } = loaderData;
   const busy = useNavigation().state !== "idle";
+  const [params] = useSearchParams();
   useEffect(() => {
     if (actionData?.message)
       toast.success(actionData.message, { id: "profile-feedback", toasterId: "profile" });
     else if (actionData?.error)
       toast.error(actionData.error, { id: "profile-feedback", toasterId: "profile" });
   }, [actionData]);
+  if (import.meta.env.DEV && ["A", "B", "C"].includes(params.get("variant") ?? ""))
+    return <ProfileLayoutPrototype loaderData={loaderData} />;
   return (
     <>
       <Toaster
