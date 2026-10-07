@@ -4,6 +4,7 @@ import { directoryRepository } from "../db/directory.repository.server";
 import { directorySearchInput, parseInput } from "../http/validation";
 import { profileEligibilityReason } from "./eligibility";
 import { readLocationValues, selectedLocationOptions } from "./locations";
+import { matchesDirectoryLocation } from "./location-search";
 export async function searchDirectory(request: Request, env: Env, profileId?: string) {
   await requireDirectory(request, env);
   const params = new URL(request.url).searchParams;
@@ -41,21 +42,14 @@ export async function searchDirectory(request: Request, env: Env, profileId?: st
     if (!profile) throw new Response("Profil tidak tersedia.", { status: 404 });
     return { profiles: [profile], nextCursor: null, tags };
   }
+  const cityQuery = selectedLocationOptions(query.city ?? [], "city");
+  const countryQuery = selectedLocationOptions(query.country ?? [], "country");
   const matches = profiles.filter(
     (p) =>
       (!query.expertise || p.expertiseTags.includes(query.expertise)) &&
       includes(p.introduction, query.introduction) &&
-      (!query.city?.length ||
-        selectedLocationOptions(query.city, "city").some((o) =>
-          includes(p.city.join(" "), o.label.startsWith("Lokasi sebelumnya: ") ? o.value : o.label)
-        )) &&
-      (!query.country?.length ||
-        selectedLocationOptions(query.country, "country").some((o) =>
-          includes(
-            p.country.join(" "),
-            o.label.startsWith("Lokasi sebelumnya: ") ? o.value : o.label
-          )
-        )) &&
+      matchesDirectoryLocation(p.city, cityQuery, "city") &&
+      matchesDirectoryLocation(p.country, countryQuery, "country") &&
       (!query.helpType || p.helpTypes.includes(query.helpType)) &&
       (!query.availability || p.availability === query.availability) &&
       (query.graduationFrom === undefined ||

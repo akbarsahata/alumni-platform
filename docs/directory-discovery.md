@@ -29,6 +29,11 @@ Filters: `expertise` (stable tag ID), `introduction`, `city`, `country`, `helpTy
 `availability` (`available` or `limited`), `graduationFrom`, `graduationTo`,
 `attendanceFrom`, `attendanceTo`. Text filters match case-insensitive substrings;
 location text matches human-readable catalogue labels, including legacy locations.
+Selected catalogue locations match whole normalized labels. City search ignores a
+leading `Kota`, case, repeated whitespace, and dash variants, so catalogue aliases
+such as `Bandung` and `Kota Bandung` match in either direction within the same
+province. Province qualifiers and `Kabupaten` remain significant. Unqualified legacy
+names are not guessed into a province, and stored profile selections are not rewritten.
 The directory UI reuses profile searchable city/country multi-selects without helper
 subtitles. Repeated `city` and `country` parameters accept canonical location IDs;
 choices within one field match any selected location, while different filters intersect.

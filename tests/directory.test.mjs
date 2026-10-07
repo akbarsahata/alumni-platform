@@ -91,6 +91,33 @@ test("coordinator finds eligible profiles by skills, introduction, locations, he
     const state = await (await call(coordinator, `/api/directory?${query}`)).json();
     assert.ok(!state.profiles.some((p) => p.id === member.id), query);
   }
+  for (const [plain, administrative] of [
+    ["ID:JB:Depok", "ID:JB:Kota Depok"],
+    ["ID:JB:Bandung", "ID:JB:Kota Bandung"],
+    ["ID:KI:Balikpapan", "ID:KI:Kota Balikpapan"],
+  ]) {
+    for (const [saved, searched] of [
+      [plain, administrative],
+      [administrative, plain],
+    ]) {
+      await call(member, "/api/profile", { ...input, city: [saved] });
+      const state = await (
+        await call(coordinator, `/api/directory?city=${encodeURIComponent(searched)}`)
+      ).json();
+      assert.ok(
+        state.profiles.some((p) => p.id === member.id),
+        `${saved} matches ${searched}`
+      );
+    }
+  }
+  await call(member, "/api/profile", { ...input, city: ["ID:JB:Depok"] });
+  for (const city of ["ID:YO:Depok", "ID:JB:Bekasi"]) {
+    const state = await (
+      await call(coordinator, `/api/directory?city=${encodeURIComponent(city)}`)
+    ).json();
+    assert.ok(!state.profiles.some((p) => p.id === member.id), `different place: ${city}`);
+  }
+  await call(member, "/api/profile", input);
   assert.equal((await call(coordinator, "/api/directory?house=Komodo")).status, 400);
   for (const endpoint of [
     `/api/directory/${member.id}`,
