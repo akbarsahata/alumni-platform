@@ -30,12 +30,21 @@ test("member edits, consents, pauses, opts out, and reconfirms a private profile
     }
     await page.goto("/");
     await page.getByRole("link", { name: "Profil keahlian" }).click();
+    await page.getByText("Identitas sekolah terverifikasi ·", { exact: false }).click();
     await expect(page.getByLabel("Identitas sekolah terverifikasi")).toContainText(
       "Nama semasa sekolah"
     );
     await expect(page.getByLabel("Aktifkan partisipasi")).not.toBeChecked();
+    await expect(page.getByLabel("Perkenalan profesional (wajib)")).toHaveAttribute("required", "");
+    await expect(page.getByLabel("Perkenalan profesional (wajib)")).toHaveAttribute(
+      "placeholder",
+      /Contoh:/
+    );
+    await expect(page.getByLabel("Catatan ketersediaan (opsional)")).not.toHaveAttribute(
+      "required"
+    );
     await page.getByLabel("Nama tampilan (opsional)").fill("Nama profesional");
-    await page.getByLabel("Perkenalan profesional (opsional)").fill("Mendampingi klub robotika");
+    await page.getByLabel("Perkenalan profesional (wajib)").fill("Mendampingi klub robotika");
     await selectLocation(
       "Kota di Indonesia (opsional)",
       "Palembang",

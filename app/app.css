@@ -497,3 +497,153 @@ main .profile-location-select input:focus {
 .profile-location-select .location__menu {
   z-index: 20;
 }
+
+/* Responsive profile editor. */
+.app-shell > main.profile-page {
+  max-width: 1240px;
+  padding: clamp(1rem, 2.5vw, 2rem);
+  margin-bottom: 6rem;
+}
+.profile-page > * + * {
+  margin-top: 1rem;
+}
+.profile-page > p {
+  max-width: 85ch;
+}
+.profile-identity {
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+.profile-identity summary,
+.profile-privacy summary {
+  cursor: pointer;
+  min-height: 24px;
+}
+.profile-identity section {
+  padding-top: 0.7rem;
+}
+.profile-status {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.25rem 1.5rem;
+  padding: 1rem;
+  background: var(--paper);
+  border-radius: 8px;
+  font-size: 0.8rem;
+}
+.profile-status p:last-child {
+  grid-column: 1 / -1;
+  color: var(--muted-ink);
+}
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+.profile-panel {
+  min-width: 0;
+  padding: 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: white;
+}
+.profile-panel > * + * {
+  margin-top: 1rem;
+}
+.profile-panel h2 {
+  font-family: Georgia, serif;
+  font-size: 1.4rem;
+}
+.profile-panel p {
+  color: var(--muted-ink);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+.profile-panel legend {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+}
+.profile-panel fieldset label {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  gap: 0.5rem;
+  font-weight: 400;
+}
+.profile-panel input[type="checkbox"] {
+  flex-shrink: 0;
+}
+.profile-save {
+  position: sticky;
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  z-index: 5;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: #fffefa;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 4px 20px #183b4515;
+}
+.profile-save p {
+  font-size: 0.75rem;
+  color: var(--muted-ink);
+}
+
+.profile-skills fieldset label {
+  border-bottom: 1px solid var(--line);
+}
+.profile-status > details {
+  grid-column: 1 / -1;
+}
+.profile-page summary {
+  cursor: pointer;
+}
+main.profile-page textarea {
+  field-sizing: fixed;
+  min-height: 10rem;
+  line-height: 1.75rem;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(1.75rem - 1px),
+    #e3e5df calc(1.75rem - 1px),
+    #e3e5df 1.75rem
+  );
+  background-origin: content-box;
+  background-clip: content-box;
+}
+@media (max-width: 1000px) {
+  .profile-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .profile-availability {
+    grid-column: 1 / -1;
+  }
+}
+@media (max-width: 700px) {
+  .app-shell:has(.profile-page) {
+    padding-inline: 0.75rem;
+  }
+  .profile-grid,
+  .profile-status {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .profile-panel {
+    padding: 1rem;
+  }
+  .profile-save {
+    padding: 0.6rem;
+  }
+  .profile-save p {
+    max-width: 45%;
+    font-size: 0.65rem;
+    line-height: 1.4;
+  }
+}

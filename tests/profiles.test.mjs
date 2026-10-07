@@ -34,6 +34,10 @@ test("member privately creates and confirms a profile with verified identity and
   assert.equal(state.profile.participation, false);
   assert.equal(state.eligibility.eligible, false);
   assert.equal((await call(member, path, { ...profile, participationConsent: false })).status, 400);
+  for (const introduction of ["", "   ", undefined]) {
+    assert.equal((await call(member, path, { ...profile, introduction })).status, 400);
+  }
+  assert.equal((await call(member, path, { ...profile, availabilityNote: "" })).status, 200);
   response = await call(member, path, profile);
   assert.equal(response.status, 200);
   state = await response.json();
