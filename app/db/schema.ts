@@ -173,3 +173,72 @@ export const expertiseTagEvent = sqliteTable("expertise_tag_event", {
   replacementId: text("replacement_id"),
   occurredAt: text("occurred_at").notNull(),
 });
+
+export const schoolNeed = sqliteTable("school_need", {
+  id: text("id").primaryKey(),
+  submitterUserId: text("submitter_user_id").notNull(),
+  version: integer("version").notNull(),
+  category: text("category", { enum: ["school-activity", "student-mentoring"] }).notNull(),
+  title: text("title").notNull(),
+  purpose: text("purpose").notNull(),
+  requestedHelp: text("requested_help").notNull(),
+  timeCommitment: text("time_commitment").notNull(),
+  timing: text("timing"),
+  deadline: text("deadline"),
+  locationMode: text("location_mode", { enum: ["remote", "on-site"] }).notNull(),
+  locationDetails: text("location_details").notNull(),
+  staffContactUserId: text("staff_contact_user_id").notNull(),
+  staffContactName: text("staff_contact_name").notNull(),
+  participationTerms: text("participation_terms", { enum: ["voluntary", "paid"] }).notNull(),
+  paidDetails: text("paid_details").notNull(),
+  initiativeLink: text("initiative_link"),
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
+  updatedBy: text("updated_by").notNull(),
+});
+
+export const schoolNeedRevision = sqliteTable(
+  "school_need_revision",
+  {
+    needId: text("need_id").notNull(),
+    version: integer("version").notNull(),
+    actorUserId: text("actor_user_id").notNull(),
+    category: text("category", { enum: ["school-activity", "student-mentoring"] }).notNull(),
+    title: text("title").notNull(),
+    purpose: text("purpose").notNull(),
+    requestedHelp: text("requested_help").notNull(),
+    timeCommitment: text("time_commitment").notNull(),
+    timing: text("timing"),
+    deadline: text("deadline"),
+    locationMode: text("location_mode", { enum: ["remote", "on-site"] }).notNull(),
+    locationDetails: text("location_details").notNull(),
+    staffContactUserId: text("staff_contact_user_id").notNull(),
+    staffContactName: text("staff_contact_name").notNull(),
+    participationTerms: text("participation_terms", { enum: ["voluntary", "paid"] }).notNull(),
+    paidDetails: text("paid_details").notNull(),
+    initiativeLink: text("initiative_link"),
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.needId, table.version] })]
+);
+
+export const schoolNeedApproval = sqliteTable(
+  "school_need_approval",
+  {
+    needId: text("need_id").notNull(),
+    version: integer("version").notNull(),
+    stage: text("stage", { enum: ["staff-validation", "directory-approval"] }).notNull(),
+    actorUserId: text("actor_user_id").notNull(),
+    approvedAt: text("approved_at").notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.needId, table.version, table.stage] })]
+);
+
+export const schoolNeedAudit = sqliteTable("school_need_audit", {
+  id: text("id").primaryKey(),
+  needId: text("need_id").notNull(),
+  version: integer("version").notNull(),
+  actorUserId: text("actor_user_id").notNull(),
+  action: text("action").notNull(),
+  occurredAt: text("occurred_at").notNull(),
+});

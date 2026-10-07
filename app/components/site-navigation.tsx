@@ -5,6 +5,7 @@ import "./site-navigation.css";
 
 type NavigationAccess = {
   membership: string;
+  roles: string[];
   permissions: {
     directory: boolean;
     manageRoles: boolean;
@@ -27,6 +28,11 @@ export function SiteNavigation({
   const access: NavigationAccess = preview
     ? {
         membership: previewRoles.includes("member") ? "approved" : "none",
+        roles: [
+          ...(previewRoles.includes("directory") ? ["directory-coordinator"] : []),
+          ...(previewRoles.includes("staff") ? ["staff"] : []),
+          ...(previewRoles.includes("student") ? ["student"] : []),
+        ],
         permissions: {
           manageRoles: previewRoles.includes("primary"),
           audit: previewRoles.includes("primary"),
@@ -77,6 +83,9 @@ export function SiteNavigation({
           { path: "/directory/tags", label: "Kelola keahlian", group: "Direktori" },
         ]
       : []),
+    ...(access?.roles.some((role) => ["staff", "student", "directory-coordinator"].includes(role))
+      ? [{ path: "/school-needs", label: "Kebutuhan sekolah", group: "Sekolah" }]
+      : []),
     ...(access?.permissions.reviewMembership
       ? [{ path: "/admin/membership", label: "Tinjau keanggotaan", group: "Administrasi" }]
       : []),
@@ -113,7 +122,7 @@ export function SiteNavigation({
           >
             <House size={21} aria-hidden="true" />
           </Link>
-          {["Pribadi", "Direktori", "Administrasi"]
+          {["Pribadi", "Sekolah", "Direktori", "Administrasi"]
             .filter((group) => menus.some((menu) => menu.group === group && menu.path !== "/"))
             .map((group) => (
               <details key={group} name="site-navigation">

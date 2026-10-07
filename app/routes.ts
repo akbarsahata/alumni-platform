@@ -13,6 +13,8 @@ export default [
   route("directory/:userId", "routes/directory-profile.tsx"),
   route("directory", "routes/directory.tsx"),
   route("profile", "routes/profile.tsx"),
+  route("school-needs", "routes/school-needs.tsx"),
+  route("school-needs/:needId", "routes/school-need.tsx"),
   route("membership", "routes/membership.tsx"),
   route("references/:requestId", "routes/reference-response.tsx"),
   route("admin/membership", "routes/admin-membership.tsx"),

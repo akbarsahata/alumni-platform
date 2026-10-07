@@ -8,6 +8,7 @@ import { readLocalMail } from "../app/email/email.server";
 import { requestPolicy } from "../app/http/middleware.server";
 import { administrationRoutes } from "../app/http/administration.routes.server";
 import { membershipRoutes } from "../app/http/membership.routes.server";
+import { schoolNeedsRoutes } from "../app/http/school-needs.routes.server";
 
 const requestHandler = createRequestHandler(
   () => import("virtual:react-router/server-build"),
@@ -21,6 +22,7 @@ app.route("/api", administrationRoutes);
 app.route("/api/membership", membershipRoutes);
 app.route("/api/profile", profileRoutes);
 app.route("/api/directory", directoryRoutes);
+app.route("/api/school-needs", schoolNeedsRoutes);
 app.all("/api/*", () => new Response(null, { status: 404 }));
 app.all("/__local/mail", (c) => readLocalMail(c.req.raw, c.env));
 app.all("*", (c) => requestHandler(c.req.raw));
