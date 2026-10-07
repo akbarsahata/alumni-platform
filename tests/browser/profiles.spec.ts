@@ -29,13 +29,22 @@ test("member edits, consents, pauses, opts out, and reconfirms a private profile
       await input.press("Escape");
     }
     await page.goto("/");
-    await page.getByRole("link", { name: "Profil keahlian" }).click();
+    await page.getByRole("link", { name: "Profil & Keahlian" }).click();
+    await page.getByText("Identitas sekolah terverifikasi ·", { exact: false }).click();
     await expect(page.getByLabel("Identitas sekolah terverifikasi")).toContainText(
       "Nama semasa sekolah"
     );
     await expect(page.getByLabel("Aktifkan partisipasi")).not.toBeChecked();
+    await expect(page.getByLabel("Perkenalan profesional (wajib)")).toHaveAttribute("required", "");
+    await expect(page.getByLabel("Perkenalan profesional (wajib)")).toHaveAttribute(
+      "placeholder",
+      /Contoh:/
+    );
+    await expect(page.getByLabel("Catatan ketersediaan (opsional)")).not.toHaveAttribute(
+      "required"
+    );
     await page.getByLabel("Nama tampilan (opsional)").fill("Nama profesional");
-    await page.getByLabel("Perkenalan profesional (opsional)").fill("Mendampingi klub robotika");
+    await page.getByLabel("Perkenalan profesional (wajib)").fill("Mendampingi klub robotika");
     await selectLocation(
       "Kota di Indonesia (opsional)",
       "Palembang",
@@ -52,31 +61,47 @@ test("member edits, consents, pauses, opts out, and reconfirms a private profile
     await selectLocation("Negara (opsional)", "Indonesia", "Indonesia");
     await selectLocation("Negara (opsional)", "Australia", "Australia");
     await expect(page.locator("#participation-help")).toContainText("Hapus centang");
-    await expect(page.locator("#participation-consent-help")).toContainText(
-      "tidak membagikan email"
-    );
     await page.getByLabel("Teknologi", { exact: true }).check();
     await page.getByLabel("Sains", { exact: true }).check();
     await page.getByLabel("Pendampingan", { exact: true }).check();
     await page.getByLabel("Ketersediaan", { exact: true }).selectOption("limited");
     await page.getByLabel("Aktifkan partisipasi").check();
     await save();
-    await expect(page.getByRole("alert")).toContainText("persetujuan");
-    await page.getByLabel("Saya menyetujui").check();
-    await save();
+    await expect(page.getByRole("alert")).toHaveCount(0);
+    await expect(page.locator('input[name="participationConsent"]')).toHaveCount(0);
     await expect(notifications).toContainText("tersimpan");
     await notifications.getByRole("button", { name: "Tutup pemberitahuan" }).click();
-    await expect(page.getByText("Kelayakan penjangkauan: Memenuhi syarat")).toBeVisible();
+    await expect(page.getByText("Status relevansi profil: Memenuhi syarat")).toBeVisible();
+    await page.reload();
+    await expect(page.getByLabel("Nama tampilan (opsional)")).toHaveValue("Nama profesional");
+    await expect(page.getByLabel("Perkenalan profesional (wajib)")).toHaveValue(
+      "Mendampingi klub robotika"
+    );
+    await expect(page.getByLabel("Aktifkan partisipasi")).toBeChecked();
+    await expect(page.getByLabel("Teknologi", { exact: true })).toBeChecked();
+    await expect(page.getByLabel("Ketersediaan", { exact: true })).toHaveValue("limited");
+    await page.getByLabel("Nama tampilan (opsional)").fill("Nama aktif diperbarui");
+    await page.getByLabel("Perkenalan profesional (wajib)").fill("Perkenalan aktif diperbarui");
+    await page.getByLabel("Catatan ketersediaan (opsional)").fill("Sabtu pagi");
+    await save();
+    await expect(notifications).toContainText("tersimpan");
+    await expect(page.getByLabel("Nama tampilan (opsional)")).toHaveValue("Nama aktif diperbarui");
+    await page.reload();
+    await expect(page.getByLabel("Nama tampilan (opsional)")).toHaveValue("Nama aktif diperbarui");
+    await expect(page.getByLabel("Perkenalan profesional (wajib)")).toHaveValue(
+      "Perkenalan aktif diperbarui"
+    );
+    await expect(page.getByLabel("Catatan ketersediaan (opsional)")).toHaveValue("Sabtu pagi");
+    await expect(page.getByLabel("Aktifkan partisipasi")).toBeChecked();
     await page.getByLabel("Ketersediaan", { exact: true }).selectOption("unavailable");
-    await page.getByLabel("Saya menyetujui").check();
     await save();
     await expect(
-      page.getByText("Kelayakan penjangkauan: Anda sementara tidak tersedia.")
+      page.getByText("Status relevansi profil: Anda sementara tidak tersedia.")
     ).toBeVisible();
     await page.getByLabel("Aktifkan partisipasi").uncheck();
     await save();
     await expect(
-      page.getByText("Kelayakan penjangkauan: Partisipasi belum diaktifkan.")
+      page.getByText("Status relevansi profil: Partisipasi belum diaktifkan.")
     ).toBeVisible();
     await page.getByLabel("Nama tampilan (opsional)").fill("Nama diperbarui");
     await save();
@@ -103,7 +128,10 @@ test("member edits, consents, pauses, opts out, and reconfirms a private profile
     await expect(
       page.locator(".location__multi-value__label").filter({ hasText: "Indonesia" })
     ).toBeVisible();
-    await page.getByRole("button", { name: "Konfirmasi profil masih benar" }).click();
+    await page
+      .getByRole("region", { name: "Status relevansi profil", exact: true })
+      .getByRole("button", { name: "Konfirmasi profil masih benar" })
+      .click();
     await expect(notifications).toContainText("Profil dikonfirmasi");
     await expect(notifications.locator("[data-sonner-toast]")).toHaveCSS("opacity", "1");
     const toastBox = await notifications.locator("[data-sonner-toast]").boundingBox();

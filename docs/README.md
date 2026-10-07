@@ -9,6 +9,7 @@ Recovered planning documents from the “Move attach session results” chat, wi
 - [Architecture and data model](architecture.md): stack proposal, authorization, storage, and compatibility gate.
 - [Ticket 1 specification](ticket-1-spec.md): agreed membership scope, accepted integration testing seam, and published GitHub issue.
 - [Profiles, expertise discovery, and school outreach specification](profiles-expertise-outreach-spec.md): settled local scope, consent/disclosure rules, manual retention, and confirmed integration testing seam.
+- [Profile layout decision](profile-layout.md): adopted responsive editor, required introduction, single participation checkbox and retained prototype branch.
 - [Profiles and school outreach implementation issues](profiles-expertise-outreach-issues.md): eight flat GitHub tasks with explicit blockers and the initial runnable frontier.
 - [Implementation tickets](tickets.md): recovered planning sequence and acceptance criteria.
 - [Session handoff](handoff.md): historical recovery notes and current local verification.

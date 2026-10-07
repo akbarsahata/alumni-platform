@@ -60,13 +60,18 @@ export async function saveProfile(request: Request, env: Env, input: unknown, co
   const confirmedAt = new Date().toISOString();
   if (confirm) {
     parseInput(z.object({}).strict(), input, "Permintaan konfirmasi tidak valid.");
+    const own = await repository.own(access.account.id);
+    if (own.profile && !own.profile.introduction.trim())
+      throw new Response("Isi perkenalan profesional sebelum mengonfirmasi profil.", {
+        status: 400,
+      });
     const rows = await repository.confirm(access.account.id, confirmedAt);
     if (!rows.length) throw new Response("Simpan profil terlebih dahulu.", { status: 409 });
   } else {
     const { participationConsent: _consent, ...profile } = parseInput(
       profileInput,
       input,
-      "Lengkapi pilihan keahlian, bentuk bantuan, ketersediaan, dan persetujuan partisipasi."
+      "Isi perkenalan profesional dan lengkapi pilihan keahlian, bentuk bantuan, ketersediaan, dan persetujuan partisipasi."
     );
     const own = await repository.own(access.account.id);
     const existingCity = own.profile
