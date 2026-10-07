@@ -19,7 +19,7 @@ import { Textarea } from "../components/ui/textarea";
 import { Button } from "../components/ui/button";
 import { pageTitle } from "../content/page-title";
 export function meta() {
-  return [{ title: pageTitle("Profil keahlian") }];
+  return [{ title: pageTitle("Profil & Keahlian") }];
 }
 export async function loader({ request }: Route.LoaderArgs) {
   return await readProfile(request, env);
@@ -82,7 +82,7 @@ export default function Profile({ loaderData, actionData }: Route.ComponentProps
         toastOptions={{ closeButtonAriaLabel: "Tutup pemberitahuan" }}
       />
       <main className="profile-page">
-        <h1 className="text-2xl font-semibold">Profil keahlian</h1>
+        <h1 className="text-2xl font-semibold">Profil & Keahlian</h1>
         <Link to="/">Beranda</Link>
         <details className="profile-privacy">
           <summary>Profil privat · Email hanya dibagikan dengan persetujuan</summary>{" "}

@@ -29,7 +29,7 @@ test("member edits, consents, pauses, opts out, and reconfirms a private profile
       await input.press("Escape");
     }
     await page.goto("/");
-    await page.getByRole("link", { name: "Profil keahlian" }).click();
+    await page.getByRole("link", { name: "Profil & Keahlian" }).click();
     await page.getByText("Identitas sekolah terverifikasi ·", { exact: false }).click();
     await expect(page.getByLabel("Identitas sekolah terverifikasi")).toContainText(
       "Nama semasa sekolah"
