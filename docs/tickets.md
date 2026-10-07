@@ -1,6 +1,6 @@
 # Implementation tickets
 
-Ticket 0 is partially implemented and locally verified; see the handoff for remaining work. Tickets 1–5 are pending. Work sequentially: 0 → 1 → 2 → 3 → 4 → 5. Keep each change reviewable and update the session handoff.
+The numbered sections below are the historical pilot roadmap, not the naming or hierarchy for new GitHub issues. Consult the latest handoff for implementation status. Write agreed specifications locally first, then create flat implementation issues with descriptive titles, spec references, and explicit blockers as needed. Keep each change reviewable and update the session handoff.
 
 ## 0 — Cloudflare foundation and authentication compatibility
 
@@ -39,9 +39,9 @@ Acceptance: the login/application/endorsement/review screens support an end-to-e
 
 ## 2 — Profiles, expertise search, and contact requests
 
-Implement editable profiles, expertise tags, availability, cohort filters, visibility/contact preferences and coordinator outreach. Include profile confirmation date and deletion-request handling.
+The agreed scope now lives in [Profiles, expertise discovery, and school outreach](profiles-expertise-outreach-spec.md). That specification supersedes this section's earlier summary. It covers explicit opt-in, coordinator-only discovery, staff-validated needs, separate sharing consent, bounded outreach, profile confirmation, and manually processed directory deletion. Automated deletion is out of scope. Implementation issues have not been created for this scope.
 
-Acceptance: only designated coordinators discover private records; searches respect member preferences; requests reach eligible members through the email abstraction without disclosing their contact details to students; declined contact preferences are enforced server-side; bulk export is unavailable in the pilot. Test ownership and field-level disclosure boundaries.
+Acceptance and testing decisions are defined in the local specification, using the confirmed real Worker/D1/captured-email HTTP and Chromium seam.
 
 ## 3 — School initiatives and approval
 

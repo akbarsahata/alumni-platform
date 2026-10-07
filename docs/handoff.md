@@ -449,3 +449,11 @@ The interface now uses “Keluarga Alumni” at the user's request. The school w
 Added local shadcn/ui Button, Input, Textarea and Card components with pinned supporting dependencies and a shared class utility. The form components preserve native submission, labels and validation. TypeScript's shared path configuration and components.json support the component directory. The login email subject also uses the family identity.
 
 Validation: typecheck, build, formatting and lint pass. Full local suite passes 25 HTTP tests and three Chromium browser journeys, including real OTP expiry. The login preview was visually inspected in Edge; localhost home returns HTTP 200. Standards review found zero material findings; Spec review caught the remaining email identity and duplicate login footnote, both corrected. Changes are local; no deployment or push performed.
+
+## Profiles and school outreach local specification — 2026-10-07
+
+Settled the profiles, expertise discovery, and school outreach scope through the design interview and saved it in docs/profiles-expertise-outreach-spec.md. The user confirmed the existing real Worker/D1/Better Auth/captured-email HTTP and Chromium testing seam. Automated deletion and anonymization are explicitly deferred; directory deletion requests immediately hide profiles and cancel pending outreach, with manual processing and retention procedures.
+
+Updated AGENTS.md and docs/agents/issue-tracker.md to persist the project's new workflow: local specifications first, then flat descriptive implementation issues with specification references and explicit blockers. Parent specification issues, sub-issues, and decimal pseudo-subtickets are not used for new work. Existing issue structures remain historical references. Updated the document index and roadmap to point to the settled local specification.
+
+This session changes documentation only. No implementation, GitHub issue creation, existing-issue restructuring, deployment, or live email occurred. Changes remain local and uncommitted. Next: review the local specification and, when requested, decompose it into flat implementation issues.

@@ -8,7 +8,7 @@ Before implementing a ticket, read docs/pilot.md, docs/architecture.md, docs/tic
 
 ### Issue tracker
 
-Track specifications and tasks in GitHub Issues for akbarsahata/alumni-platform through the GitHub plugin. Read docs/agents/issue-tracker.md before tracker operations.
+Write agreed specifications locally in docs/ before creating implementation issues. Use flat GitHub implementation issues with descriptive titles, without parent specification issues or decimal subticket numbering. Read docs/agents/issue-tracker.md before specification-to-ticket work or tracker operations. Use the GitHub plugin for akbarsahata/alumni-platform.
 
 ### Triage labels
 
