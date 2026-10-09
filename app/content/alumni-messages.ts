@@ -1,13 +1,21 @@
 // Short excerpts from “Spread Our Wings”; other taglines are original English copy.
 // Source: https://lirik.web.id/r/raina/lirik-lagu-raina-spread-our-wings/
+export const headlineOptions = [
+  "Make their impossible dreams possible.",
+  "Let's lend our hands to our brothers and sisters.",
+  "We can make a difference.",
+  "For we are one big family.",
+  "Let's make a brighter tomorrow for others.",
+  "There'll always be time for sharing and caring.",
+  "We're all together in this journey.",
+];
+
 export const alumniMessages = {
   footer: "For we are one big family",
   home: {
     eyebrow: "We remember the start",
-    headline: ["Our roots connect us.", "Our stories keep growing.", "There is room for you."],
+    headline: "It's our turn.",
     introduction:
-      "Dari SMAN Sumatera Selatan, kita melangkah ke banyak arah. Di sini, kita kembali bertemu dan membuka kesempatan untuk tumbuh bersama.",
-    welcome: "Your next chapter starts here.",
-    family: "Nine houses. A lifetime of connections.",
+      "With our hands joined, let's put our skills, time, and connections toward advancing education at our almamater.",
   },
 } as const;
