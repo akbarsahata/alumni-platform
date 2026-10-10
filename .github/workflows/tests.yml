@@ -4,20 +4,23 @@ on:
   push:
     branches:
       - "**"
+    tags:
+      - "**"
+  pull_request:
+  merge_group:
 
 permissions:
   contents: read
 
 jobs:
   tests:
-    if: github.ref_protected || github.ref_name == 'master'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
       HUSKY: "0"
       CLOUDFLARE_SEND_METRICS: "false"
     steps:
-      - name: Check out the pushed commit
+      - name: Check out the commit under test
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false

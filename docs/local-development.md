@@ -51,11 +51,13 @@ See [membership-review.md](membership-review.md) for manual testing, decision hi
 
 ## GitHub Actions
 
-The `Tests` workflow runs on every push to `master` and any branch protected by GitHub branch protection or a ruleset. `master` is included explicitly because the repository currently has no protected branches. Other unprotected branch pushes are skipped, and tag pushes do not trigger the workflow. Every matching push gets its own run; newer pushes do not cancel earlier runs.
+The `Tests` workflow runs on every branch and tag push, when a pull request is opened or reopened or its branch receives new commits, and for merge queue groups. Every matching event gets its own run; newer pushes do not cancel earlier runs. A push to an open pull request produces both a push run and a pull-request run; the latter tests GitHub's proposed merge commit.
+
+To enforce the pull-request quality gate, configure the target branch (normally `master`) in GitHub Settings → Rules → Rulesets, or branch protection. Require a pull request before merging and require the `tests` status check from GitHub Actions to pass. Select the check after this workflow has run on GitHub. Enable the up-to-date branch requirement if merges must pass against the latest target branch. The `merge_group` trigger also supports a merge queue. No manual workflow run is needed; editing this YAML alone does not configure GitHub's merge restrictions.
 
 CI uses an Ubuntu runner and Node 24, installs locked dependencies and Chromium system dependencies, then checks formatting, runs advisory lint, typechecks, builds and runs `npm test`. The test harness applies migrations and uses disposable local D1/KV state. Local setup generates temporary synthetic keys; no repository secrets, Cloudflare credentials, live email or deployment are needed. Husky is disabled in CI because no commit is created by the workflow. The job has a 15-minute timeout to accommodate the real five-minute OTP expiry check.
 
-The README badge is scoped to the latest `push` run for `master`; clicking it opens that branch's push workflow history. It starts reporting after this workflow reaches GitHub and the first push run completes. If the default branch is renamed, update the explicit branch condition and badge URLs together.
+The README badge is scoped to the latest `push` run for `master`; clicking it opens that branch's push workflow history. It starts reporting after this workflow reaches GitHub and the first push run completes. If the default branch is renamed, update the badge URLs and target branch rules together.
 
 ## Installed auth behavior
 
