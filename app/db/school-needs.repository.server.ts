@@ -1,7 +1,12 @@
 import { desc, eq, sql } from "drizzle-orm";
 import { database } from "./database.server";
 import { schoolNeed, schoolNeedApproval, schoolNeedRevision } from "./schema";
-import type { LocationMode, NeedCategory, ParticipationTerm } from "../school-needs/model";
+import type {
+  LocationMode,
+  NeedCategory,
+  NeedStatus,
+  ParticipationTerm,
+} from "../school-needs/model";
 
 type NeedInput = {
   category: NeedCategory;
@@ -14,7 +19,6 @@ type NeedInput = {
   locationMode: LocationMode;
   locationDetails: string;
   staffContactUserId: string;
-  staffContactName: string;
   participationTerms: ParticipationTerm;
   paidDetails: string;
   initiativeLink: string;
@@ -30,8 +34,21 @@ type NeedSummary = {
   staffContactName: string;
   staffValidated: boolean;
   coordinatorApproved: boolean;
-  status: "awaiting-staff" | "awaiting-coordinator" | "approved";
+  status: NeedStatus;
 };
+
+type SummaryRow = Omit<NeedSummary, "staffValidated" | "coordinatorApproved"> & {
+  staffValidated: number;
+  coordinatorApproved: number;
+};
+
+function summaryFromRow(row: SummaryRow): NeedSummary {
+  return {
+    ...row,
+    staffValidated: row.staffValidated === 1,
+    coordinatorApproved: row.coordinatorApproved === 1,
+  };
+}
 
 const summaryFields = sql`
   n.id,n.version,n.category,n.title,n.updated_at AS updatedAt,
@@ -56,53 +73,31 @@ export function schoolNeedsRepository(binding: D1Database) {
   return {
     async staffContacts() {
       return await db.all<{ id: string; name: string }>(sql`
-        SELECT u.id,u.name FROM user u JOIN role_assignment r ON r.user_id=u.id
+        SELECT u.id,COALESCE(NULLIF(trim(u.name),''),'Akun staf ' || substr(u.id,1,8)) AS name
+        FROM user u JOIN role_assignment r ON r.user_id=u.id
         WHERE r.role='staff' AND u.email_verified=1
         ORDER BY u.name COLLATE NOCASE,u.id
       `);
     },
     async ownNeeds(userId: string) {
-      const rows = await db.all<
-        Omit<NeedSummary, "staffValidated" | "coordinatorApproved"> & {
-          staffValidated: number;
-          coordinatorApproved: number;
-        }
-      >(sql`
+      const rows = await db.all<SummaryRow>(sql`
         SELECT ${summaryFields} FROM school_need n JOIN user u ON u.id=n.staff_contact_user_id
         WHERE n.submitter_user_id=${userId} ORDER BY n.updated_at DESC,n.id LIMIT 100
       `);
-      return rows.map((row) => ({
-        ...row,
-        staffValidated: row.staffValidated === 1,
-        coordinatorApproved: row.coordinatorApproved === 1,
-      }));
+      return rows.map(summaryFromRow);
     },
     async staffQueue(userId: string) {
-      const rows = await db.all<
-        Omit<NeedSummary, "staffValidated" | "coordinatorApproved"> & {
-          staffValidated: number;
-          coordinatorApproved: number;
-        }
-      >(sql`
+      const rows = await db.all<SummaryRow>(sql`
         SELECT ${summaryFields} FROM school_need n JOIN user u ON u.id=n.staff_contact_user_id
         WHERE n.staff_contact_user_id=${userId}
           AND NOT EXISTS(SELECT 1 FROM school_need_approval a WHERE a.need_id=n.id
             AND a.version=n.version AND a.stage='staff-validation')
         ORDER BY n.updated_at DESC,n.id LIMIT 100
       `);
-      return rows.map((row) => ({
-        ...row,
-        staffValidated: row.staffValidated === 1,
-        coordinatorApproved: row.coordinatorApproved === 1,
-      }));
+      return rows.map(summaryFromRow);
     },
     async coordinatorQueue() {
-      const rows = await db.all<
-        Omit<NeedSummary, "staffValidated" | "coordinatorApproved"> & {
-          staffValidated: number;
-          coordinatorApproved: number;
-        }
-      >(sql`
+      const rows = await db.all<SummaryRow>(sql`
         SELECT ${summaryFields} FROM school_need n JOIN user u ON u.id=n.staff_contact_user_id
         WHERE EXISTS(SELECT 1 FROM school_need_approval a WHERE a.need_id=n.id
           AND a.version=n.version AND a.stage='staff-validation')
@@ -110,11 +105,7 @@ export function schoolNeedsRepository(binding: D1Database) {
           AND a.version=n.version AND a.stage='directory-approval')
         ORDER BY n.updated_at DESC,n.id LIMIT 100
       `);
-      return rows.map((row) => ({
-        ...row,
-        staffValidated: row.staffValidated === 1,
-        coordinatorApproved: row.coordinatorApproved === 1,
-      }));
+      return rows.map(summaryFromRow);
     },
     async visibility(needId: string, actorId: string) {
       const rows = await db.all<{
@@ -224,14 +215,15 @@ export function schoolNeedsRepository(binding: D1Database) {
         SELECT ${input.id},${input.actorId},1,${input.category},${input.title},${input.purpose},
           ${input.requestedHelp},${input.timeCommitment},${input.timing || null},${input.deadline},
           ${input.locationMode},${input.locationDetails},${input.staffContactUserId},
-          ${input.staffContactName},${input.participationTerms},${input.paidDetails},
+          COALESCE(NULLIF(trim(u.name),''),'Akun staf ' || substr(u.id,1,8)),
+          ${input.participationTerms},${input.paidDetails},
           ${input.initiativeLink || null},
           ${input.occurredAt},${input.occurredAt},${input.actorId}
-        WHERE EXISTS(SELECT 1 FROM role_assignment WHERE user_id=${input.actorId}
+        FROM user u WHERE u.id=${input.staffContactUserId}
+          AND EXISTS(SELECT 1 FROM role_assignment WHERE user_id=${input.actorId}
           AND role IN('staff','student','directory-coordinator'))
-          AND EXISTS(SELECT 1 FROM role_assignment r JOIN user u ON u.id=r.user_id
-            WHERE r.user_id=${input.staffContactUserId} AND r.role='staff'
-              AND u.email_verified=1)
+          AND EXISTS(SELECT 1 FROM role_assignment r WHERE r.user_id=u.id AND r.role='staff')
+          AND u.email_verified=1
         RETURNING id
       `);
     },
@@ -249,7 +241,8 @@ export function schoolNeedsRepository(binding: D1Database) {
           time_commitment=${input.timeCommitment},timing=${input.timing || null},
           deadline=${input.deadline},location_mode=${input.locationMode},
           location_details=${input.locationDetails},staff_contact_user_id=${input.staffContactUserId},
-          staff_contact_name=${input.staffContactName},
+          staff_contact_name=(SELECT COALESCE(NULLIF(trim(name),''),'Akun staf ' || substr(id,1,8))
+            FROM user WHERE id=${input.staffContactUserId}),
           participation_terms=${input.participationTerms},paid_details=${input.paidDetails},
           initiative_link=${input.initiativeLink || null},updated_at=${input.occurredAt},
           updated_by=${input.actorId}

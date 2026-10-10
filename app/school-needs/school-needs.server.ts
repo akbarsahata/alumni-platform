@@ -83,7 +83,6 @@ type ParsedNeed = {
   locationMode: LocationMode;
   locationDetails: string;
   staffContactUserId: string;
-  staffContactName: string;
   participationTerms: ParticipationTerm;
   paidDetails: string;
   initiativeLink: string;

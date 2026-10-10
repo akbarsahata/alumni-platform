@@ -2,7 +2,8 @@ import { env } from "cloudflare:workers";
 import { Form, Link, data, useNavigation } from "react-router";
 import type { Route } from "./+types/school-needs";
 import { pageTitle } from "../content/page-title";
-import { needCategories, needCategoryLabels } from "../school-needs/model";
+import { needCategories, needCategoryLabels, needStatusLabels } from "../school-needs/model";
+import { schoolNeedFormInput } from "../school-needs/form-input";
 import { readSchoolNeeds, submitSchoolNeed } from "../school-needs/school-needs.server";
 
 export function meta() {
@@ -13,40 +14,15 @@ export async function loader({ request }: Route.LoaderArgs) {
   return await readSchoolNeeds(request, env);
 }
 
-function formInput(form: FormData) {
-  return {
-    category: form.get("category"),
-    title: form.get("title"),
-    purpose: form.get("purpose"),
-    requestedHelp: form.get("requestedHelp"),
-    timeCommitment: form.get("timeCommitment"),
-    timing: form.get("timing"),
-    deadline: form.get("deadline") || null,
-    locationMode: form.get("locationMode"),
-    locationDetails: form.get("locationDetails"),
-    staffContactUserId: form.get("staffContactUserId"),
-    staffContactName: form.get("staffContactName"),
-    participationTerms: form.get("participationTerms"),
-    paidDetails: form.get("paidDetails"),
-    initiativeLink: form.get("initiativeLink"),
-  };
-}
-
 export async function action({ request }: Route.ActionArgs) {
   try {
-    await submitSchoolNeed(request, env, formInput(await request.formData()));
+    await submitSchoolNeed(request, env, schoolNeedFormInput(await request.formData()));
     return { error: null, message: "Kebutuhan sekolah berhasil dikirim untuk ditinjau." };
   } catch (error) {
     if (!(error instanceof Response) || ![400, 403, 409].includes(error.status)) throw error;
     return data({ error: await error.text(), message: null }, { status: error.status });
   }
 }
-
-const statusLabels = {
-  "awaiting-staff": "Menunggu validasi perwakilan staf",
-  "awaiting-coordinator": "Menunggu persetujuan koordinator direktori",
-  approved: "Disetujui untuk penjangkauan",
-};
 
 function NeedList({
   title,
@@ -63,7 +39,7 @@ function NeedList({
           {needs.map((need) => (
             <li key={need.id}>
               <Link to={`/school-needs/${need.id}`}>
-                {need.title} · {statusLabels[need.status]} · versi {need.version}
+                {need.title} · {needStatusLabels[need.status]} · versi {need.version}
               </Link>
             </li>
           ))}
@@ -158,11 +134,7 @@ export default function SchoolNeeds({ loaderData, actionData }: Route.ComponentP
               ))}
             </select>
           </label>
-          <label className="block">
-            Nama perwakilan staf
-            <input name="staffContactName" required maxLength={200} />
-          </label>
-          <p>Perwakilan bernama ini harus masuk dengan akun staf terverifikasi yang dipilih.</p>
+          <p>Nama kontak diambil dari akun staf terverifikasi yang dipilih.</p>
           <label className="block">
             Ketentuan partisipasi
             <select name="participationTerms" required defaultValue="">

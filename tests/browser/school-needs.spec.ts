@@ -38,7 +38,6 @@ test("student submits a need for independent staff validation and coordinator ap
     await studentPage.getByLabel("Waktu pelaksanaan", { exact: true }).fill("Mulai bulan depan.");
     await studentPage.getByLabel("Lokasi kegiatan").selectOption("remote");
     await studentPage.getByLabel("Perwakilan staf terverifikasi").selectOption(staff.id);
-    await studentPage.getByLabel("Nama perwakilan staf").fill("Ibu Staf Pendamping");
     await studentPage.getByLabel("Ketentuan partisipasi").selectOption("voluntary");
     await studentPage.getByRole("button", { name: "Kirim kebutuhan" }).click();
     await expect(studentPage.getByRole("status")).toContainText("berhasil dikirim untuk ditinjau");

@@ -2,7 +2,8 @@ import { env } from "cloudflare:workers";
 import { Form, Link, data, useNavigation } from "react-router";
 import type { Route } from "./+types/school-need";
 import { pageTitle } from "../content/page-title";
-import { needCategoryLabels } from "../school-needs/model";
+import { needCategoryLabels, needStatusLabels } from "../school-needs/model";
+import { schoolNeedFormInput } from "../school-needs/form-input";
 import {
   approveSchoolNeed,
   editSchoolNeed,
@@ -18,32 +19,12 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   return await readSchoolNeed(request, env, params.needId!);
 }
 
-function input(form: FormData) {
-  return {
-    category: form.get("category"),
-    title: form.get("title"),
-    purpose: form.get("purpose"),
-    requestedHelp: form.get("requestedHelp"),
-    timeCommitment: form.get("timeCommitment"),
-    timing: form.get("timing"),
-    deadline: form.get("deadline") || null,
-    locationMode: form.get("locationMode"),
-    locationDetails: form.get("locationDetails"),
-    staffContactUserId: form.get("staffContactUserId"),
-    staffContactName: form.get("staffContactName"),
-    participationTerms: form.get("participationTerms"),
-    paidDetails: form.get("paidDetails"),
-    initiativeLink: form.get("initiativeLink"),
-    expectedVersion: form.get("expectedVersion"),
-  };
-}
-
 export async function action({ request, params }: Route.ActionArgs) {
   const needId = params.needId!;
   const form = await request.formData();
   const intent = form.get("intent");
   try {
-    if (intent === "edit") await editSchoolNeed(request, env, needId, input(form));
+    if (intent === "edit") await editSchoolNeed(request, env, needId, schoolNeedFormInput(form));
     else if (intent === "validate")
       await validateSchoolNeed(request, env, needId, {
         expectedVersion: form.get("expectedVersion"),
@@ -60,12 +41,6 @@ export async function action({ request, params }: Route.ActionArgs) {
   }
 }
 
-const statusLabels = {
-  "awaiting-staff": "Menunggu validasi perwakilan staf",
-  "awaiting-coordinator": "Menunggu persetujuan koordinator direktori",
-  approved: "Disetujui untuk penjangkauan",
-};
-
 export default function SchoolNeed({ loaderData, actionData }: Route.ComponentProps) {
   const { need, access, revisions, approvals } = loaderData;
   const busy = useNavigation().state !== "idle";
@@ -73,7 +48,7 @@ export default function SchoolNeed({ loaderData, actionData }: Route.ComponentPr
     <main className="mx-auto max-w-3xl space-y-6">
       <Link to="/school-needs">← Kebutuhan sekolah</Link>
       <h1 className="text-2xl font-semibold">{need.title}</h1>
-      <p role="status">{statusLabels[need.status]}</p>
+      <p role="status">{needStatusLabels[need.status]}</p>
       {actionData?.error && <p role="alert">{actionData.error}</p>}
       {actionData?.message && <p role="status">{actionData.message}</p>}
       <dl className="space-y-3">
@@ -224,15 +199,6 @@ export default function SchoolNeed({ loaderData, actionData }: Route.ComponentPr
                   </option>
                 ))}
               </select>
-            </label>
-            <label className="block">
-              Nama perwakilan staf
-              <input
-                name="staffContactName"
-                required
-                maxLength={200}
-                defaultValue={need.staffContactName}
-              />
             </label>
             <label className="block">
               Ketentuan partisipasi

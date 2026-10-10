@@ -117,14 +117,13 @@ export const invitationInput = z
   })
   .strict();
 export const invitationAcceptanceInput = z.object({}).strict();
-const needText = (max: number) => z.string().trim().min(1).max(max);
 export const schoolNeedInput = z
   .object({
     category: z.enum(needCategories),
-    title: needText(200),
-    purpose: needText(2000),
-    requestedHelp: needText(2000),
-    timeCommitment: needText(500),
+    title: requiredText(200),
+    purpose: requiredText(2000),
+    requestedHelp: requiredText(2000),
+    timeCommitment: requiredText(500),
     timing: z.string().trim().max(500).default(""),
     deadline: z
       .union([z.string(), z.null()])
@@ -141,7 +140,6 @@ export const schoolNeedInput = z
     locationMode: z.enum(locationModes),
     locationDetails: z.string().trim().max(500).default(""),
     staffContactUserId: z.string().min(1).max(200),
-    staffContactName: needText(200),
     participationTerms: z.enum(participationTerms),
     paidDetails: z.string().trim().max(1000).default(""),
     initiativeLink: z
@@ -150,17 +148,7 @@ export const schoolNeedInput = z
       .max(500)
       .default("")
       .refine((value) => !value || /^https?:\/\/\S+$/i.test(value)),
-    expectedVersion: z
-      .union([z.number(), z.string().min(1)])
-      .transform(Number)
-      .pipe(
-        z
-          .number()
-          .int()
-          .min(1)
-          .max(Number.MAX_SAFE_INTEGER - 1)
-      )
-      .optional(),
+    expectedVersion: integer(1, Number.MAX_SAFE_INTEGER - 1).optional(),
   })
   .strict()
   .refine((value) => value.timing.length > 0 || value.deadline !== null, {
@@ -174,10 +162,7 @@ export const schoolNeedInput = z
   });
 export const schoolNeedApprovalInput = z
   .object({
-    expectedVersion: z
-      .union([z.number(), z.string().min(1)])
-      .transform(Number)
-      .pipe(z.number().int().min(1).max(Number.MAX_SAFE_INTEGER)),
+    expectedVersion: integer(1, Number.MAX_SAFE_INTEGER - 1),
   })
   .strict();
 export const membershipStatusInput = z.object({

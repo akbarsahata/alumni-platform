@@ -16,7 +16,6 @@ const details = {
   locationMode: "remote",
   locationDetails: "",
   staffContactUserId: "",
-  staffContactName: "Ibu Perwakilan Sekolah",
   participationTerms: "voluntary",
   paidDetails: "",
   initiativeLink: "",
@@ -93,7 +92,6 @@ test("school roles submit complete needs without alumni profiles and private pro
     { locationMode: undefined },
     { locationMode: "on-site", locationDetails: "" },
     { staffContactUserId: undefined },
-    { staffContactName: " " },
     { participationTerms: undefined },
     { participationTerms: "paid", paidDetails: "" },
     { deadline: "2026-02-30" },
@@ -117,6 +115,25 @@ test("school roles submit complete needs without alumni profiles and private pro
   const { needId } = JSON.parse(result);
   assert.ok(needId);
 
+  assert.equal(
+    (await call(student, endpoint, { ...valid, staffContactName: "Nama yang dipalsukan" })).status,
+    400
+  );
+  for (const [path, body] of [
+    [`${endpoint}/${needId}/edit`, { ...valid, expectedVersion: 1 }],
+    [`${endpoint}/${needId}/validate`, { expectedVersion: 1 }],
+    [`${endpoint}/${needId}/approve`, { expectedVersion: 1 }],
+  ]) {
+    assert.equal(
+      (
+        await call(student, path, body, {
+          Origin: "https://attacker.example",
+        })
+      ).status,
+      403
+    );
+  }
+
   const ownResponse = await call(student, endpoint);
   assert.equal(ownResponse.headers.get("cache-control"), "no-store");
   const own = await ownResponse.json();
@@ -127,7 +144,12 @@ test("school roles submit complete needs without alumni profiles and private pro
   assert.doesNotMatch(JSON.stringify(own), new RegExp(staff.email));
   const ownDetail = await call(student, `/api/school-needs/${needId}`);
   assert.equal(ownDetail.status, 200);
-  assert.doesNotMatch(await ownDetail.text(), new RegExp(staff.email));
+  const ownNeed = await ownDetail.json();
+  assert.equal(
+    ownNeed.need.staffContactName,
+    own.staffContacts.find((contact) => contact.id === staff.id).name
+  );
+  assert.doesNotMatch(JSON.stringify(ownNeed), new RegExp(staff.email));
   assert.equal((await call(unrelatedStudent, endpoint)).status, 200);
   assert.equal((await call(unrelatedStudent, `/api/school-needs/${needId}`)).status, 404);
   assert.equal((await call(otherStaff, `/api/school-needs/${needId}`)).status, 404);
