@@ -99,7 +99,7 @@ format files. VS Code/Cursor [settings](.vscode/settings.json) enable formatting
 files, lints, and typechecks. The full test suite runs in GitHub Actions. See
 [formatting and linting](docs/local-development.md#formatting-and-linting).
 
-The [Tests workflow](.github/workflows/tests.yml) runs on every branch/tag push, pull request, and merge queue group. It
+The [Tests workflow](.github/workflows/tests.yml) runs on pushes to `master`, pull requests, and merge queue groups. It
 uses Ubuntu, Node 24, and Chromium to check formatting, lint, types, build, and the full test suite
 without live credentials. The badge above shows the latest `master` push result. See
 [CI details](docs/local-development.md#github-actions).

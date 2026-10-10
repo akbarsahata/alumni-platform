@@ -51,7 +51,7 @@ See [membership-review.md](membership-review.md) for manual testing, decision hi
 
 ## GitHub Actions
 
-The `Tests` workflow runs on every branch and tag push, when a pull request is opened or reopened or its branch receives new commits, and for merge queue groups. Every matching event gets its own run; newer pushes do not cancel earlier runs. A push to an open pull request produces both a push run and a pull-request run; the latter tests GitHub's proposed merge commit.
+The `Tests` workflow runs on pushes to `master`, when a pull request is opened or reopened or its branch receives new commits, and for merge queue groups. A feature-branch push with an open pull request triggers one pull-request run, testing GitHub's proposed merge commit. Feature branches without an open pull request and tag pushes do not trigger tests. Every matching event gets its own run; newer pushes do not cancel earlier runs.
 
 To enforce the pull-request quality gate, configure the target branch (normally `master`) in GitHub Settings → Rules → Rulesets, or branch protection. Require a pull request before merging and require the `tests` status check from GitHub Actions to pass. Select the check after this workflow has run on GitHub. Enable the up-to-date branch requirement if merges must pass against the latest target branch. The `merge_group` trigger also supports a merge queue. No manual workflow run is needed; editing this YAML alone does not configure GitHub's merge restrictions.
 

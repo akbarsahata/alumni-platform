@@ -3,9 +3,7 @@ name: Tests
 on:
   push:
     branches:
-      - "**"
-    tags:
-      - "**"
+      - master
   pull_request:
   merge_group:
 
