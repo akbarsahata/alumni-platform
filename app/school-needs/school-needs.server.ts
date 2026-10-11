@@ -1,7 +1,12 @@
 import { getAccess } from "../authorization/permissions.server";
 import { schoolNeedsRepository } from "../db/school-needs.repository.server";
 import { hasTrustedOrigin } from "../auth/auth.server";
-import { parseInput, schoolNeedApprovalInput, schoolNeedInput } from "../http/validation";
+import {
+  parseInput,
+  schoolNeedApprovalInput,
+  schoolNeedCursor,
+  schoolNeedInput,
+} from "../http/validation";
 import type { LocationMode, NeedCategory, ParticipationTerm } from "./model";
 
 const submitterRoles = ["staff", "student", "directory-coordinator"] as const;
@@ -19,14 +24,45 @@ function requireOrigin(request: Request, env: Env) {
 export async function readSchoolNeeds(request: Request, env: Env) {
   const access = await getAccess(request, env);
   requireSubmitter(access.roles);
+  const searchParams = new URL(request.url).searchParams;
+  const cursor = (key: string) => {
+    const value = searchParams.get(key);
+    if (!value) return null;
+    const parsed = parseInput(schoolNeedCursor, value, "Kursor tidak valid.");
+    const [updatedAt, id] = parsed.split("|");
+    return { updatedAt, id };
+  };
+  const page = <T extends { id: string; updatedAt: string }>(rows: T[]) => {
+    const items = rows.slice(0, 100);
+    const last = items.at(-1);
+    return {
+      items,
+      nextCursor: rows.length > 100 && last ? `${last.updatedAt}|${last.id}` : null,
+    };
+  };
   const repository = schoolNeedsRepository(env.DB);
-  const [ownNeeds, staffContacts, staffQueue, coordinatorQueue] = await Promise.all([
-    repository.ownNeeds(access.account.id),
+  const [ownRows, staffContacts, staffRows, coordinatorRows] = await Promise.all([
+    repository.ownNeeds(access.account.id, cursor("ownAfter")),
     repository.staffContacts(),
-    access.roles.includes("staff") ? repository.staffQueue(access.account.id) : [],
-    access.roles.includes("directory-coordinator") ? repository.coordinatorQueue() : [],
+    access.roles.includes("staff")
+      ? repository.staffQueue(access.account.id, cursor("staffAfter"))
+      : [],
+    access.roles.includes("directory-coordinator")
+      ? repository.coordinatorQueue(cursor("coordinatorAfter"))
+      : [],
   ]);
-  return { ownNeeds, staffContacts, staffQueue, coordinatorQueue };
+  const ownNeeds = page(ownRows);
+  const staffQueue = page(staffRows);
+  const coordinatorQueue = page(coordinatorRows);
+  return {
+    ownNeeds: ownNeeds.items,
+    ownNeedsNextCursor: ownNeeds.nextCursor,
+    staffContacts,
+    staffQueue: staffQueue.items,
+    staffQueueNextCursor: staffQueue.nextCursor,
+    coordinatorQueue: coordinatorQueue.items,
+    coordinatorQueueNextCursor: coordinatorQueue.nextCursor,
+  };
 }
 
 export async function readSchoolNeed(request: Request, env: Env, needId: string) {

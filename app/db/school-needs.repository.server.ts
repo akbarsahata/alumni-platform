@@ -79,31 +79,41 @@ export function schoolNeedsRepository(binding: D1Database) {
         ORDER BY u.name COLLATE NOCASE,u.id
       `);
     },
-    async ownNeeds(userId: string) {
+    async ownNeeds(userId: string, after: { updatedAt: string; id: string } | null) {
       const rows = await db.all<SummaryRow>(sql`
         SELECT ${summaryFields} FROM school_need n JOIN user u ON u.id=n.staff_contact_user_id
-        WHERE n.submitter_user_id=${userId} ORDER BY n.updated_at DESC,n.id LIMIT 100
+        WHERE n.submitter_user_id=${userId}
+          AND (${after?.updatedAt ?? null} IS NULL
+          OR n.updated_at < ${after?.updatedAt ?? null}
+          OR (n.updated_at = ${after?.updatedAt ?? null} AND n.id > ${after?.id ?? null}))
+        ORDER BY n.updated_at DESC,n.id LIMIT 101
       `);
       return rows.map(summaryFromRow);
     },
-    async staffQueue(userId: string) {
+    async staffQueue(userId: string, after: { updatedAt: string; id: string } | null) {
       const rows = await db.all<SummaryRow>(sql`
         SELECT ${summaryFields} FROM school_need n JOIN user u ON u.id=n.staff_contact_user_id
         WHERE n.staff_contact_user_id=${userId}
+          AND (${after?.updatedAt ?? null} IS NULL
+          OR n.updated_at < ${after?.updatedAt ?? null}
+          OR (n.updated_at = ${after?.updatedAt ?? null} AND n.id > ${after?.id ?? null}))
           AND NOT EXISTS(SELECT 1 FROM school_need_approval a WHERE a.need_id=n.id
-            AND a.version=n.version AND a.stage='staff-validation')
-        ORDER BY n.updated_at DESC,n.id LIMIT 100
+          AND a.version=n.version AND a.stage='staff-validation')
+        ORDER BY n.updated_at DESC,n.id LIMIT 101
       `);
       return rows.map(summaryFromRow);
     },
-    async coordinatorQueue() {
+    async coordinatorQueue(after: { updatedAt: string; id: string } | null) {
       const rows = await db.all<SummaryRow>(sql`
         SELECT ${summaryFields} FROM school_need n JOIN user u ON u.id=n.staff_contact_user_id
         WHERE EXISTS(SELECT 1 FROM school_need_approval a WHERE a.need_id=n.id
           AND a.version=n.version AND a.stage='staff-validation')
           AND NOT EXISTS(SELECT 1 FROM school_need_approval a WHERE a.need_id=n.id
           AND a.version=n.version AND a.stage='directory-approval')
-        ORDER BY n.updated_at DESC,n.id LIMIT 100
+          AND (${after?.updatedAt ?? null} IS NULL
+          OR n.updated_at < ${after?.updatedAt ?? null}
+          OR (n.updated_at = ${after?.updatedAt ?? null} AND n.id > ${after?.id ?? null}))
+        ORDER BY n.updated_at DESC,n.id LIMIT 101
       `);
       return rows.map(summaryFromRow);
     },

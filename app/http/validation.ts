@@ -94,6 +94,9 @@ export const responseInput = z
   .refine((value) => value.outcome !== "endorse" || value.personallyKnown);
 export const queueCursor = z.string().max(200);
 export const auditCursor = z.string().regex(/^\d{4}-\d{2}-\d{2}T.*Z\|[a-f0-9]{32,33}$/);
+export const schoolNeedCursor = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z\|[a-f0-9-]{36}$/);
 export const signInCodeInput = z.object({ type: z.literal("sign-in") });
 
 export const manualReviewInput = z.object({

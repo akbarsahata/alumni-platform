@@ -402,6 +402,71 @@ test("same-session role revocation immediately blocks school need reads and writ
   );
 });
 
+test("submitted needs and both review queues expose every page through cursors", async () => {
+  const { primary } = await membershipReviewers();
+  const student = await schoolActor("need-pagination-owner", "student", primary);
+  const staff = await schoolActor("need-pagination-staff", "staff", primary);
+  const coordinator = await schoolActor(
+    "need-pagination-coordinator",
+    "directory-coordinator",
+    primary
+  );
+  const needIds = [];
+
+  for (let index = 0; index < 101; index++) {
+    const response = await submit(student, staff, { title: `Kebutuhan halaman ${index}` });
+    assert.equal(response.status, 200);
+    needIds.push((await response.json()).needId);
+  }
+
+  assert.equal((await call(student, `${endpoint}?ownAfter=invalid`)).status, 400);
+
+  const readPages = async (account, param, field, nextCursorField) => {
+    const first = await (await call(account, endpoint)).json();
+    assert.equal(first[field].length, 100);
+    assert.ok(first[nextCursorField]);
+    const second = await (
+      await call(account, `${endpoint}?${param}=${encodeURIComponent(first[nextCursorField])}`)
+    ).json();
+    assert.equal(second[field].length, 1);
+    assert.equal(second[nextCursorField], null);
+    assert.equal(new Set([...first[field], ...second[field]].map((need) => need.id)).size, 101);
+    assert.deepEqual(
+      new Set([...first[field], ...second[field]].map((need) => need.id)),
+      new Set(needIds)
+    );
+    return first[nextCursorField];
+  };
+
+  const ownCursor = await readPages(student, "ownAfter", "ownNeeds", "ownNeedsNextCursor");
+  const ownPage = await (await call(student, "/school-needs")).text();
+  assert.match(ownPage, /Halaman berikutnya/);
+  assert.match(ownPage, /ownAfter/);
+  assert.ok(ownCursor);
+
+  const staffCursor = await readPages(staff, "staffAfter", "staffQueue", "staffQueueNextCursor");
+  const staffPage = await (await call(staff, "/school-needs")).text();
+  assert.match(staffPage, /Halaman berikutnya/);
+  assert.match(staffPage, /staffAfter/);
+  assert.ok(staffCursor);
+
+  for (const needId of needIds) {
+    const response = await call(staff, `${endpoint}/${needId}/validate`, { expectedVersion: 1 });
+    assert.equal(response.status, 200);
+  }
+
+  const coordinatorCursor = await readPages(
+    coordinator,
+    "coordinatorAfter",
+    "coordinatorQueue",
+    "coordinatorQueueNextCursor"
+  );
+  const coordinatorPage = await (await call(coordinator, "/school-needs")).text();
+  assert.match(coordinatorPage, /Halaman berikutnya/);
+  assert.match(coordinatorPage, /coordinatorAfter/);
+  assert.ok(coordinatorCursor);
+});
+
 after(async () => {
   const { primary } = await membershipReviewers();
   const student = await schoolActor("browser-need-student", "student", primary);

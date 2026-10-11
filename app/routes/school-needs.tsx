@@ -1,5 +1,5 @@
 import { env } from "cloudflare:workers";
-import { Form, Link, data, useNavigation } from "react-router";
+import { Form, Link, data, useNavigation, useSearchParams } from "react-router";
 import type { Route } from "./+types/school-needs";
 import { pageTitle } from "../content/page-title";
 import { needCategories, needCategoryLabels, needStatusLabels } from "../school-needs/model";
@@ -27,10 +27,17 @@ export async function action({ request }: Route.ActionArgs) {
 function NeedList({
   title,
   needs,
+  nextCursor,
+  cursorParam,
 }: {
   title: string;
   needs: Awaited<ReturnType<typeof readSchoolNeeds>>["ownNeeds"];
+  nextCursor: string | null;
+  cursorParam: string;
 }) {
+  const [searchParams] = useSearchParams();
+  const nextPage = new URLSearchParams(searchParams);
+  if (nextCursor) nextPage.set(cursorParam, nextCursor);
   return (
     <section className="space-y-3">
       <h2 className="text-xl font-semibold">{title}</h2>
@@ -46,6 +53,11 @@ function NeedList({
         </ul>
       ) : (
         <p>Belum ada kebutuhan untuk ditinjau.</p>
+      )}
+      {nextCursor && (
+        <Link className="underline" to={`?${nextPage}`}>
+          Halaman berikutnya
+        </Link>
       )}
     </section>
   );
@@ -158,14 +170,26 @@ export default function SchoolNeeds({ loaderData, actionData }: Route.ComponentP
           </button>
         </Form>
       </section>
-      <NeedList title="Kebutuhan yang saya ajukan" needs={loaderData.ownNeeds} />
+      <NeedList
+        title="Kebutuhan yang saya ajukan"
+        needs={loaderData.ownNeeds}
+        nextCursor={loaderData.ownNeedsNextCursor}
+        cursorParam="ownAfter"
+      />
       {loaderData.staffQueue.length > 0 && (
-        <NeedList title="Menunggu validasi staf Anda" needs={loaderData.staffQueue} />
+        <NeedList
+          title="Menunggu validasi staf Anda"
+          needs={loaderData.staffQueue}
+          nextCursor={loaderData.staffQueueNextCursor}
+          cursorParam="staffAfter"
+        />
       )}
       {loaderData.coordinatorQueue.length > 0 && (
         <NeedList
           title="Menunggu persetujuan koordinator direktori"
           needs={loaderData.coordinatorQueue}
+          nextCursor={loaderData.coordinatorQueueNextCursor}
+          cursorParam="coordinatorAfter"
         />
       )}
     </main>
