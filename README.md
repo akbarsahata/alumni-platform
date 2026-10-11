@@ -71,8 +71,8 @@ The primary administrator issues seven-day, single-use staff/student invitations
 `/admin/invitations`. Recipients verify the invited email and accept without an alumni application.
 See the [school invitation guide](docs/school-invitations.md) for local capture and audit history.
 
-School needs use migration `0013_school_needs.sql`, applied by the standard
-`npm run db:migrate` local setup command. No additional environment variables are required. Editing a
+School needs use migrations `0013_school_needs.sql` and
+`0014_school_need_verified_contact_name.sql`, both applied by the standard `npm run db:migrate` local setup command. No additional environment variables are required. Editing a
 need creates a new version and clears its current approvals; captured mail is used for test sign-in,
 not sent by this needs workflow.
 
