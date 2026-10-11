@@ -34,8 +34,8 @@ data change occurred.
 ## Migration and local configuration
 
 Migration `migrations/0013_school_needs.sql` creates the version, approval and
-minimal audit tables plus write-boundary triggers. There are no new environment
-variables or credentials. Standard local setup remains:
+minimal audit tables plus write-boundary triggers; `migrations/0014_school_need_verified_contact_name.sql`
+strengthens those triggers to verify the stored contact name. There are no new environment variables or credentials.
 
 ```sh
 npm run local:setup
