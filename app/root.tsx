@@ -26,7 +26,11 @@ export async function loader({ request }: Route.LoaderArgs) {
   return {
     account: account ? { email: account.email } : null,
     navigationAccess: access
-      ? { membership: access.membership.status, permissions: access.permissions }
+      ? {
+          membership: access.membership.status,
+          roles: access.roles,
+          permissions: access.permissions,
+        }
       : null,
   };
 }

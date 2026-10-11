@@ -2,6 +2,7 @@ import { helpTypes, availabilityChoices } from "../profiles/model";
 import { z } from "zod";
 import { houses } from "../membership/model";
 import { roles } from "../authorization/roles";
+import { locationModes, needCategories, participationTerms } from "../school-needs/model";
 
 export function parseInput<T>(schema: z.ZodType<T>, input: unknown, message: string): T {
   const result = schema.safeParse(input);
@@ -93,6 +94,9 @@ export const responseInput = z
   .refine((value) => value.outcome !== "endorse" || value.personallyKnown);
 export const queueCursor = z.string().max(200);
 export const auditCursor = z.string().regex(/^\d{4}-\d{2}-\d{2}T.*Z\|[a-f0-9]{32,33}$/);
+export const schoolNeedCursor = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z\|[a-f0-9-]{36}$/);
 export const signInCodeInput = z.object({ type: z.literal("sign-in") });
 
 export const manualReviewInput = z.object({
@@ -116,7 +120,54 @@ export const invitationInput = z
   })
   .strict();
 export const invitationAcceptanceInput = z.object({}).strict();
-
+export const schoolNeedInput = z
+  .object({
+    category: z.enum(needCategories),
+    title: requiredText(200),
+    purpose: requiredText(2000),
+    requestedHelp: requiredText(2000),
+    timeCommitment: requiredText(500),
+    timing: z.string().trim().max(500).default(""),
+    deadline: z
+      .union([z.string(), z.null()])
+      .nullable()
+      .default(null)
+      .transform((value) => (value ? value : null))
+      .refine(
+        (value) =>
+          value === null ||
+          (/^\d{4}-\d{2}-\d{2}$/.test(value) &&
+            !Number.isNaN(Date.parse(`${value}T00:00:00.000Z`)) &&
+            new Date(`${value}T00:00:00.000Z`).toISOString().slice(0, 10) === value)
+      ),
+    locationMode: z.enum(locationModes),
+    locationDetails: z.string().trim().max(500).default(""),
+    staffContactUserId: z.string().min(1).max(200),
+    participationTerms: z.enum(participationTerms),
+    paidDetails: z.string().trim().max(1000).default(""),
+    initiativeLink: z
+      .string()
+      .trim()
+      .max(500)
+      .default("")
+      .refine((value) => !value || /^https?:\/\/\S+$/i.test(value)),
+    expectedVersion: integer(1, Number.MAX_SAFE_INTEGER - 1).optional(),
+  })
+  .strict()
+  .refine((value) => value.timing.length > 0 || value.deadline !== null, {
+    path: ["timing"],
+  })
+  .refine((value) => value.locationMode !== "on-site" || value.locationDetails.length > 0, {
+    path: ["locationDetails"],
+  })
+  .refine((value) => value.participationTerms !== "paid" || value.paidDetails.length > 0, {
+    path: ["paidDetails"],
+  });
+export const schoolNeedApprovalInput = z
+  .object({
+    expectedVersion: integer(1, Number.MAX_SAFE_INTEGER - 1),
+  })
+  .strict();
 export const membershipStatusInput = z.object({
   expectedVersion: integer(0, Number.MAX_SAFE_INTEGER - 1),
   outcome: z.enum(["suspended", "approved"]),
