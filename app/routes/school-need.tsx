@@ -70,7 +70,7 @@ export default function SchoolNeed({ loaderData, actionData }: Route.ComponentPr
         </div>
         <div>
           <dt className="font-semibold">Waktu atau batas waktu</dt>
-          <dd>{need.timing || need.deadline}</dd>
+          <dd>{[need.timing, need.deadline].filter(Boolean).join(" · ")}</dd>
         </div>
         <div>
           <dt className="font-semibold">Lokasi</dt>
