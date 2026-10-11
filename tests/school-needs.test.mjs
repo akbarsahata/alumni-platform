@@ -194,6 +194,7 @@ test("staff validation and directory approval are independent, current-version, 
     "directory-coordinator",
     primary
   );
+  const replacementStaff = await schoolActor("need-approval-replacement-staff", "staff", primary);
   await assign(staff, "directory-coordinator", primary);
   const response = await submit(student, staff);
   assert.equal(response.status, 200);
@@ -262,7 +263,7 @@ test("staff validation and directory approval are independent, current-version, 
     (
       await call(student, `${endpoint}/${needId}/edit`, {
         ...details,
-        staffContactUserId: staff.id,
+        staffContactUserId: replacementStaff.id,
         title: "Pendampingan robotika revisi",
         expectedVersion: 1,
       })
@@ -289,9 +290,11 @@ test("staff validation and directory approval are independent, current-version, 
     current.approvals.map((approval) => approval.version),
     [1, 1]
   );
+  assert.equal((await call(staff, `${endpoint}/${needId}`)).status, 404);
+  assert.equal((await call(replacementStaff, `${endpoint}/${needId}`)).status, 200);
   assert.equal((await call(coordinator, `${endpoint}/${needId}`)).status, 404);
   assert.equal(
-    (await call(staff, `${endpoint}/${needId}/validate`, { expectedVersion: 2 })).status,
+    (await call(replacementStaff, `${endpoint}/${needId}/validate`, { expectedVersion: 2 })).status,
     200
   );
   assert.equal(

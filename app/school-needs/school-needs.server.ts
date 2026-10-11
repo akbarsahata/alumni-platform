@@ -69,19 +69,22 @@ export async function readSchoolNeed(request: Request, env: Env, needId: string)
   const access = await getAccess(request, env);
   requireSubmitter(access.roles);
   const repository = schoolNeedsRepository(env.DB);
-  const visibility = await repository.visibility(needId, access.account.id);
-  if (!visibility) throw new Response("Kebutuhan tidak ditemukan.", { status: 404 });
-  const isOwner = visibility.submitterUserId === access.account.id;
+  const details = await repository.detail(needId, access.account.id);
+  if (!details) throw new Response("Kebutuhan tidak ditemukan.", { status: 404 });
+  const isOwner = details.need.submitterUserId === access.account.id;
   const isStaffReviewer =
-    visibility.staffContactUserId === access.account.id && access.roles.includes("staff");
+    details.need.staffContactUserId === access.account.id && access.roles.includes("staff");
   const isCoordinatorReviewer =
     access.roles.includes("directory-coordinator") &&
-    ((visibility.staffValidated && !visibility.coordinatorApproved) ||
-      visibility.coordinatorApprovedByActor);
+    ((details.need.staffValidated && !details.need.coordinatorApproved) ||
+      details.approvals.some(
+        (approval) =>
+          approval.version === details.need.version &&
+          approval.stage === "directory-approval" &&
+          approval.actorUserId === access.account.id
+      ));
   if (!isOwner && !isStaffReviewer && !isCoordinatorReviewer)
     throw new Response("Kebutuhan tidak ditemukan.", { status: 404 });
-  const details = await repository.detail(needId);
-  if (!details) throw new Response("Kebutuhan tidak ditemukan.", { status: 404 });
   const reviewer = isStaffReviewer || isCoordinatorReviewer;
   const { submitterUserId: _submitterUserId, ...need } = details.need;
   const actorAlreadyApproved = details.approvals.some(

@@ -146,7 +146,7 @@ export function schoolNeedsRepository(binding: D1Database) {
           }
         : undefined;
     },
-    async detail(needId: string) {
+    async detail(needId: string, actorId: string) {
       const [needs, revisions, approvals] = await db.batch([
         db
           .select({
@@ -170,8 +170,30 @@ export function schoolNeedsRepository(binding: D1Database) {
             paidDetails: schoolNeed.paidDetails,
             initiativeLink: schoolNeed.initiativeLink,
           })
-          .from(schoolNeed)
-          .where(eq(schoolNeed.id, needId)),
+          .from(schoolNeed).where(sql`
+            ${schoolNeed.id}=${needId}
+            AND EXISTS(SELECT 1 FROM role_assignment r
+              WHERE r.user_id=${actorId}
+                AND r.role IN('staff','student','directory-coordinator'))
+            AND (
+              ${schoolNeed.submitterUserId}=${actorId}
+              OR (${schoolNeed.staffContactUserId}=${actorId}
+                AND EXISTS(SELECT 1 FROM role_assignment r JOIN user u ON u.id=r.user_id
+                  WHERE r.user_id=${actorId} AND r.role='staff' AND u.email_verified=1))
+              OR (EXISTS(SELECT 1 FROM role_assignment r
+                  WHERE r.user_id=${actorId} AND r.role='directory-coordinator')
+                AND (
+                  (EXISTS(SELECT 1 FROM school_need_approval a WHERE a.need_id=${schoolNeed.id}
+                    AND a.version=${schoolNeed.version} AND a.stage='staff-validation')
+                   AND NOT EXISTS(SELECT 1 FROM school_need_approval a
+                    WHERE a.need_id=${schoolNeed.id} AND a.version=${schoolNeed.version}
+                      AND a.stage='directory-approval'))
+                  OR EXISTS(SELECT 1 FROM school_need_approval a
+                    WHERE a.need_id=${schoolNeed.id} AND a.version=${schoolNeed.version}
+                      AND a.stage='directory-approval' AND a.actor_user_id=${actorId})
+                ))
+            )
+          `),
         db
           .select({
             version: schoolNeedRevision.version,
