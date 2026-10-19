@@ -2,7 +2,8 @@
 
 A two-axis review of `9b58c3e` found standards and spec issues in the local #16
 implementation. The fixes are local to `master`; no push, PR, deployment or live
-email occurred.
+email occurred. Issue #16 was closed on GitHub on 2026-10-19 UTC; the code remains
+unpushed.
 
 - Outreach reads now use explicit typed Drizzle projections and `db.batch`: the need
   workspace, request list, request/need detail, and aggregates no longer issue
@@ -33,8 +34,10 @@ The documentation frontier update was committed on `master` as `27134c6`, after
 school-needs PR #23 merged at `48dea53`. Issue
 [#16](https://github.com/akbarsahata/alumni-platform/issues/16) is now implemented
 locally on the same branch. No push, PR, deployment or live email occurred for
-this implementation. The GitHub issue remains open pending delivery of the local
-commit; its implementation prerequisites #14 and #15 and review issue #24 are closed.
+this implementation. Issue #16 was closed on GitHub on 2026-10-19 UTC after the
+review fixes; its implementation prerequisites #14 and #15 and review issue #24 are
+closed.
+The code remains unpushed.
 
 ## Bounded outreach
 
@@ -72,16 +75,17 @@ processing (#20) remain separate work. No automated deletion/anonymization is ad
 ## Issue #16 verification
 
 - TDD used the already agreed real Worker/D1/Better Auth/captured-email HTTP and
-  Chromium seam. Focused verification passes eight HTTP journeys and one Chromium
-  journey, covering contact limits and races, response/decline privacy, expiry,
-  reminder uniqueness, queued eligibility changes, takeover and revoked access.
-- The Chromium journey exercises desktop sending and a 375px member decline, checks
-  school aggregate disclosure and horizontal overflow, and captures desktop/mobile
+  Chromium seam. Final focused verification passes ten HTTP journeys and two
+  Chromium journeys, covering contact limits and races, response/decline privacy,
+  expiry, reminder uniqueness, queued eligibility changes, takeover and revoked
+  access.
+- The Chromium journeys exercise desktop sending, a 375px member decline, reminder
+  delivery, coordinator takeover and the expired-request read-only state, check
+  school aggregate disclosure and horizontal overflow, and capture desktop/mobile
   screenshots that were visually inspected.
-- Typecheck and production build pass. Standards review found no actionable issues.
-  Spec review found and reproduced a coordinator-departure continuity bug; migration
-  0016 and a real HTTP regression fix it. Final Spec review has no remaining findings.
-- Final `npm test` passes six helper tests, 77 HTTP tests and all 15 Chromium
+- Typecheck and production build pass. The post-implementation review is recorded
+  above; it found and fixed read, audit, pagination and browser-evidence issues.
+- Final `npm test` passes six helper tests, 79 HTTP tests and all 16 Chromium
   journeys, with no failures or skips. This includes the real five-minute OTP
   expiry and rate-limit windows. Lint, formatting and staged whitespace checks pass.
 - Ordinary localhost remains available: `/login` returns 200 and signed-out
@@ -92,8 +96,9 @@ processing (#20) remain separate work. No automated deletion/anonymization is ad
 
 The next local implementation frontier is **#17** (consented introductions) and
 **#18** (private clarification), both depending on #16. #19 follows #17; #20 follows
-both #18 and #19. Publish the local #16 commit and reconcile its tracker state before
-claiming those prerequisites are delivered remotely. See the
+both #18 and #19. Issue #16 is closed on GitHub, but its code remains local and
+unpushed; publish the local commits before claiming those prerequisites are delivered
+remotely. See the
 [implementation index](profiles-expertise-outreach-issues.md) and
 [agreed specification](profiles-expertise-outreach-spec.md).
 

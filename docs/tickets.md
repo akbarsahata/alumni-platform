@@ -4,9 +4,10 @@ The numbered sections below are the historical pilot roadmap, not the naming or 
 
 ## Current continuation baseline
 
-Local records show profiles (#13) and directory discovery (#14) complete. School
-needs and independent approval (#15) is being implemented on PR #23; issue #16
-remains blocked until #15 is complete. Follow the
+Local records show profiles (#13), directory discovery (#14), school needs and
+independent approval (#15), and bounded outreach (#16) complete; #16 is closed on
+GitHub, though its code remains unpushed. The next local frontier is #17 and #18.
+Follow the
 [implementation index](profiles-expertise-outreach-issues.md) and
 [shared navigation decision](navigation-prototype.md): role-based grouped menus,
 guest login on `/`, no breadcrumbs, and a deferred actionable home dashboard.

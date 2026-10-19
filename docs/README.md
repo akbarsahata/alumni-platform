@@ -11,7 +11,7 @@ Recovered planning documents from the “Move attach session results” chat, wi
 - [Profiles, expertise discovery, and school outreach specification](profiles-expertise-outreach-spec.md): settled local scope, consent/disclosure rules, manual retention, and confirmed integration testing seam.
 - [Shared navigation and guest homepage](navigation-prototype.md): selected grouped menu, primary-only role preview, guest login and deferred dashboard/breadcrumbs.
 - [Profile layout decision](profile-layout.md): adopted responsive editor, required introduction, single participation checkbox and retained prototype branch.
-- [Profiles and school outreach implementation issues](profiles-expertise-outreach-issues.md): eight flat GitHub tasks with explicit blockers and the current next issue (#15).
+- [Profiles and school outreach implementation issues](profiles-expertise-outreach-issues.md): eight flat GitHub tasks with explicit blockers and the current next issues (#17 and #18).
 - [Implementation tickets](tickets.md): recovered planning sequence and acceptance criteria.
 - [Session handoff](handoff.md): current working-tree state, next issue, verification boundaries and historical recovery notes.
 - [Recovered project overview](recovered-readme.md): original overview, preserved for provenance.

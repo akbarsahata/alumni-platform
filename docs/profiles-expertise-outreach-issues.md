@@ -16,7 +16,7 @@ frontier. These are flat issues, without parent issues or decimal subtickets.
 | [#19](https://github.com/akbarsahata/alumni-platform/issues/19) | Track outcomes and close school needs                  | [#17](https://github.com/akbarsahata/alumni-platform/issues/17)                                                                  |
 | [#20](https://github.com/akbarsahata/alumni-platform/issues/20) | Process directory deletion and manual retention        | [#18](https://github.com/akbarsahata/alumni-platform/issues/18), [#19](https://github.com/akbarsahata/alumni-platform/issues/19) |
 
-## Current frontier — 2026-10-19
+## Current frontier — 2026-10-20
 
 The initial frontier was **#13** and **#15**. Issue #13 is implemented, including
 the responsive “Profil & Keahlian” editor, required professional introduction and
@@ -26,14 +26,14 @@ Issue #14 is closed. Issue #15 is closed following the merge of
 present on local `master` at `48dea53`. The school-needs review issue
 [#24](https://github.com/akbarsahata/alumni-platform/issues/24) is also closed.
 
-Issue **#16 is implemented locally** on `master`; its prerequisites #14 and #15
-are complete. The GitHub issue remains open because this implementation has not
-been pushed. The implementation treats current approvals as approval evidence for
-the current need version: directory approval authority is historical, while every
-send, takeover and delivery still requires an active coordinator and the named
-staff contact's current verified staff role. The next local implementation frontier is **#17** and **#18**;
-#19 follows #17, and #20 follows both #18 and #19. Issues #16–#20 remain open on
-GitHub. The table above retains the declared prerequisite relationships even when
+Issue **#16 is implemented locally** on `master` and was closed on GitHub on
+2026-10-19 UTC after the review fixes; its prerequisites #14 and #15 are complete. The
+code has not been pushed. The implementation treats current approvals as approval
+evidence for the current need version: directory approval authority is historical,
+while every send, takeover and delivery still requires an active coordinator and the
+named staff contact's current verified staff role. The next local implementation
+frontier is **#17** and **#18**; #19 follows #17, and #20 follows both #18 and #19.
+Issues #17–#20 remain open on GitHub. The table above retains the declared prerequisite relationships even when
 those prerequisites are complete locally.
 
 See [outreach.md](outreach.md) for the request/response operating procedure and
