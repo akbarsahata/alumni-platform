@@ -1,3 +1,4 @@
+import { outreachRoutes } from "../app/http/outreach.routes.server";
 import { directoryRoutes } from "../app/http/directory.routes.server";
 import { profileRoutes } from "../app/http/profile.routes.server";
 import { apiMethodPolicy } from "../app/http/methods.server";
@@ -23,6 +24,7 @@ app.route("/api/membership", membershipRoutes);
 app.route("/api/profile", profileRoutes);
 app.route("/api/directory", directoryRoutes);
 app.route("/api/school-needs", schoolNeedsRoutes);
+app.route("/api/outreach", outreachRoutes);
 app.all("/api/*", () => new Response(null, { status: 404 }));
 app.all("/__local/mail", (c) => readLocalMail(c.req.raw, c.env));
 app.all("*", (c) => requestHandler(c.req.raw));

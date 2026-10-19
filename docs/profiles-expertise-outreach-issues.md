@@ -26,16 +26,19 @@ Issue #14 is closed. Issue #15 is closed following the merge of
 present on local `master` at `48dea53`. The school-needs review issue
 [#24](https://github.com/akbarsahata/alumni-platform/issues/24) is also closed.
 
-The next unblocked issue is **#16**: both of its prerequisites, #14 and #15, are
-complete. Issues #16–#20 remain open. Completing #16 unblocks **#17** and **#18**;
-#19 follows #17, and #20 follows both #18 and #19. The table above retains the
-declared prerequisite relationships even when those prerequisites are complete.
+Issue **#16 is implemented locally** on `master`; its prerequisites #14 and #15
+are complete. The GitHub issue remains open because this implementation has not
+been pushed. The next local implementation frontier is **#17** and **#18**;
+#19 follows #17, and #20 follows both #18 and #19. Issues #16–#20 remain open on
+GitHub. The table above retains the declared prerequisite relationships even when
+those prerequisites are complete locally.
 
-See [handoff.md](handoff.md) for the current checkout and recorded verification
-boundaries. Recheck the current tracker body, labels, comments and dependencies
-before starting. Each issue includes its own end-to-end
-acceptance criteria, synthetic Worker/D1/captured-email HTTP and Chromium verification,
-and build/typecheck requirements. Automated deletion and anonymization remain out of scope.
+See [outreach.md](outreach.md) for the request/response operating procedure and
+[handoff.md](handoff.md) for verification and local/remote delivery boundaries.
+Recheck the current tracker body, labels, comments and dependencies before starting.
+Each issue includes its own end-to-end acceptance criteria, synthetic
+Worker/D1/captured-email HTTP and Chromium verification, and build/typecheck
+requirements. Automated deletion and anonymization remain out of scope.
 
 The GitHub plugin exposes no native blocking-link operation; dependency edges are
 explicit issue links in each issue's `Blocked by` section. No parent issue was
@@ -55,4 +58,5 @@ role-based destinations, while server permission checks remain authoritative.
 Guests use `/` or `/login` without a menu. Breadcrumbs and the signed-in actionable
 home dashboard are deferred. Keep useful feature/parent links on pages, without
 redundant Beranda links. This navigation is part of the committed baseline on
-`master`; extend it when implementing #16.
+`master`, including the role-appropriate request and audit destinations added for #16.
+Extend this baseline when implementing #17 and #18.

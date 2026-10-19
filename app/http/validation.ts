@@ -269,3 +269,23 @@ export const taxonomyInput = z.discriminatedUnion("action", [
     })
     .strict(),
 ]);
+
+export const outreachSendInput = z
+  .object({ expectedVersion: integer(1), recipientUserId: requiredText(200) })
+  .strict();
+export const outreachResponseInput = z
+  .object({
+    outcome: z.enum(["interested", "declined"]),
+    reason: z.string().trim().max(1000).default(""),
+  })
+  .strict()
+  .refine((v) => v.outcome === "declined" || !v.reason);
+export const outreachActionInput = z.object({}).strict();
+
+export const outreachTakeoverInput = z
+  .object({ expectedCoordinatorUserId: requiredText(200) })
+  .strict();
+export const outreachPageCursor = z
+  .string()
+  .max(200)
+  .regex(/^[a-f0-9-]*$/);

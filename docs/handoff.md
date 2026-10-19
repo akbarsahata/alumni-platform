@@ -1,18 +1,80 @@
-# Current handoff — bounded outreach is next — 2026-10-19
+# Current handoff — bounded outreach implemented locally — 2026-10-19
 
-Current checkout: `master` at `48dea53`, the merge of
-[PR #23](https://github.com/akbarsahata/alumni-platform/pull/23) on 2026-10-11.
-The working tree was clean before this documentation update and the local
-`origin/master` ref points to the same commit. GitHub issues
-[#14](https://github.com/akbarsahata/alumni-platform/issues/14),
-[#15](https://github.com/akbarsahata/alumni-platform/issues/15) and the school-needs
-review issue [#24](https://github.com/akbarsahata/alumni-platform/issues/24) are
-closed. The next unblocked implementation issue is
-[#16: Send bounded outreach and collect interest or declines](https://github.com/akbarsahata/alumni-platform/issues/16).
-Its prerequisite issues #14 and #15 are complete.
+The documentation frontier update was committed on `master` as `27134c6`, after
+school-needs PR #23 merged at `48dea53`. Issue
+[#16](https://github.com/akbarsahata/alumni-platform/issues/16) is now implemented
+locally on the same branch. No push, PR, deployment or live email occurred for
+this implementation. The GitHub issue remains open pending delivery of the local
+commit; its implementation prerequisites #14 and #15 and review issue #24 are closed.
 
-This update changes documentation only. No new runtime verification, deployment,
-remote migration, live email or ordinary localhost D1 change was performed.
+## Bounded outreach
+
+- Current directory coordinators use **Permintaan bantuan** to select individual
+  eligible recipients for an approved need, send captured-mail requests, inspect
+  private response status, retry pending notification capture, send one reminder
+  after seven days, take over coordination and close needs.
+- Enforce ten recipients per need, one request per member per need, and three new
+  requests per member in a rolling 30-day window across coordinators and replacement
+  needs. Atomic conditional writes serialize competing sends and responses.
+- Members authenticate to see frozen terms and respond interested or declined;
+  interest does not share email. Optional decline reasons remain private to the
+  member and current directory coordinators. Requests expire after 14 days or at
+  the deadline date's end in UTC, whichever is earlier. Retries retain that expiry.
+- Opt-out, unavailability, deletion flags and suspension cancel unanswered requests
+  and queued notifications; access/delivery reconciles elapsed profile staleness.
+  Delivery rechecks eligibility, approvals, active coordinator authority and closure.
+  Historical directory approval survives its coordinator's departure so an active
+  replacement can continue organization-owned requests.
+- Sending freezes need details. Closure cancels unanswered requests and retains
+  historical responses; changed terms require a replacement need and fresh approvals.
+  School need pages show aggregate counts only. Primary operators have a dedicated
+  minimal audit screen, without implicit directory access.
+- Migration `0015_outreach.sql` adds workflow records, views and atomic notification,
+  audit, freeze and cancellation triggers. `0016_outreach_approval_continuity.sql`
+  preserves valid historical directory approval after coordinator departure. Both
+  were applied to ordinary local D1 with `npm run db:migrate`; disposable integration
+  state remains separate. There are no new environment variables.
+
+See [outreach.md](outreach.md) for the operating procedure, UTC deadline semantics,
+manual reminder initiation and captured-notification recovery boundary. Consented
+introductions (#17), private clarification (#18), outcomes (#19) and manual deletion
+processing (#20) remain separate work. No automated deletion/anonymization is added.
+
+## Issue #16 verification
+
+- TDD used the already agreed real Worker/D1/Better Auth/captured-email HTTP and
+  Chromium seam. Focused verification passes eight HTTP journeys and one Chromium
+  journey, covering contact limits and races, response/decline privacy, expiry,
+  reminder uniqueness, queued eligibility changes, takeover and revoked access.
+- The Chromium journey exercises desktop sending and a 375px member decline, checks
+  school aggregate disclosure and horizontal overflow, and captures desktop/mobile
+  screenshots that were visually inspected.
+- Typecheck and production build pass. Standards review found no actionable issues.
+  Spec review found and reproduced a coordinator-departure continuity bug; migration
+  0016 and a real HTTP regression fix it. Final Spec review has no remaining findings.
+- Final `npm test` passes six helper tests, 77 HTTP tests and all 15 Chromium
+  journeys, with no failures or skips. This includes the real five-minute OTP
+  expiry and rate-limit windows. Lint, formatting and staged whitespace checks pass.
+- Ordinary localhost remains available: `/login` returns 200 and signed-out
+  `/outreach` returns 401. Normal local data was preserved; only the documented
+  migrations changed its schema. All automated accounts and mail were synthetic.
+
+## Next implementation
+
+The next local implementation frontier is **#17** (consented introductions) and
+**#18** (private clarification), both depending on #16. #19 follows #17; #20 follows
+both #18 and #19. Publish the local #16 commit and reconcile its tracker state before
+claiming those prerequisites are delivered remotely. See the
+[implementation index](profiles-expertise-outreach-issues.md) and
+[agreed specification](profiles-expertise-outreach-spec.md).
+
+---
+
+# School-needs baseline recorded before issue #16
+
+The following behavior and verification describe the school-needs baseline. Its
+workflow now also has the outreach freeze, closure and aggregate progress described
+above. Historical results below do not replace the issue #16 verification record.
 
 ## Current behavior
 
@@ -74,26 +136,6 @@ verification result for the merged commit.
   was unavailable in this environment; no review comments were returned.
 - The secret scan found no secrets in changed code/tests. No live email, deployment
   or hosted CI result is claimed.
-
-## Next implementation
-
-Start #16 from the agreed specification and its current issue acceptance criteria:
-
-- Add coordinator recipient selection and captured-email requests for approved
-  school needs, with private member interest/decline responses.
-- Enforce the per-need and rolling member contact limits, frozen sent terms,
-  expiry, one eligible reminder and cancellation when eligibility changes.
-- Preserve current authorization, minimal audits and staff/student aggregate-only
-  views. Verify the slice through real local Worker/D1/Better Auth/captured-email
-  HTTP and Chromium journeys, plus the required full suite and build checks.
-- Completion of #16 unblocks #17 (consented introductions) and #18 (private
-  clarification). #19 follows #17; #20 follows both #18 and #19. Automated deletion
-  and anonymization remain outside the agreed scope.
-
-See the
-[flat implementation index](profiles-expertise-outreach-issues.md) and the agreed
-[profiles, expertise and school outreach specification](profiles-expertise-outreach-spec.md).
-Earlier entries below retain their historical dates and change boundaries.
 
 ---
 

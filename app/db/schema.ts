@@ -242,3 +242,37 @@ export const schoolNeedAudit = sqliteTable("school_need_audit", {
   action: text("action").notNull(),
   occurredAt: text("occurred_at").notNull(),
 });
+
+export const outreachRequest = sqliteTable("outreach_request", {
+  id: text("id").primaryKey(),
+  needId: text("need_id").notNull(),
+  needVersion: integer("need_version").notNull(),
+  recipientUserId: text("recipient_user_id").notNull(),
+  coordinatorUserId: text("coordinator_user_id").notNull(),
+  sentAt: text("sent_at").notNull(),
+  expiresAt: text("expires_at").notNull(),
+  status: text("status", { enum: ["pending", "interested", "declined", "cancelled"] }).notNull(),
+  declineReason: text("decline_reason").notNull(),
+  respondedAt: text("responded_at"),
+  reminderAt: text("reminder_at"),
+  updatedBy: text("updated_by").notNull(),
+  updatedAt: text("updated_at").notNull(),
+});
+export const outreachNotification = sqliteTable("outreach_notification", {
+  id: text("id").primaryKey(),
+  requestId: text("request_id").notNull(),
+  kind: text("kind").notNull(),
+  state: text("state").notNull(),
+});
+export const outreachClosure = sqliteTable("outreach_closure", {
+  needId: text("need_id").primaryKey(),
+  actorUserId: text("actor_user_id").notNull(),
+  closedAt: text("closed_at").notNull(),
+});
+export const outreachAudit = sqliteTable("outreach_audit", {
+  id: text("id").primaryKey(),
+  needId: text("need_id").notNull(),
+  actorUserId: text("actor_user_id"),
+  action: text("action").notNull(),
+  occurredAt: text("occurred_at").notNull(),
+});

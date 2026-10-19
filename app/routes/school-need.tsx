@@ -101,6 +101,15 @@ export default function SchoolNeed({ loaderData, actionData }: Route.ComponentPr
           </div>
         )}
       </dl>
+      <section aria-label="Progres penjangkauan" className="space-y-2">
+        <h2>Progres penjangkauan</h2>
+        <p>{loaderData.outreach.closed ? "Kebutuhan ditutup" : "Kebutuhan terbuka"}</p>
+        <p>
+          Total: {loaderData.outreach.total} · Menunggu: {loaderData.outreach.pending} · Berminat:{" "}
+          {loaderData.outreach.interested} · Ditolak: {loaderData.outreach.declined} · Dibatalkan:{" "}
+          {loaderData.outreach.cancelled} · Kedaluwarsa: {loaderData.outreach.expired}
+        </p>
+      </section>
       <section aria-label="Status persetujuan">
         <h2 className="text-xl font-semibold">Persetujuan versi {need.version}</h2>
         <p>Validasi staf: {need.staffValidated ? "Selesai" : "Belum"}</p>

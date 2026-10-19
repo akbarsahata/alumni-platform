@@ -1,0 +1,106 @@
+import assert from "node:assert/strict";
+import { login, call } from "./accounts.mjs";
+import { membershipReviewers, application, decision } from "./membership.mjs";
+
+export const profile = {
+  displayName: "Mentor robotika",
+  introduction: "Pengalaman pendampingan robotika",
+  expertiseTags: ["technology"],
+  helpTypes: ["mentoring"],
+  availability: "available",
+  participation: true,
+  participationConsent: true,
+};
+export const needInput = {
+  category: "student-mentoring",
+  title: "Pendampingan robotika",
+  purpose: "Mendampingi siswa merancang robot",
+  requestedHelp: "Mentor teknologi",
+  timeCommitment: "Dua jam",
+  timing: "Sesuai kesepakatan",
+  locationMode: "remote",
+  participationTerms: "voluntary",
+};
+export async function role(account, name, primary, action = "grant") {
+  assert.equal(
+    (
+      await call(primary, "/api/admin/roles", {
+        targetUserId: account.id,
+        role: name,
+        action,
+        reason: "Synthetic outreach appointment",
+      })
+    ).status,
+    200
+  );
+}
+export async function member(label) {
+  const { reviewer } = await membershipReviewers();
+  const account = await login(label);
+  assert.equal((await call(account, "/api/membership/application", application)).status, 200);
+  assert.equal(
+    (await call(reviewer, `/api/membership/reviews/${account.id}`, decision)).status,
+    200
+  );
+  assert.equal((await call(account, "/api/profile", profile)).status, 200);
+  return account;
+}
+export async function setup() {
+  const { primary, reviewer } = await membershipReviewers();
+  const staff = await login("outreach-staff");
+  const student = await login("outreach-student");
+  const coordinator = await login("outreach-coordinator");
+  const otherCoordinator = await login("outreach-other-coordinator");
+  for (const [account, name] of [
+    [staff, "staff"],
+    [student, "student"],
+    [coordinator, "directory-coordinator"],
+    [otherCoordinator, "directory-coordinator"],
+  ])
+    await role(account, name, primary);
+  return { primary, reviewer, staff, student, coordinator, otherCoordinator };
+}
+export async function approvedNeed(fixture, overrides = {}) {
+  const response = await call(fixture.student, "/api/school-needs", {
+    ...needInput,
+    staffContactUserId: fixture.staff.id,
+    ...overrides,
+  });
+  assert.equal(response.status, 200, await response.clone().text());
+  const { needId } = await response.json();
+  for (const [actor, stage] of [
+    [fixture.staff, "validate"],
+    [fixture.coordinator, "approve"],
+  ])
+    assert.equal(
+      (await call(actor, `/api/school-needs/${needId}/${stage}`, { expectedVersion: 1 })).status,
+      200
+    );
+  return needId;
+}
+export async function send(fixture, needId, recipient, actor = fixture.coordinator) {
+  return call(actor, `/api/outreach/needs/${needId}/send`, {
+    expectedVersion: 1,
+    recipientUserId: recipient.id,
+  });
+}
+
+// Time/queue fixtures only: writes are guarded to this runner's disposable D1.
+export async function fixtureSql(sql) {
+  assert.ok(process.env.ALUMNI_TEST_STATE?.includes("integration-state-"));
+  const { execFileSync } = await import("node:child_process");
+  execFileSync(
+    "node_modules/.bin/wrangler",
+    [
+      "d1",
+      "execute",
+      "alumni_local",
+      "--local",
+      "--persist-to",
+      process.env.ALUMNI_TEST_STATE,
+      "--command",
+      sql,
+    ],
+    { stdio: "pipe" }
+  );
+}

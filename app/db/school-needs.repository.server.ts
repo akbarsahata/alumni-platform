@@ -278,7 +278,10 @@ export function schoolNeedsRepository(binding: D1Database) {
           participation_terms=${input.participationTerms},paid_details=${input.paidDetails},
           initiative_link=${input.initiativeLink || null},updated_at=${input.occurredAt},
           updated_by=${input.actorId}
-        WHERE id=${input.id} AND submitter_user_id=${input.actorId} AND version=${input.expectedVersion}
+        WHERE id=${input.id}
+          AND NOT EXISTS(SELECT 1 FROM outreach_request WHERE need_id=school_need.id)
+          AND NOT EXISTS(SELECT 1 FROM outreach_closure WHERE need_id=school_need.id)
+          AND submitter_user_id=${input.actorId} AND version=${input.expectedVersion}
           AND EXISTS(SELECT 1 FROM role_assignment WHERE user_id=${input.actorId}
             AND role IN('staff','student','directory-coordinator'))
           AND EXISTS(SELECT 1 FROM role_assignment r JOIN user u ON u.id=r.user_id

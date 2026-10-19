@@ -77,6 +77,16 @@ export function SiteNavigation({
     ...(access && ["approved", "suspended"].includes(access.membership)
       ? [{ path: "/profile", label: "Profil & Keahlian", group: "Pribadi" }]
       : []),
+    ...(access &&
+    (["approved", "suspended"].includes(access.membership) || access.permissions.directory)
+      ? [
+          {
+            path: "/outreach",
+            label: "Permintaan bantuan",
+            group: access.permissions.directory ? "Direktori" : "Pribadi",
+          },
+        ]
+      : []),
     ...(access?.permissions.directory
       ? [
           { path: "/directory", label: "Direktori keahlian", group: "Direktori" },
@@ -97,7 +107,10 @@ export function SiteNavigation({
         ]
       : []),
     ...(access?.permissions.audit
-      ? [{ path: "/admin/audit", label: "Riwayat audit", group: "Administrasi" }]
+      ? [
+          { path: "/admin/audit", label: "Riwayat audit", group: "Administrasi" },
+          { path: "/admin/outreach-audit", label: "Audit penjangkauan", group: "Administrasi" },
+        ]
       : []),
   ];
 

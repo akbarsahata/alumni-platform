@@ -1,3 +1,4 @@
+import { outreachRepository } from "../db/outreach.repository.server";
 import { getAccess } from "../authorization/permissions.server";
 import { schoolNeedsRepository } from "../db/school-needs.repository.server";
 import { hasTrustedOrigin } from "../auth/auth.server";
@@ -87,11 +88,13 @@ export async function readSchoolNeed(request: Request, env: Env, needId: string)
     throw new Response("Kebutuhan tidak ditemukan.", { status: 404 });
   const reviewer = isStaffReviewer || isCoordinatorReviewer;
   const { submitterUserId: _submitterUserId, ...need } = details.need;
+  const outreach = await outreachRepository(env.DB).aggregate(needId);
   const actorAlreadyApproved = details.approvals.some(
     (approval) => approval.version === need.version && approval.actorUserId === access.account.id
   );
   return {
     need,
+    outreach,
     staffContacts: await repository.staffContacts(),
     revisions: details.revisions.map(({ actorUserId, ...revision }) =>
       reviewer ? { ...revision, actorUserId } : revision
@@ -100,7 +103,7 @@ export async function readSchoolNeed(request: Request, env: Env, needId: string)
       reviewer ? { ...approval, actorUserId } : approval
     ),
     access: {
-      canEdit: isOwner,
+      canEdit: isOwner && !outreach.total && !outreach.closed,
       canValidate: isStaffReviewer && !need.staffValidated && !actorAlreadyApproved,
       canApprove:
         isCoordinatorReviewer &&
