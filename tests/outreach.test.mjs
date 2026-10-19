@@ -232,14 +232,94 @@ test("one reminder is permitted after seven days; expiry and short deadlines nev
   assert.equal(state.request.expiresAt, `${tomorrow}T23:59:59.999Z`);
 });
 
+test("primary audit history is chronological and paginates with a stable cursor", async () => {
+  const f = await setup();
+  const needId = await approvedNeed(f);
+  const inserts = Array.from({ length: 52 }, (_, index) => {
+    const id = (51 - index).toString(16).padStart(32, "0");
+    const occurredAt = `2026-01-01T00:00:${String(index).padStart(2, "0")}.000Z`;
+    return `INSERT INTO outreach_audit VALUES('${id}','${needId}',NULL,'test-${String(index).padStart(3, "0")}','${occurredAt}')`;
+  }).join(";");
+  await fixtureSql(inserts);
+  const first = await (await call(f.primary, "/api/outreach/audit")).json();
+  assert.equal(first.events.length, 50);
+  assert.equal(first.events[0].action, "test-000");
+  assert.equal(first.events[49].action, "test-049");
+  assert.match(first.nextCursor, /\|/);
+  const second = await (
+    await call(f.primary, `/api/outreach/audit?after=${encodeURIComponent(first.nextCursor)}`)
+  ).json();
+  assert.deepEqual(
+    second.events.slice(0, 2).map((event) => event.action),
+    ["test-050", "test-051"]
+  );
+  assert.deepEqual(
+    first.events.map((event) => event.action),
+    Array.from({ length: 50 }, (_, index) => `test-${String(index).padStart(3, "0")}`)
+  );
+});
+
+test("outreach lists apply needs and requests cursors independently", async () => {
+  const f = await setup();
+  const memberAccount = await member("paging-coordinator");
+  const { role } = await import("./helpers/outreach.mjs");
+  await role(memberAccount, "directory-coordinator", f.primary);
+  const needA = await approvedNeed(f);
+  const needB = await approvedNeed(f);
+  const sentA = await send(f, needA, memberAccount, memberAccount);
+  const sentB = await send(f, needB, memberAccount, memberAccount);
+  assert.equal(sentA.status, 200, await sentA.clone().text());
+  assert.equal(sentB.status, 200, await sentB.clone().text());
+  const requestA = (await sentA.json()).requestId;
+  const requestB = (await sentB.json()).requestId;
+  const needsFiltered = await (
+    await call(memberAccount, `/api/outreach?needsAfter=${needA}`)
+  ).json();
+  assert.ok(!needsFiltered.needs.some((need) => need.id === needA));
+  assert.ok(needsFiltered.requests.some((request) => request.id === requestA));
+  assert.ok(needsFiltered.requests.some((request) => request.id === requestB));
+  const requestsFiltered = await (
+    await call(memberAccount, `/api/outreach?requestsAfter=${requestA}`)
+  ).json();
+  assert.ok(!requestsFiltered.requests.some((request) => request.id === requestA));
+  assert.ok(requestsFiltered.needs.some((need) => need.id === needA));
+  assert.ok(requestsFiltered.needs.some((need) => need.id === needB));
+});
+
 after(async () => {
   const f = await setup();
   const recipient = await member("browser-outreach-member");
   const needId = await approvedNeed(f, { title: "Mentor robotika untuk siswa" });
+  const reminderRecipient = await member("browser-reminder-member");
+  const reminderNeedId = await approvedNeed(f, { title: "Pendampingan robotika lanjutan" });
+  const reminderSent = await send(f, reminderNeedId, reminderRecipient);
+  assert.equal(reminderSent.status, 200);
+  const reminderRequestId = (await reminderSent.json()).requestId;
+  await fixtureSql(
+    `UPDATE outreach_request SET sent_at=strftime('%Y-%m-%dT%H:%M:%fZ','now','-8 days') WHERE id='${reminderRequestId}'`
+  );
+  const expiredRecipient = await member("browser-expired-member");
+  const expiredNeedId = await approvedNeed(f, { title: "Mentor robotika kedaluwarsa" });
+  const expiredSent = await send(f, expiredNeedId, expiredRecipient);
+  assert.equal(expiredSent.status, 200);
+  const expiredRequestId = (await expiredSent.json()).requestId;
+  await fixtureSql(
+    `UPDATE outreach_request SET expires_at=strftime('%Y-%m-%dT%H:%M:%fZ','now','-1 second') WHERE id='${expiredRequestId}'`
+  );
   const { writeFile } = await import("node:fs/promises");
   await writeFile(
     `${process.env.ALUMNI_TEST_STATE}/outreach-accounts.json`,
-    JSON.stringify({ ...f, recipient, needId }),
+    JSON.stringify({
+      ...f,
+      recipient,
+      needId,
+      reminderRecipient,
+      reminderNeedId,
+      reminderRequestId,
+      expiredRecipient,
+      expiredNeedId,
+      expiredRequestId,
+    }),
     { mode: 0o600 }
   );
 });
@@ -404,7 +484,7 @@ test("outreach APIs, pages and data routes enforce privacy, origin checks and st
     assert.equal((await call(f.coordinator, path)).status, 403);
 });
 
-test("an active coordinator continues inherited pending requests after the original approver leaves", async () => {
+test("historical directory approval lets an active coordinator continue and extend outreach", async () => {
   const f = await setup();
   const recipient = await member("inherited-pending");
   const needId = await approvedNeed(f);
@@ -413,6 +493,10 @@ test("an active coordinator continues inherited pending requests after the origi
   const requestId = (await sent.json()).requestId;
   const { role } = await import("./helpers/outreach.mjs");
   await role(f.coordinator, "directory-coordinator", f.primary, "revoke");
+  assert.equal(
+    (await send(f, needId, await member("inherited-new"), f.otherCoordinator)).status,
+    200
+  );
   assert.equal(
     (
       await call(f.otherCoordinator, `/api/outreach/requests/${requestId}/take-over`, {

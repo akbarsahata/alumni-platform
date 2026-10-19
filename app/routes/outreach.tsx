@@ -11,6 +11,12 @@ export async function loader({ request }: Route.LoaderArgs) {
   return readOutreach(request, env);
 }
 export default function Outreach({ loaderData: d }: Route.ComponentProps) {
+  const requestsNext = new URLSearchParams();
+  if (d.needsAfter) requestsNext.set("needsAfter", d.needsAfter);
+  if (d.requestsNextCursor) requestsNext.set("requestsAfter", d.requestsNextCursor);
+  const needsNext = new URLSearchParams();
+  if (d.requestsAfter) needsNext.set("requestsAfter", d.requestsAfter);
+  if (d.needsNextCursor) needsNext.set("needsAfter", d.needsNextCursor);
   return (
     <main className="mx-auto max-w-4xl space-y-6">
       <h1>Permintaan bantuan</h1>
@@ -29,9 +35,7 @@ export default function Outreach({ loaderData: d }: Route.ComponentProps) {
             </p>
           </article>
         ))}
-        {d.requestsNextCursor && (
-          <Link to={`?after=${d.requestsNextCursor}`}>Permintaan berikutnya</Link>
-        )}
+        {d.requestsNextCursor && <Link to={`?${requestsNext}`}>Permintaan berikutnya</Link>}
       </section>
       {d.isCoordinator && (
         <section className="space-y-3">
@@ -46,9 +50,7 @@ export default function Outreach({ loaderData: d }: Route.ComponentProps) {
               <Link to={`/outreach/needs/${n.id}`}>{n.title}</Link>
             </article>
           ))}
-          {d.needsNextCursor && (
-            <Link to={`?after=${d.needsNextCursor}`}>Kebutuhan berikutnya</Link>
-          )}
+          {d.needsNextCursor && <Link to={`?${needsNext}`}>Kebutuhan berikutnya</Link>}
         </section>
       )}
     </main>

@@ -8,8 +8,14 @@ import {
   outreachActionInput,
   outreachTakeoverInput,
   outreachPageCursor,
+  outreachAuditCursor,
 } from "../http/validation";
 import { sendEmail } from "../email/email.server";
+import {
+  formatOutreachAuditCursor,
+  parseOutreachAuditCursor,
+  type OutreachAuditCursor,
+} from "./model";
 function origin(request: Request, env: Env) {
   if (!hasTrustedOrigin(request, env))
     throw new Response("Permintaan tidak diizinkan.", { status: 403 });
@@ -57,7 +63,7 @@ export async function deliverOutreach(
       break;
     }
   }
-  return { notificationPending: await repository.pending(requestId) };
+  return { notificationPending: await repository.hasPendingNotification(requestId) };
 }
 export async function sendOutreach(request: Request, env: Env, needId: string, input: unknown) {
   origin(request, env);
@@ -82,35 +88,26 @@ export async function sendOutreach(request: Request, env: Env, needId: string, i
 export async function readOutreachNeed(request: Request, env: Env, needId: string) {
   const access = await requireDirectory(request, env);
   const repository = outreachRepository(env.DB);
-  await repository.reconcile();
-  const need = await repository.need(needId);
-  if (
-    !(await repository.available(needId)) &&
-    !(await repository.frozen(needId)) &&
-    !(await repository.closed(needId))
-  )
+  const detail = await repository.needWorkspace(needId);
+  if (!detail.available && !detail.frozen && !detail.closed)
     throw new Response("Kebutuhan tidak tersedia untuk penjangkauan.", { status: 404 });
-  if (!need) throw new Response("Kebutuhan tidak ditemukan.", { status: 404 });
-  const { submitterUserId: _submitter, updatedBy: _updated, ...details } = need;
+  if (!detail.need) throw new Response("Kebutuhan tidak ditemukan.", { status: 404 });
   return {
-    need: details,
+    need: detail.need,
     actorId: access.account.id,
-    canSend: await repository.available(needId),
-    closed: await repository.closed(needId),
-    requests: await repository.requests(needId),
-    notifications: await repository.notifications(needId),
+    canSend: detail.available,
+    closed: detail.closed,
+    requests: detail.requests,
+    notifications: detail.notifications,
   };
 }
 export async function readOutreachRequest(request: Request, env: Env, requestId: string) {
   const access = await getAccess(request, env);
   const repository = outreachRepository(env.DB);
   await repository.reconcile();
-  const row = await repository.request(requestId, access.account.id);
+  const row = await repository.requestWithNeed(requestId, access.account.id);
   if (!row) throw new Response("Permintaan tidak ditemukan.", { status: 404 });
-  const need = await repository.need(row.needId);
-  if (!need) throw new Response("Kebutuhan tidak ditemukan.", { status: 404 });
-  const { submitterUserId: _submitter, updatedBy: _updated, ...details } = need;
-  return { request: row, need: details };
+  return row;
 }
 export async function respondOutreach(
   request: Request,
@@ -173,13 +170,18 @@ export async function takeOverOutreach(
 }
 export async function readOutreachAudit(request: Request, env: Env) {
   await requirePrimary(request, env);
-  const after = parseInput(
-    outreachPageCursor,
-    new URL(request.url).searchParams.get("after") ?? "",
-    "Kursor tidak valid."
-  );
+  const raw = new URL(request.url).searchParams.get("after") ?? "";
+  let after: OutreachAuditCursor | null = null;
+  if (raw) {
+    parseInput(outreachAuditCursor, raw, "Kursor tidak valid.");
+    after = parseOutreachAuditCursor(raw);
+  }
   const rows = await outreachRepository(env.DB).audit(after);
-  return { events: rows.slice(0, 50), nextCursor: rows.length > 50 ? rows[49].id : null };
+  const last = rows[49];
+  return {
+    events: rows.slice(0, 50),
+    nextCursor: rows.length > 50 && last ? formatOutreachAuditCursor(last) : null,
+  };
 }
 
 export async function remindOutreach(
@@ -200,22 +202,30 @@ export async function remindOutreach(
 export async function readOutreach(request: Request, env: Env) {
   const access = await getAccess(request, env);
   const repo = outreachRepository(env.DB);
-  await repo.reconcile();
-  const after = parseInput(
+  const searchParams = new URL(request.url).searchParams;
+  const needsAfter = parseInput(
     outreachPageCursor,
-    new URL(request.url).searchParams.get("after") ?? "",
+    searchParams.get("needsAfter") ?? "",
+    "Kursor tidak valid."
+  );
+  const requestsAfter = parseInput(
+    outreachPageCursor,
+    searchParams.get("requestsAfter") ?? "",
     "Kursor tidak valid."
   );
   const { needs, requests } = await repo.list(
     access.account.id,
     access.permissions.directory,
-    after
+    needsAfter,
+    requestsAfter
   );
   return {
     needs: needs.slice(0, 50),
     requests: requests.slice(0, 50),
     needsNextCursor: needs.length > 50 ? needs[49].id : null,
     requestsNextCursor: requests.length > 50 ? requests[49].id : null,
+    needsAfter,
+    requestsAfter,
     isCoordinator: access.permissions.directory,
   };
 }

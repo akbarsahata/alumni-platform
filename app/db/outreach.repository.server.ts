@@ -1,13 +1,35 @@
-import { and, gt, eq, sql } from "drizzle-orm";
+import { and, asc, count, eq, exists, gt, or, sql } from "drizzle-orm";
 import { database } from "./database.server";
 import {
   schoolNeed,
+  outreachApprovedNeed,
   outreachRequest,
   outreachNotification,
   outreachClosure,
   outreachAudit,
 } from "./schema";
+import type { OutreachAuditCursor, OutreachStatus } from "../outreach/model";
 
+const needColumns = {
+  id: schoolNeed.id,
+  version: schoolNeed.version,
+  category: schoolNeed.category,
+  title: schoolNeed.title,
+  purpose: schoolNeed.purpose,
+  requestedHelp: schoolNeed.requestedHelp,
+  timeCommitment: schoolNeed.timeCommitment,
+  timing: schoolNeed.timing,
+  deadline: schoolNeed.deadline,
+  locationMode: schoolNeed.locationMode,
+  locationDetails: schoolNeed.locationDetails,
+  staffContactUserId: schoolNeed.staffContactUserId,
+  staffContactName: schoolNeed.staffContactName,
+  participationTerms: schoolNeed.participationTerms,
+  paidDetails: schoolNeed.paidDetails,
+  initiativeLink: schoolNeed.initiativeLink,
+  createdAt: schoolNeed.createdAt,
+  updatedAt: schoolNeed.updatedAt,
+};
 const requestColumns = {
   id: outreachRequest.id,
   needId: outreachRequest.needId,
@@ -15,84 +37,122 @@ const requestColumns = {
   coordinatorUserId: outreachRequest.coordinatorUserId,
   sentAt: outreachRequest.sentAt,
   expiresAt: outreachRequest.expiresAt,
-  status: sql<string>`CASE WHEN ${outreachRequest.status}='pending' AND julianday(${outreachRequest.expiresAt})<=julianday('now') THEN 'expired' ELSE ${outreachRequest.status} END`,
+  status: sql<OutreachStatus>`CASE WHEN ${outreachRequest.status}='pending' AND julianday(${outreachRequest.expiresAt})<=julianday('now') THEN 'expired' ELSE ${outreachRequest.status} END`,
   declineReason: outreachRequest.declineReason,
   reminderAt: outreachRequest.reminderAt,
 };
-export type OutreachRequest = {
-  id: string;
-  needId: string;
-  recipientUserId: string;
-  coordinatorUserId: string;
-  sentAt: string;
-  expiresAt: string;
-  status: string;
-  declineReason: string;
-  reminderAt: string | null;
-};
 export function outreachRepository(binding: D1Database) {
   const db = database(binding);
+  const closedNeed = (needId: string) =>
+    db
+      .select({ id: outreachClosure.needId })
+      .from(outreachClosure)
+      .where(eq(outreachClosure.needId, needId))
+      .limit(1);
+  const requestAccess = (requestId: string, actorId: string) =>
+    and(
+      eq(outreachRequest.id, requestId),
+      sql`(${outreachRequest.recipientUserId}=${actorId} OR EXISTS(SELECT 1 FROM role_assignment WHERE user_id=${actorId} AND role='directory-coordinator'))`
+    );
   return {
-    async list(actorId: string, coordinator: boolean, after: string) {
-      const needs = coordinator
-        ? await db
-            .select({ id: schoolNeed.id, title: schoolNeed.title, version: schoolNeed.version })
-            .from(schoolNeed)
-            .where(
-              sql`${schoolNeed.id}>${after} AND (EXISTS(SELECT 1 FROM outreach_approved_need WHERE id=${schoolNeed.id}) OR EXISTS(SELECT 1 FROM outreach_request WHERE need_id=${schoolNeed.id}))`
-            )
-            .orderBy(schoolNeed.id)
-            .limit(51)
-        : [];
-      const requests = await db
+    async list(actorId: string, coordinator: boolean, needsAfter: string, requestsAfter: string) {
+      const requests = db
         .select({ ...requestColumns, title: schoolNeed.title })
         .from(outreachRequest)
         .innerJoin(schoolNeed, eq(schoolNeed.id, outreachRequest.needId))
-        .where(and(eq(outreachRequest.recipientUserId, actorId), gt(outreachRequest.id, after)))
+        .where(
+          and(eq(outreachRequest.recipientUserId, actorId), gt(outreachRequest.id, requestsAfter))
+        )
         .orderBy(outreachRequest.id)
         .limit(51);
-      return { needs, requests };
+      if (!coordinator) return { needs: [], requests: await requests };
+      const needs = db
+        .select({ id: schoolNeed.id, title: schoolNeed.title, version: schoolNeed.version })
+        .from(schoolNeed)
+        .where(
+          and(
+            gt(schoolNeed.id, needsAfter),
+            or(
+              exists(
+                db
+                  .select({ id: outreachApprovedNeed.id })
+                  .from(outreachApprovedNeed)
+                  .where(eq(outreachApprovedNeed.id, schoolNeed.id))
+              ),
+              exists(
+                db
+                  .select({ id: outreachRequest.id })
+                  .from(outreachRequest)
+                  .where(eq(outreachRequest.needId, schoolNeed.id))
+              )
+            )
+          )
+        )
+        .orderBy(schoolNeed.id)
+        .limit(51);
+      const [needRows, requestRows] = await db.batch([needs, requests]);
+      return { needs: needRows, requests: requestRows };
     },
-    async available(needId: string) {
-      return !!(await db.get(sql`SELECT id FROM outreach_approved_need WHERE id=${needId}`));
-    },
-    async notifications(needId: string) {
-      return db
-        .select({
-          requestId: outreachNotification.requestId,
-          kind: outreachNotification.kind,
-          state: outreachNotification.state,
-        })
-        .from(outreachNotification)
-        .innerJoin(outreachRequest, eq(outreachRequest.id, outreachNotification.requestId))
-        .where(eq(outreachRequest.needId, needId));
+    async needWorkspace(needId: string) {
+      const [needs, available, frozen, closed, requests, notifications] = await db.batch([
+        db.select(needColumns).from(schoolNeed).where(eq(schoolNeed.id, needId)),
+        db
+          .select({ id: outreachApprovedNeed.id })
+          .from(outreachApprovedNeed)
+          .where(eq(outreachApprovedNeed.id, needId))
+          .limit(1),
+        db
+          .select({ id: outreachRequest.id })
+          .from(outreachRequest)
+          .where(eq(outreachRequest.needId, needId))
+          .limit(1),
+        closedNeed(needId),
+        db
+          .select(requestColumns)
+          .from(outreachRequest)
+          .where(eq(outreachRequest.needId, needId))
+          .orderBy(outreachRequest.sentAt, outreachRequest.id),
+        db
+          .select({
+            requestId: outreachNotification.requestId,
+            kind: outreachNotification.kind,
+            state: outreachNotification.state,
+          })
+          .from(outreachNotification)
+          .innerJoin(outreachRequest, eq(outreachRequest.id, outreachNotification.requestId))
+          .where(eq(outreachRequest.needId, needId)),
+      ]);
+      return {
+        need: needs[0],
+        available: !!available[0],
+        frozen: !!frozen[0],
+        closed: !!closed[0],
+        requests,
+        notifications,
+      };
     },
     async aggregate(needId: string) {
-      await this.reconcile();
-      const rows = await db.all<{ status: string; count: number }>(
-        sql`SELECT CASE WHEN status='pending' AND julianday(expires_at)<=julianday('now') THEN 'expired' ELSE status END AS status,count(*) AS count FROM outreach_request WHERE need_id=${needId} GROUP BY 1`
-      );
-      const counts = {
-        total: 0,
+      const [rows, closures] = await db.batch([
+        db
+          .select({ status: requestColumns.status, count: count() })
+          .from(outreachRequest)
+          .where(eq(outreachRequest.needId, needId))
+          .groupBy(requestColumns.status),
+        closedNeed(needId),
+      ]);
+      const counts: Record<OutreachStatus, number> = {
         pending: 0,
         interested: 0,
         declined: 0,
         cancelled: 0,
         expired: 0,
-        closed: await this.closed(needId),
       };
+      let total = 0;
       for (const row of rows) {
-        counts.total += row.count;
-        if (
-          row.status === "pending" ||
-          row.status === "interested" ||
-          row.status === "declined" ||
-          row.status === "cancelled" ||
-          row.status === "expired"
-        )
-          counts[row.status] = row.count;
+        total += row.count;
+        counts[row.status] = row.count;
       }
-      return counts;
+      return { total, ...counts, closed: !!closures[0] };
     },
     async remind(requestId: string, actorId: string) {
       return db.all<{
@@ -111,35 +171,24 @@ export function outreachRepository(binding: D1Database) {
      WHERE id=${requestId} AND coordinator_user_id=${expectedCoordinatorId} AND coordinator_user_id!=${actorId}
      AND EXISTS(SELECT 1 FROM role_assignment WHERE user_id=${actorId} AND role='directory-coordinator') RETURNING id`);
     },
-    async audit(after: string) {
+    async audit(after: OutreachAuditCursor | null) {
       return db
         .select()
         .from(outreachAudit)
-        .where(gt(outreachAudit.id, after))
-        .orderBy(outreachAudit.id)
+        .where(
+          after
+            ? or(
+                gt(outreachAudit.occurredAt, after.occurredAt),
+                and(eq(outreachAudit.occurredAt, after.occurredAt), gt(outreachAudit.id, after.id))
+              )
+            : undefined
+        )
+        .orderBy(asc(outreachAudit.occurredAt), asc(outreachAudit.id))
         .limit(51);
     },
     async reconcile() {
       await db.run(sql`UPDATE outreach_request SET status='cancelled',updated_by=recipient_user_id,updated_at=strftime('%Y-%m-%dT%H:%M:%fZ','now')
      WHERE status='pending' AND NOT EXISTS(SELECT 1 FROM outreach_eligible_recipient WHERE user_id=recipient_user_id)`);
-    },
-    async closed(needId: string) {
-      return !!(
-        await db
-          .select({ id: outreachClosure.needId })
-          .from(outreachClosure)
-          .where(eq(outreachClosure.needId, needId))
-          .limit(1)
-      )[0];
-    },
-    async frozen(needId: string) {
-      return !!(
-        await db
-          .select({ id: outreachRequest.id })
-          .from(outreachRequest)
-          .where(eq(outreachRequest.needId, needId))
-          .limit(1)
-      )[0];
     },
     async close(needId: string, actorId: string) {
       return db.all<{
@@ -174,27 +223,21 @@ export function outreachRepository(binding: D1Database) {
       AND julianday(sent_at)>julianday(${input.now},'-30 days'))<3
     RETURNING id`);
     },
-    async need(needId: string) {
-      return (await db.select().from(schoolNeed).where(eq(schoolNeed.id, needId)))[0];
-    },
-    async requests(needId: string) {
-      return db
-        .select(requestColumns)
-        .from(outreachRequest)
-        .where(eq(outreachRequest.needId, needId))
-        .orderBy(outreachRequest.sentAt, outreachRequest.id);
-    },
     async request(requestId: string, actorId: string) {
       return (
         await db
           .select(requestColumns)
           .from(outreachRequest)
-          .where(
-            and(
-              eq(outreachRequest.id, requestId),
-              sql`(${outreachRequest.recipientUserId}=${actorId} OR EXISTS(SELECT 1 FROM role_assignment WHERE user_id=${actorId} AND role='directory-coordinator'))`
-            )
-          )
+          .where(requestAccess(requestId, actorId))
+      )[0];
+    },
+    async requestWithNeed(requestId: string, actorId: string) {
+      return (
+        await db
+          .select({ request: requestColumns, need: needColumns })
+          .from(outreachRequest)
+          .innerJoin(schoolNeed, eq(schoolNeed.id, outreachRequest.needId))
+          .where(requestAccess(requestId, actorId))
       )[0];
     },
     async respond(input: {
@@ -241,7 +284,7 @@ export function outreachRepository(binding: D1Database) {
     AND EXISTS(SELECT 1 FROM role_assignment WHERE user_id=r.coordinator_user_id AND role='directory-coordinator')`)
       )[0];
     },
-    async pending(requestId: string) {
+    async hasPendingNotification(requestId: string) {
       return !!(
         await db
           .select({ id: outreachNotification.id })

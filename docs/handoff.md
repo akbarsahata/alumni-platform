@@ -1,3 +1,32 @@
+# Review fixes — 2026-10-20
+
+A two-axis review of `9b58c3e` found standards and spec issues in the local #16
+implementation. The fixes are local to `master`; no push, PR, deployment or live
+email occurred.
+
+- Outreach reads now use explicit typed Drizzle projections and `db.batch`: the need
+  workspace, request list, request/need detail, and aggregates no longer issue
+  sequential raw reads. The school-need aggregate is read-only, so loading a school
+  need no longer performs a reconciliation write; member request access still
+  reconciles elapsed eligibility as the specification requires.
+- Primary audit history is ordered by `occurred_at` then id, with a stable
+  `occurredAt|id` cursor. `/outreach` paginates needs and requests independently
+  through `needsAfter` and `requestsAfter`.
+- Directory approval continuity is explicit. Approval evidence must match the
+  current need version; historical directory approval survives its approver's
+  departure, while sending, takeover and delivery still require an active
+  coordinator assignment and the named staff contact's current verified role. The
+  operating procedure in [outreach.md](outreach.md) states these conditions.
+- Chromium coverage now includes reminder delivery, coordinator takeover and an
+  expired request's read-only state, alongside the existing send/decline journey;
+  HTTP covers the rejected response to an expired request.
+- Verification: focused HTTP outreach journeys pass 10/10 and the two Chromium
+  journeys pass. The full `npm test` suite passes (including six helper tests, the
+  HTTP suites and all 16 Chromium journeys), as do `npm run typecheck`,
+  `npm run build`, `npm run lint` and `npm run format:check`.
+
+---
+
 # Current handoff — bounded outreach implemented locally — 2026-10-19
 
 The documentation frontier update was committed on `master` as `27134c6`, after

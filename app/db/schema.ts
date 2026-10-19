@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer, primaryKey } from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, integer, primaryKey, sqliteView } from "drizzle-orm/sqlite-core";
 import { roles } from "../authorization/roles";
 import { houses } from "../membership/model";
 export { user } from "../auth/schema";
@@ -243,6 +243,9 @@ export const schoolNeedAudit = sqliteTable("school_need_audit", {
   occurredAt: text("occurred_at").notNull(),
 });
 
+export const outreachApprovedNeed = sqliteView("outreach_approved_need", {
+  id: text("id"),
+}).existing();
 export const outreachRequest = sqliteTable("outreach_request", {
   id: text("id").primaryKey(),
   needId: text("need_id").notNull(),

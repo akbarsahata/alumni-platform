@@ -51,8 +51,12 @@ records the one reminder intent and attempts captured delivery. Operators initia
 reminders from this screen; no scheduler or live mail delivery is configured.
 A short response deadline can leave no reminder window.
 
-The repository rechecks current recipient eligibility, current independent
-approvals, active coordinator authority and closure before capture. Profile opt-out,
+The repository rechecks current recipient eligibility, approval evidence for the
+current need version, active coordinator authority and closure before capture.
+Directory approval authority was checked when the immutable approval was recorded, so
+a later coordinator departure leaves the organization-owned approval valid; sending,
+takeover and delivery still require an active coordinator assignment, as described
+above. The named staff contact must still hold a verified staff role. Profile opt-out,
 unavailability, deletion flags and membership suspension cancel unanswered requests
 and pending/claimed notifications at the database change. Access/delivery also
 reconciles elapsed profile staleness. Re-enabling a profile does not revive cancelled

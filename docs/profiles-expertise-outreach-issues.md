@@ -28,7 +28,10 @@ present on local `master` at `48dea53`. The school-needs review issue
 
 Issue **#16 is implemented locally** on `master`; its prerequisites #14 and #15
 are complete. The GitHub issue remains open because this implementation has not
-been pushed. The next local implementation frontier is **#17** and **#18**;
+been pushed. The implementation treats current approvals as approval evidence for
+the current need version: directory approval authority is historical, while every
+send, takeover and delivery still requires an active coordinator and the named
+staff contact's current verified staff role. The next local implementation frontier is **#17** and **#18**;
 #19 follows #17, and #20 follows both #18 and #19. Issues #16–#20 remain open on
 GitHub. The table above retains the declared prerequisite relationships even when
 those prerequisites are complete locally.
