@@ -152,6 +152,9 @@ export default function OutreachRequest({ loaderData: d, actionData }: Route.Com
               diberikan sebelum batas respons.
             </p>
           )}
+          {!d.eligible && !active && !shared.length && (
+            <p>Profil atau keanggotaan Anda belum memenuhi syarat untuk perkenalan ini.</p>
+          )}
           {!d.staffRecipient?.active && !active && !shared.length && (
             <p>Perkenalan belum dapat dilakukan karena kontak staf tidak aktif.</p>
           )}

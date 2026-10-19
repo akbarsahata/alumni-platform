@@ -399,6 +399,10 @@ test("eligibility changes during queued delivery block the introduction", async 
       detail.sharing.some((item) => item.invalidatedAt),
       label
     );
+    if (label === "participation") {
+      const page = await (await call(recipient, `/outreach/requests/${requestId}`)).text();
+      assert.match(page, /belum memenuhi syarat/);
+    }
     assert.deepEqual(await capturedMail(f.staff.email), staffMailBefore, label);
     const events = await auditEvents(f.primary);
     assert.equal(
