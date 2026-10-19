@@ -16,7 +16,8 @@ outreach/response slice of [the agreed specification](profiles-expertise-outreac
   in the Pribadi menu. Captured email links directly to the authenticated request.
   Members can express interest or decline once; an optional decline reason is
   visible only to the member and current directory coordinators. Interest does not
-  share email. Introduction/consent and clarification belong to #17 and #18.
+  share email. Consented introductions are implemented in #17; private
+  clarification remains #18.
 - Each need has at most ten recipients, each member receives one request per need,
   and each member receives at most three new requests in a rolling 30-day period
   across all coordinators and replacement needs. Cancelled, declined and expired
@@ -56,11 +57,48 @@ current need version, active coordinator authority and closure before capture.
 Directory approval authority was checked when the immutable approval was recorded, so
 a later coordinator departure leaves the organization-owned approval valid; sending,
 takeover and delivery still require an active coordinator assignment, as described
-above. The named staff contact must still hold a verified staff role. Profile opt-out,
+above. The current named introduction recipient must still hold a verified staff
+role. Profile opt-out,
 unavailability, deletion flags and membership suspension cancel unanswered requests
 and pending/claimed notifications at the database change. Access/delivery also
 reconciles elapsed profile staleness. Re-enabling a profile does not revive cancelled
 requests. Completed responses remain historical records.
+
+## Consented introductions
+
+- Interest is not consent. After expressing interest, the member sees an initially
+  unchecked consent box naming the current verified staff recipient and the
+  member's own account email. Consent is a separate authenticated,
+  origin-protected action; it may be added at any time before the request expires.
+- `outreach_introduction` retains restricted evidence: the member email, named
+  staff user, consent time, withdrawal or invalidation, delivery state and sharing
+  time. It is never exposed through coordinator/student projections or general
+  audits. Audit events carry only actor ID, need ID, action and UTC time.
+- Consent immediately records the evidence and attempts one introduction through
+  the captured email abstraction to the named staff recipient only. The delivery
+  claim rechecks approved membership, participation, availability, profile
+  eligibility, active consent, request state, consent-before-expiry, current staff
+  role and verified email, and that the account email still matches the consented
+  email.
+- Failed capture leaves the introduction pending. A current directory coordinator
+  can retry it from the need page. Withdrawal is allowed while delivery is pending,
+  including after request expiry. A claimed delivery is in progress and a shared
+  email cannot be recalled. A claimed row left by a process crash requires
+  operator recovery; general provider recovery remains outside this slice.
+- Expiry blocks new responses and consent. Interest without consent expires
+  without an introduction. A consent recorded before expiry may finish afterward
+  only while eligibility and consent still hold. An authorized introduction may
+  also finish after the need closes, consistent with the accepted-arrangement rule;
+  closure does not itself invalidate the member's consent.
+- A sent need keeps its historical staff validation. The current introduction
+  recipient is stored in `outreach_staff_recipient`. A directory coordinator can
+  replace the recipient on a sent need; replacement invalidates pending consents
+  and requires fresh member consent to the new recipient. Loss of the recipient's
+  staff role pauses delivery; restoring the role allows retry.
+- Students and directory coordinators see sharing status only (staff name and
+  timestamps), never member email. The introduction email contains the member's
+  display/school name, email and need title/purpose/requested help; it excludes
+  house, profile text and decline reasons.
 
 ## Local setup and verification
 
@@ -68,8 +106,12 @@ Migration `0015_outreach.sql` adds requests, notification intents, closures, min
 audits, current-eligibility views and cancellation/freeze/history triggers.
 `0016_outreach_approval_continuity.sql` preserves historical directory approval
 after coordinator departure while retaining current staff and sending-authority
-checks. There are no new environment variables. Use the existing local setup and
-captured-mail adapter:
+checks. `0017_outreach_staff_recipients.sql` adds the current named introduction
+recipient and replaces the approved-need view so historical staff validation
+survives recipient replacement while current recipient authority is still checked.
+`0018_outreach_introductions.sql` adds consent/sharing evidence, delivery state,
+partial uniqueness indexes and eligibility/replacement/audit triggers. There are no
+new environment variables. Use the existing local setup and captured-mail adapter:
 
 ```sh
 npm run local:setup
@@ -82,6 +124,7 @@ routes and Chromium, with synthetic accounts:
 
 ```sh
 node scripts/test.mjs tests/outreach.test.mjs tests/browser/outreach.spec.ts
+node scripts/test.mjs tests/introductions.test.mjs tests/browser/introductions.spec.ts
 npm run typecheck
 npm run build
 ```

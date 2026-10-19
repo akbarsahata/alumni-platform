@@ -1,3 +1,86 @@
+# Consented introductions — 2026-10-20
+
+Issue [#17](https://github.com/akbarsahata/alumni-platform/issues/17) is
+implemented locally on `master` from starting commit `db67c3d`, with implementation
+commits `c8ada19` and `9556cec`. The code remains unpushed; issue #17 remains open
+on GitHub. No deployment, remote provisioning or live email occurred.
+
+## Consented introductions
+
+- Interest and email-sharing consent are separate. After a member expresses
+  interest, the request page shows an initially unchecked consent box naming the
+  current verified staff recipient and the member's own account email. The
+  response API remains interest/decline only; consent is an authenticated,
+  origin-protected `/consent` action and may be added until expiry.
+- `outreach_introduction` retains restricted evidence of consent, withdrawal or
+  invalidation, the named staff recipient, delivery state and sharing time. The
+  member email is not included in coordinator/student projections or general
+  audits. Audit actions (`consent-recorded`, `consent-withdrawn`,
+  `consent-invalidated`, `introduction-shared`, `staff-recipient-changed`)
+  contain only actor/need IDs, action and UTC time.
+- Consent immediately attempts one introduction to the named staff recipient
+  through the existing captured-email abstraction. The claim rechecks approved
+  membership, participation, availability, profile eligibility, active consent,
+  request state, consent-before-expiry, current staff role and verified email, and
+  that the account email still matches the consented email. Failed capture leaves
+  the introduction pending for a coordinator retry; repeated/concurrent actions
+  and retries cannot create a second share.
+- Withdrawal is allowed while delivery is pending, including after expiry. A
+  claimed delivery is in progress; a shared email cannot be recalled. A claim left
+  by a process crash requires operator recovery, matching the #16 claimed-
+  notification boundary. General provider recovery remains out of scope.
+- Expiry blocks new responses and consent. Interest without consent expires without
+  an introduction; a consent recorded before expiry may finish afterward only while
+  eligibility and consent still hold.
+- `outreach_staff_recipient` holds the current named introduction recipient. A
+  directory coordinator can replace it on a sent need; the replacement invalidates
+  pending consents and requires fresh member consent bound to the new recipient.
+  Loss of the recipient's staff role pauses delivery; restoring the role resumes
+  retries. Historical staff validation remains evidence of the need content, while
+  sending/member-notification delivery checks the current recipient's role.
+- Students and directory coordinators see sharing status (staff name/timestamps)
+  but never member email. The introduction email goes only to the named staff
+  account and contains member display/school name, email, need title, purpose and
+  requested help; it excludes house, profile text and decline reasons.
+- Migration `0017_outreach_staff_recipients.sql` adds the current recipient mapping,
+  backfill, request-insert initialization and the revised approved-need view.
+  `0018_outreach_introductions.sql` adds consent/sharing evidence, delivery state,
+  partial uniqueness indexes and eligibility/replacement/audit triggers. There are
+  no new environment variables. Both were applied to ordinary local D1 with
+  `npm run db:migrate`.
+
+## Issue #17 verification
+
+- Focused `node scripts/test.mjs tests/introductions.test.mjs
+tests/browser/introductions.spec.ts` passes eight HTTP journeys and three
+  Chromium journeys. Coverage includes interest without consent, the initially
+  unchecked consent box, captured-mail recipient/content, repeated and concurrent
+  consent, withdrawal before/after sharing, consent/withdraw races, expiry,
+  staff-role revocation and restoration, replacement before/after sharing,
+  eligibility/email changes during queued delivery, privacy, origin protection and
+  no-store responses.
+- Chromium captures desktop and 375px evidence at
+  `test-results/introductions-consent-desktop.png`,
+  `test-results/introductions-consent-mobile.png` and
+  `test-results/introductions-replacement.png`; the layouts were visually inspected.
+- Full `npm test` passes six helper tests, 87 HTTP tests and all 19 Chromium
+  journeys, with no failures or skips. The suite includes the real five-minute OTP
+  expiry and production-equivalent limiter windows.
+- `npm run typecheck`, `npm run build`, `npm run lint` and `npm run format:check`
+  pass.
+- Ordinary localhost remains available: `/login` and `/` return 200, and signed-out
+  `/outreach` returns 401. Normal local data was preserved; only the documented
+  migrations changed its schema. All automated accounts and captured mail were
+  synthetic.
+
+## Next implementation
+
+The next local implementation frontier is **#18** (private clarification); #19
+follows #17 and #20 follows both #18 and #19. Issue #17 remains open remotely and
+its code is unpushed. Automated deletion/anonymization remains out of scope.
+
+---
+
 # Review fixes — 2026-10-20
 
 A two-axis review of `9b58c3e` found standards and spec issues in the local #16

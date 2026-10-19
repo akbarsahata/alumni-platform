@@ -27,14 +27,15 @@ present on local `master` at `48dea53`. The school-needs review issue
 [#24](https://github.com/akbarsahata/alumni-platform/issues/24) is also closed.
 
 Issue **#16 is implemented locally** on `master` and was closed on GitHub on
-2026-10-19 UTC after the review fixes; its prerequisites #14 and #15 are complete. The
-code has not been pushed. The implementation treats current approvals as approval
-evidence for the current need version: directory approval authority is historical,
-while every send, takeover and delivery still requires an active coordinator and the
-named staff contact's current verified staff role. The next local implementation
-frontier is **#17** and **#18**; #19 follows #17, and #20 follows both #18 and #19.
-Issues #17–#20 remain open on GitHub. The table above retains the declared prerequisite relationships even when
-those prerequisites are complete locally.
+2026-10-19 UTC after the review fixes; its prerequisites #14 and #15 are complete.
+Issue **#17 is implemented locally** on `master`; its code and evidence are also
+unpushed. The implementation keeps historical staff validation while checking the
+current named introduction recipient's verified staff role, requires separate
+member consent before sharing email, and requires fresh consent after a recipient
+replacement. The next local implementation frontier is **#18**; #19 follows #17,
+and #20 follows both #18 and #19. Issues #17–#20 remain open on GitHub. The table
+above retains the declared prerequisite relationships even when those prerequisites
+are complete locally.
 
 See [outreach.md](outreach.md) for the request/response operating procedure and
 [handoff.md](handoff.md) for verification and local/remote delivery boundaries.
