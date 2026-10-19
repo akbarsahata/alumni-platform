@@ -6,6 +6,13 @@ export const outreachStatusLabels: Record<OutreachStatus, string> = {
   cancelled: "Dibatalkan",
   expired: "Kedaluwarsa",
 };
+export type IntroductionDeliveryState = "pending" | "claimed" | "captured" | "cancelled";
+export const invalidationReasonLabels: Record<string, string> = {
+  "eligibility-changed": "Kelayakan profil atau keanggotaan berubah",
+  "email-changed": "Alamat email akun berubah",
+  "staff-recipient-changed": "Kontak staf penerima berubah",
+  "delivery-blocked": "Pengiriman tidak dapat dilanjutkan",
+};
 export type OutreachAuditCursor = { occurredAt: string; id: string };
 export function parseOutreachAuditCursor(value: string): OutreachAuditCursor {
   const [occurredAt, id] = value.split("|");

@@ -246,6 +246,29 @@ export const schoolNeedAudit = sqliteTable("school_need_audit", {
 export const outreachApprovedNeed = sqliteView("outreach_approved_need", {
   id: text("id"),
 }).existing();
+export const outreachStaffRecipient = sqliteTable("outreach_staff_recipient", {
+  needId: text("need_id").primaryKey(),
+  userId: text("user_id").notNull(),
+  assignedBy: text("assigned_by").notNull(),
+  assignedAt: text("assigned_at").notNull(),
+});
+export const outreachIntroduction = sqliteTable("outreach_introduction", {
+  id: text("id").primaryKey(),
+  needId: text("need_id").notNull(),
+  requestId: text("request_id").notNull(),
+  memberUserId: text("member_user_id").notNull(),
+  staffUserId: text("staff_user_id").notNull(),
+  memberEmail: text("member_email").notNull(),
+  consentedAt: text("consented_at").notNull(),
+  withdrawnAt: text("withdrawn_at"),
+  invalidatedAt: text("invalidated_at"),
+  invalidationReason: text("invalidation_reason"),
+  deliveryState: text("delivery_state", {
+    enum: ["pending", "claimed", "captured", "cancelled"],
+  }).notNull(),
+  claimedAt: text("claimed_at"),
+  sharedAt: text("shared_at"),
+});
 export const outreachRequest = sqliteTable("outreach_request", {
   id: text("id").primaryKey(),
   needId: text("need_id").notNull(),

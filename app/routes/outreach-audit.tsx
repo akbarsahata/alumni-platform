@@ -17,6 +17,11 @@ const labels: Record<string, string> = {
   interested: "Respons berminat",
   declined: "Respons menolak",
   cancelled: "Permintaan dibatalkan",
+  "consent-recorded": "Persetujuan berbagi dicatat",
+  "consent-withdrawn": "Persetujuan ditarik",
+  "consent-invalidated": "Persetujuan dibatalkan",
+  "introduction-shared": "Perkenalan dibagikan",
+  "staff-recipient-changed": "Kontak staf penerima berubah",
 };
 export default function OutreachAudit({ loaderData: d }: Route.ComponentProps) {
   return (

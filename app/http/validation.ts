@@ -281,6 +281,13 @@ export const outreachResponseInput = z
   .strict()
   .refine((v) => v.outcome === "declined" || !v.reason);
 export const outreachActionInput = z.object({}).strict();
+export const outreachConsentInput = z.object({ consent: z.literal(true) }).strict();
+export const outreachStaffRecipientInput = z
+  .object({
+    expectedStaffUserId: requiredText(200),
+    staffUserId: requiredText(200),
+  })
+  .strict();
 
 export const outreachTakeoverInput = z
   .object({ expectedCoordinatorUserId: requiredText(200) })

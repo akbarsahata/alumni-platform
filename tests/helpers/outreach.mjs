@@ -84,6 +84,40 @@ export async function send(fixture, needId, recipient, actor = fixture.coordinat
     recipientUserId: recipient.id,
   });
 }
+export async function staffAccount(label, primary) {
+  const account = await login(label);
+  await role(account, "staff", primary);
+  return account;
+}
+export function respond(account, requestId, outcome = "interested", reason = "") {
+  return call(account, `/api/outreach/requests/${requestId}/respond`, { outcome, reason });
+}
+export function giveConsent(account, requestId) {
+  return call(account, `/api/outreach/requests/${requestId}/consent`, { consent: true });
+}
+export function withdrawConsent(account, requestId) {
+  return call(account, `/api/outreach/requests/${requestId}/withdraw-consent`, {});
+}
+export function retryIntroduction(account, requestId) {
+  return call(account, `/api/outreach/requests/${requestId}/introduction/deliver`, {});
+}
+export function changeStaff(account, needId, expectedStaffUserId, staffUserId) {
+  return call(account, `/api/outreach/needs/${needId}/staff-recipient`, {
+    expectedStaffUserId,
+    staffUserId,
+  });
+}
+export async function queueIntroduction(
+  requestId,
+  consentedAt = "strftime('%Y-%m-%dT%H:%M:%fZ','now')"
+) {
+  await fixtureSql(`INSERT INTO outreach_introduction(id,need_id,request_id,member_user_id,
+    staff_user_id,member_email,consented_at,delivery_state)
+    SELECT lower(hex(randomblob(16))),r.need_id,r.id,r.recipient_user_id,sr.user_id,u.email,
+      ${consentedAt},'pending'
+    FROM outreach_request r JOIN outreach_staff_recipient sr ON sr.need_id=r.need_id
+    JOIN user u ON u.id=r.recipient_user_id WHERE r.id='${requestId}'`);
+}
 
 // Time/queue fixtures only: writes are guarded to this runner's disposable D1.
 export async function fixtureSql(sql) {

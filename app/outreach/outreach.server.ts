@@ -1,11 +1,14 @@
 import { getAccess, requireDirectory, requirePrimary } from "../authorization/permissions.server";
 import { hasTrustedOrigin } from "../auth/auth.server";
 import { outreachRepository } from "../db/outreach.repository.server";
+import { schoolNeedsRepository } from "../db/school-needs.repository.server";
 import {
   parseInput,
   outreachSendInput,
   outreachResponseInput,
   outreachActionInput,
+  outreachConsentInput,
+  outreachStaffRecipientInput,
   outreachTakeoverInput,
   outreachPageCursor,
   outreachAuditCursor,
@@ -88,26 +91,60 @@ export async function sendOutreach(request: Request, env: Env, needId: string, i
 export async function readOutreachNeed(request: Request, env: Env, needId: string) {
   const access = await requireDirectory(request, env);
   const repository = outreachRepository(env.DB);
-  const detail = await repository.needWorkspace(needId);
+  const [detail, staffContacts] = await Promise.all([
+    repository.needWorkspace(needId),
+    schoolNeedsRepository(env.DB).staffContacts(),
+  ]);
   if (!detail.available && !detail.frozen && !detail.closed)
     throw new Response("Kebutuhan tidak tersedia untuk penjangkauan.", { status: 404 });
-  if (!detail.need) throw new Response("Kebutuhan tidak ditemukan.", { status: 404 });
+  const need = detail.need;
+  if (!need) throw new Response("Kebutuhan tidak ditemukan.", { status: 404 });
   return {
-    need: detail.need,
+    need: detail.staffRecipient ? { ...need, staffContactName: detail.staffRecipient.name } : need,
     actorId: access.account.id,
     canSend: detail.available,
     closed: detail.closed,
     requests: detail.requests,
     notifications: detail.notifications,
+    staffRecipient: detail.staffRecipient,
+    staffContacts,
+    sharing: detail.sharing,
+    canChangeStaff: detail.requests.length > 0,
   };
 }
 export async function readOutreachRequest(request: Request, env: Env, requestId: string) {
   const access = await getAccess(request, env);
   const repository = outreachRepository(env.DB);
   await repository.reconcile();
-  const row = await repository.requestWithNeed(requestId, access.account.id);
+  const row = await repository.requestDetail(requestId, access.account.id);
   if (!row) throw new Response("Permintaan tidak ditemukan.", { status: 404 });
-  return row;
+  const isRecipient = row.request.recipientUserId === access.account.id;
+  const expired = Date.parse(row.request.expiresAt) <= Date.now();
+  const active = row.sharing.find(
+    (item) => !item.sharedAt && !item.withdrawnAt && !item.invalidatedAt
+  );
+  const currentStaffId = row.staffRecipient?.userId;
+  const sharedWithCurrent =
+    !!currentStaffId &&
+    row.sharing.some((item) => !!item.sharedAt && item.staffUserId === currentStaffId);
+  const canConsent =
+    isRecipient &&
+    row.request.status === "interested" &&
+    !expired &&
+    !active &&
+    !sharedWithCurrent &&
+    row.eligible &&
+    !!row.staffRecipient?.active;
+  const canWithdraw = isRecipient && !!active && active.deliveryState === "pending";
+  const canRespond = isRecipient && row.request.status === "pending" && !expired;
+  return {
+    ...row,
+    need: row.staffRecipient
+      ? { ...row.need, staffContactName: row.staffRecipient.name }
+      : row.need,
+    viewer: { isRecipient, email: isRecipient ? access.account.email : null },
+    access: { canConsent, canWithdraw, canRespond, expired },
+  };
 }
 export async function respondOutreach(
   request: Request,
@@ -131,6 +168,148 @@ export async function respondOutreach(
     now: new Date().toISOString(),
   });
   if (!rows.length) conflict();
+  return { changed: true };
+}
+
+async function deliverIntroduction(env: Env, requestId: string) {
+  const repository = outreachRepository(env.DB);
+  await repository.reconcile();
+  const now = new Date().toISOString();
+  const claim = await repository.claimIntroduction(requestId, now);
+  if (!claim) return { shared: false, pending: await repository.hasPendingIntroduction(requestId) };
+  const delivery = await repository.introductionDelivery(claim.id);
+  if (!delivery) {
+    await repository.finishIntroduction(claim.id, "pending", now);
+    return { shared: false, pending: await repository.hasPendingIntroduction(requestId) };
+  }
+  try {
+    await sendEmail(env, {
+      to: delivery.staffEmail,
+      subject: `Perkenalan alumni: ${delivery.title}`,
+      text: `Kepada ${delivery.staffName},\n\n${delivery.memberName} (${delivery.memberEmail}) menyetujui emailnya dibagikan kepada Anda untuk kebutuhan sekolah berikut.\n\nKebutuhan: ${delivery.title}\nTujuan sekolah: ${delivery.purpose}\nBantuan yang diminta: ${delivery.requestedHelp}\n\nAlumni tersebut telah memberikan persetujuan eksplisit untuk perkenalan ini. Silakan hubungi langsung melalui email di atas.`,
+    });
+    const rows = await repository.finishIntroduction(claim.id, "captured", now);
+    return { shared: rows.length > 0, pending: false };
+  } catch {
+    await repository.finishIntroduction(claim.id, "pending", now);
+    return { shared: false, pending: true };
+  }
+}
+
+export async function giveConsent(request: Request, env: Env, requestId: string, input: unknown) {
+  origin(request, env);
+  const access = await getAccess(request, env);
+  parseInput(outreachConsentInput, input, "Centang persetujuan berbagi email.");
+  const detail = await readOutreachRequest(request, env, requestId);
+  if (!detail.viewer.isRecipient)
+    throw new Response("Permintaan tidak ditemukan.", { status: 404 });
+  if (detail.request.status === "pending")
+    throw new Response("Nyatakan minat terlebih dahulu sebelum memberikan persetujuan.", {
+      status: 409,
+    });
+  if (["declined", "cancelled", "expired"].includes(detail.request.status))
+    throw new Response("Permintaan ini sudah ditutup.", { status: 409 });
+  if (detail.access.expired)
+    throw new Response("Batas respons telah lewat. Persetujuan baru tidak dapat diberikan.", {
+      status: 409,
+    });
+  if (!detail.eligible)
+    throw new Response("Profil atau keanggotaan tidak memenuhi syarat untuk perkenalan.", {
+      status: 409,
+    });
+  if (!detail.staffRecipient?.active)
+    throw new Response("Kontak staf penerima perkenalan tidak aktif.", { status: 409 });
+  const repository = outreachRepository(env.DB);
+  const rows = await repository.consent({
+    id: crypto.randomUUID(),
+    requestId,
+    memberId: access.account.id,
+    now: new Date().toISOString(),
+  });
+  if (!rows.length) {
+    const active = await repository.activeIntroduction(requestId, access.account.id);
+    if (active?.sharedAt)
+      throw new Response("Email sudah dibagikan kepada kontak staf ini.", { status: 409 });
+    if (active) throw new Response("Persetujuan sudah tercatat.", { status: 409 });
+    throw new Response(
+      "Persetujuan belum dapat dicatat. Periksa minat, batas respons, kelayakan, dan kontak staf.",
+      { status: 409 }
+    );
+  }
+  return { changed: true, ...(await deliverIntroduction(env, requestId)) };
+}
+
+export async function withdrawConsent(
+  request: Request,
+  env: Env,
+  requestId: string,
+  input: unknown
+) {
+  origin(request, env);
+  const access = await getAccess(request, env);
+  parseInput(outreachActionInput, input, "Tindakan tidak valid.");
+  const row = await outreachRepository(env.DB).requestWithNeed(requestId, access.account.id);
+  if (!row || row.request.recipientUserId !== access.account.id)
+    throw new Response("Permintaan tidak ditemukan.", { status: 404 });
+  const rows = await outreachRepository(env.DB).withdraw(
+    requestId,
+    access.account.id,
+    new Date().toISOString()
+  );
+  if (!rows.length) {
+    const active = await outreachRepository(env.DB).activeIntroduction(
+      requestId,
+      access.account.id
+    );
+    if (active?.sharedAt)
+      throw new Response("Email sudah dibagikan dan tidak dapat ditarik kembali.", { status: 409 });
+    if (active)
+      throw new Response("Pengiriman sedang berlangsung. Persetujuan belum dapat ditarik.", {
+        status: 409,
+      });
+    throw new Response("Tidak ada persetujuan aktif untuk ditarik.", { status: 409 });
+  }
+  return { changed: true };
+}
+
+export async function retryIntroduction(
+  request: Request,
+  env: Env,
+  requestId: string,
+  input: unknown
+) {
+  origin(request, env);
+  const access = await requireDirectory(request, env);
+  parseInput(outreachActionInput, input, "Tindakan tidak valid.");
+  if (!(await outreachRepository(env.DB).request(requestId, access.account.id)))
+    throw new Response("Permintaan tidak ditemukan.", { status: 404 });
+  return { changed: true, ...(await deliverIntroduction(env, requestId)) };
+}
+
+export async function changeStaffRecipient(
+  request: Request,
+  env: Env,
+  needId: string,
+  input: unknown
+) {
+  origin(request, env);
+  const access = await requireDirectory(request, env);
+  const body = parseInput(
+    outreachStaffRecipientInput,
+    input,
+    "Pilih kontak staf penerima perkenalan yang valid."
+  );
+  const rows = await outreachRepository(env.DB).changeStaffRecipient({
+    needId,
+    actorId: access.account.id,
+    expectedStaffUserId: body.expectedStaffUserId,
+    staffUserId: body.staffUserId,
+    now: new Date().toISOString(),
+  });
+  if (!rows.length)
+    throw new Response("Kontak staf berubah atau tidak valid. Muat ulang dan coba lagi.", {
+      status: 409,
+    });
   return { changed: true };
 }
 

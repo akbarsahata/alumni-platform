@@ -10,6 +10,10 @@ import {
   readOutreachAudit,
   remindOutreach,
   readOutreach,
+  giveConsent,
+  withdrawConsent,
+  retryIntroduction,
+  changeStaffRecipient,
 } from "../outreach/outreach.server";
 export const outreachRoutes = new Hono<{ Bindings: Env }>()
   .get("/", async (c) => c.json(await readOutreach(c.req.raw, c.env)))
@@ -49,6 +53,17 @@ export const outreachRoutes = new Hono<{ Bindings: Env }>()
     )
   )
   .all("/needs/:needId/close", () => new Response(null, { status: 405 }))
+  .post("/needs/:needId/staff-recipient", async (c) =>
+    c.json(
+      await changeStaffRecipient(
+        c.req.raw,
+        c.env,
+        c.req.param("needId"),
+        await c.req.json().catch(() => null)
+      )
+    )
+  )
+  .all("/needs/:needId/staff-recipient", () => new Response(null, { status: 405 }))
   .get("/needs/:needId", async (c) =>
     c.json(await readOutreachNeed(c.req.raw, c.env, c.req.param("needId")))
   )
@@ -64,6 +79,39 @@ export const outreachRoutes = new Hono<{ Bindings: Env }>()
     )
   )
   .all("/needs/:needId/send", () => new Response(null, { status: 405 }))
+  .post("/requests/:requestId/consent", async (c) =>
+    c.json(
+      await giveConsent(
+        c.req.raw,
+        c.env,
+        c.req.param("requestId"),
+        await c.req.json().catch(() => null)
+      )
+    )
+  )
+  .all("/requests/:requestId/consent", () => new Response(null, { status: 405 }))
+  .post("/requests/:requestId/withdraw-consent", async (c) =>
+    c.json(
+      await withdrawConsent(
+        c.req.raw,
+        c.env,
+        c.req.param("requestId"),
+        await c.req.json().catch(() => null)
+      )
+    )
+  )
+  .all("/requests/:requestId/withdraw-consent", () => new Response(null, { status: 405 }))
+  .post("/requests/:requestId/introduction/deliver", async (c) =>
+    c.json(
+      await retryIntroduction(
+        c.req.raw,
+        c.env,
+        c.req.param("requestId"),
+        await c.req.json().catch(() => null)
+      )
+    )
+  )
+  .all("/requests/:requestId/introduction/deliver", () => new Response(null, { status: 405 }))
   .get("/requests/:requestId", async (c) =>
     c.json(await readOutreachRequest(c.req.raw, c.env, c.req.param("requestId")))
   )
