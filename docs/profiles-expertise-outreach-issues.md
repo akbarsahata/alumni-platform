@@ -16,14 +16,24 @@ frontier. These are flat issues, without parent issues or decimal subtickets.
 | [#19](https://github.com/akbarsahata/alumni-platform/issues/19) | Track outcomes and close school needs                  | [#17](https://github.com/akbarsahata/alumni-platform/issues/17)                                                                  |
 | [#20](https://github.com/akbarsahata/alumni-platform/issues/20) | Process directory deletion and manual retention        | [#18](https://github.com/akbarsahata/alumni-platform/issues/18), [#19](https://github.com/akbarsahata/alumni-platform/issues/19) |
 
-The initial frontier was **#13** and **#15**. Issue #13 is implemented and locally
-verified, including the responsive “Profil & Keahlian” editor, required professional
-introduction and single participation-consent checkbox. See the current summary in
-[handoff.md](handoff.md) and the [layout decision](profile-layout.md).
-Issue #14 is also implemented and locally verified; see the directory entries in
-[handoff.md](handoff.md). The next unblocked issue is **#15**. Issue #16
-remains blocked by #15. This is the local implementation record; recheck the
-current tracker body, labels and dependencies before starting. Each issue includes its own end-to-end
+## Current frontier — 2026-10-19
+
+The initial frontier was **#13** and **#15**. Issue #13 is implemented, including
+the responsive “Profil & Keahlian” editor, required professional introduction and
+single participation-consent checkbox; see the [layout decision](profile-layout.md).
+Issue #14 is closed. Issue #15 is closed following the merge of
+[PR #23](https://github.com/akbarsahata/alumni-platform/pull/23) on 2026-10-11,
+present on local `master` at `48dea53`. The school-needs review issue
+[#24](https://github.com/akbarsahata/alumni-platform/issues/24) is also closed.
+
+The next unblocked issue is **#16**: both of its prerequisites, #14 and #15, are
+complete. Issues #16–#20 remain open. Completing #16 unblocks **#17** and **#18**;
+#19 follows #17, and #20 follows both #18 and #19. The table above retains the
+declared prerequisite relationships even when those prerequisites are complete.
+
+See [handoff.md](handoff.md) for the current checkout and recorded verification
+boundaries. Recheck the current tracker body, labels, comments and dependencies
+before starting. Each issue includes its own end-to-end
 acceptance criteria, synthetic Worker/D1/captured-email HTTP and Chromium verification,
 and build/typecheck requirements. Automated deletion and anonymization remain out of scope.
 
@@ -32,8 +42,8 @@ explicit issue links in each issue's `Blocked by` section. No parent issue was
 created or modified. Existing historical membership issue structures were not changed.
 
 Publication of the issues itself did not start their implementation. Historical
-profile branch/commit details are recorded in the handoff; the current checkout
-and uncommitted UI changes are described in its opening summary.
+profile branch/commit details are recorded in the handoff; its opening summary
+describes the current checkout and supersedes those historical branch statements.
 
 ## UI baseline for subsequent issues
 
@@ -44,5 +54,5 @@ for unimplemented workflows. Keep the primary-only menu preview aligned with new
 role-based destinations, while server permission checks remain authoritative.
 Guests use `/` or `/login` without a menu. Breadcrumbs and the signed-in actionable
 home dashboard are deferred. Keep useful feature/parent links on pages, without
-redundant Beranda links. The current UI changes are local and uncommitted on
-`master`; preserve them when starting #15.
+redundant Beranda links. This navigation is part of the committed baseline on
+`master`; extend it when implementing #16.

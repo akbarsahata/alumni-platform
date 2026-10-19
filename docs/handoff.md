@@ -1,9 +1,18 @@
-# Current handoff — school needs and independent approval — 2026-10-07
+# Current handoff — bounded outreach is next — 2026-10-19
 
-Current checkout: `copilot/submit-and-approve-school-needs`, implementing issue
-#15 in open PR #23. The implementation has been committed and pushed through the
-progress tool. No deployment, remote migration, live email or normal localhost D1
-data change occurred.
+Current checkout: `master` at `48dea53`, the merge of
+[PR #23](https://github.com/akbarsahata/alumni-platform/pull/23) on 2026-10-11.
+The working tree was clean before this documentation update and the local
+`origin/master` ref points to the same commit. GitHub issues
+[#14](https://github.com/akbarsahata/alumni-platform/issues/14),
+[#15](https://github.com/akbarsahata/alumni-platform/issues/15) and the school-needs
+review issue [#24](https://github.com/akbarsahata/alumni-platform/issues/24) are
+closed. The next unblocked implementation issue is
+[#16: Send bounded outreach and collect interest or declines](https://github.com/akbarsahata/alumni-platform/issues/16).
+Its prerequisite issues #14 and #15 are complete.
+
+This update changes documentation only. No new runtime verification, deployment,
+remote migration, live email or ordinary localhost D1 change was performed.
 
 ## Current behavior
 
@@ -44,11 +53,17 @@ npm run dev
 ```
 
 The integration runner applies migrations to disposable D1 state. To use this
-feature in ordinary local data, run the existing `npm run db:migrate`; this session
-did not alter the ordinary local database. Synthetic Better Auth sign-in uses the
+feature in ordinary local data, run the existing `npm run db:migrate`. The prior
+implementation handoff did not record applying these migrations to the ordinary
+local database; this documentation update does not verify that database's state.
+Synthetic Better Auth sign-in uses the
 existing captured-mail adapter; the school-needs workflow itself sends no mail.
 
 ## Verification boundary
+
+The following results were recorded in the school-needs implementation handoff.
+They have not been rerun for this documentation update and do not establish a new
+verification result for the merged commit.
 
 - Focused `node scripts/test.mjs tests/school-needs.test.mjs tests/browser/school-needs.spec.ts`:
   four real Worker/D1/Better Auth HTTP journeys and one Chromium journey pass.
@@ -60,7 +75,22 @@ existing captured-mail adapter; the school-needs workflow itself sends no mail.
 - The secret scan found no secrets in changed code/tests. No live email, deployment
   or hosted CI result is claimed.
 
-Issue #15’s implementation is on PR #23; issue #16 still depends on #15. See the
+## Next implementation
+
+Start #16 from the agreed specification and its current issue acceptance criteria:
+
+- Add coordinator recipient selection and captured-email requests for approved
+  school needs, with private member interest/decline responses.
+- Enforce the per-need and rolling member contact limits, frozen sent terms,
+  expiry, one eligible reminder and cancellation when eligibility changes.
+- Preserve current authorization, minimal audits and staff/student aggregate-only
+  views. Verify the slice through real local Worker/D1/Better Auth/captured-email
+  HTTP and Chromium journeys, plus the required full suite and build checks.
+- Completion of #16 unblocks #17 (consented introductions) and #18 (private
+  clarification). #19 follows #17; #20 follows both #18 and #19. Automated deletion
+  and anonymization remain outside the agreed scope.
+
+See the
 [flat implementation index](profiles-expertise-outreach-issues.md) and the agreed
 [profiles, expertise and school outreach specification](profiles-expertise-outreach-spec.md).
 Earlier entries below retain their historical dates and change boundaries.
