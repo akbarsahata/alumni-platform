@@ -53,14 +53,17 @@ reminders from this screen; no scheduler or live mail delivery is configured.
 A short response deadline can leave no reminder window.
 
 The repository rechecks current recipient eligibility, approval evidence for the
-current need version, active coordinator authority and closure before capture.
-Directory approval authority was checked when the immutable approval was recorded, so
-a later coordinator departure leaves the organization-owned approval valid; sending,
-takeover and delivery still require an active coordinator assignment, as described
-above. The current named introduction recipient must still hold a verified staff
-role. Profile opt-out,
-unavailability, deletion flags and membership suspension cancel unanswered requests
-and pending/claimed notifications at the database change. Access/delivery also
+current need version, closure and the current named staff recipient's verified role
+before capture. Coordinator-initiated introduction retries also recheck the
+initiating coordinator's current directory-coordinator role at both claim and
+capture, so losing that role after the initial access check prevents sharing.
+Member-initiated delivery after explicit consent does not require a coordinator
+role. Directory approval authority was checked when the immutable approval was
+recorded, so a later coordinator departure leaves the organization-owned approval
+valid; sending, takeover and coordinator-initiated delivery still require an active
+coordinator assignment, as described above. Profile opt-out, unavailability,
+deletion flags and membership suspension cancel unanswered requests and
+pending/claimed notifications at the database change. Access/delivery also
 reconciles elapsed profile staleness. Re-enabling a profile does not revive cancelled
 requests. Completed responses remain historical records.
 
@@ -76,7 +79,9 @@ requests. Completed responses remain historical records.
 - `outreach_introduction` retains restricted evidence: the member email, named
   staff user, consent time, withdrawal or invalidation, delivery state and sharing
   time. It is never exposed through coordinator/student projections or general
-  audits. Audit events carry only actor ID, need ID, action and UTC time.
+  audits. Audit events carry only actor ID, need ID, action and UTC time. Displayed
+  staff names resolve from the current verified account identity; a primary name
+  correction does not rewrite consent or sharing evidence.
 - Consent immediately records the evidence and attempts one introduction through
   the captured email abstraction to the named staff recipient only. The delivery
   claim rechecks approved membership, participation, availability, profile

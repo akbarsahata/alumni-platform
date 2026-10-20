@@ -95,10 +95,20 @@ export const schoolInvitation = sqliteTable("school_invitation", {
   role: text("role", { enum: ["staff", "student"] }).notNull(),
   issuerId: text("issuer_id").notNull(),
   reason: text("reason").notNull(),
+  representativeName: text("representative_name"),
   issuedAt: text("issued_at").notNull(),
   expiresAt: text("expires_at").notNull(),
   acceptedBy: text("accepted_by"),
   acceptedAt: text("accepted_at"),
+});
+
+export const representativeNameChange = sqliteTable("representative_name_change", {
+  id: text("id").primaryKey(),
+  targetUserId: text("target_user_id").notNull(),
+  actorUserId: text("actor_user_id").notNull(),
+  oldName: text("old_name").notNull(),
+  newName: text("new_name").notNull(),
+  occurredAt: text("occurred_at").notNull(),
 });
 
 export const membershipStatusDecision = sqliteTable("membership_status_decision", {

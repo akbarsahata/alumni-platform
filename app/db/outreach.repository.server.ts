@@ -476,7 +476,11 @@ export function outreachRepository(binding: D1Database) {
           ORDER BY consented_at DESC,id DESC LIMIT 1`)
       )[0];
     },
-    async claimIntroduction(requestId: string, now: string) {
+    async claimIntroduction(
+      requestId: string,
+      now: string,
+      initiatingCoordinatorId: string | null
+    ) {
       return (
         await db.all<{ id: string }>(sql`
           UPDATE outreach_introduction SET delivery_state='claimed',claimed_at=${now}
@@ -496,6 +500,10 @@ export function outreachRepository(binding: D1Database) {
               AND mu.email_verified=1 AND su.email_verified=1
               AND EXISTS(SELECT 1 FROM role_assignment rr
                 WHERE rr.user_id=i.staff_user_id AND rr.role='staff')
+              AND (${initiatingCoordinatorId} IS NULL OR EXISTS(
+                SELECT 1 FROM role_assignment cr
+                WHERE cr.user_id=${initiatingCoordinatorId}
+                  AND cr.role='directory-coordinator'))
             ORDER BY i.consented_at DESC,i.id DESC LIMIT 1)
           AND delivery_state='pending'
           RETURNING id`)
@@ -541,7 +549,11 @@ export function outreachRepository(binding: D1Database) {
               WHERE rr.user_id=i.staff_user_id AND rr.role='staff')`)
       )[0];
     },
-    async captureIntroduction(id: string, message: EmailMessage) {
+    async captureIntroduction(
+      id: string,
+      message: EmailMessage,
+      initiatingCoordinatorId: string | null
+    ) {
       const now = Date.now();
       const rows = await db.all<{ recipient: string }>(sql`
         INSERT OR REPLACE INTO local_introduction_mail(
@@ -559,6 +571,10 @@ export function outreachRepository(binding: D1Database) {
           AND mu.email_verified=1 AND su.email_verified=1
           AND EXISTS(SELECT 1 FROM outreach_eligible_recipient er WHERE er.user_id=i.member_user_id)
           AND EXISTS(SELECT 1 FROM role_assignment rr WHERE rr.user_id=i.staff_user_id AND rr.role='staff')
+          AND (${initiatingCoordinatorId} IS NULL OR EXISTS(
+            SELECT 1 FROM role_assignment cr
+            WHERE cr.user_id=${initiatingCoordinatorId}
+              AND cr.role='directory-coordinator'))
         RETURNING recipient`);
       return rows.length > 0;
     },

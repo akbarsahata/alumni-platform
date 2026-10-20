@@ -128,7 +128,7 @@ export async function queueIntroduction(
 export async function fixtureSql(sql) {
   assert.ok(process.env.ALUMNI_TEST_STATE?.includes("integration-state-"));
   const { execFileSync } = await import("node:child_process");
-  execFileSync(
+  return execFileSync(
     "node_modules/.bin/wrangler",
     [
       "d1",
@@ -140,6 +140,6 @@ export async function fixtureSql(sql) {
       "--command",
       sql,
     ],
-    { stdio: "pipe" }
+    { stdio: "pipe", encoding: "utf8" }
   );
 }

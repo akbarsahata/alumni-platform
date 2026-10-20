@@ -1,6 +1,6 @@
 import { desc, eq, sql } from "drizzle-orm";
 import { database } from "./database.server";
-import { schoolNeed, schoolNeedApproval, schoolNeedRevision } from "./schema";
+import { schoolNeed, schoolNeedApproval, schoolNeedRevision, user } from "./schema";
 import type {
   LocationMode,
   NeedCategory,
@@ -52,7 +52,8 @@ function summaryFromRow(row: SummaryRow): NeedSummary {
 
 const summaryFields = sql`
   n.id,n.version,n.category,n.title,n.updated_at AS updatedAt,
-  n.staff_contact_user_id AS staffContactUserId,n.staff_contact_name AS staffContactName,
+  n.staff_contact_user_id AS staffContactUserId,
+  COALESCE(NULLIF(trim(u.name),''),'Akun staf ' || substr(u.id,1,8)) AS staffContactName,
   EXISTS(SELECT 1 FROM school_need_approval a WHERE a.need_id=n.id
     AND a.version=n.version AND a.stage='staff-validation') AS staffValidated,
   EXISTS(SELECT 1 FROM school_need_approval a WHERE a.need_id=n.id
@@ -76,7 +77,8 @@ export function schoolNeedsRepository(binding: D1Database) {
         SELECT u.id,COALESCE(NULLIF(trim(u.name),''),'Akun staf ' || substr(u.id,1,8)) AS name
         FROM user u JOIN role_assignment r ON r.user_id=u.id
         WHERE r.role='staff' AND u.email_verified=1
-        ORDER BY u.name COLLATE NOCASE,u.id
+        ORDER BY COALESCE(NULLIF(trim(u.name),''),'Akun staf ' || substr(u.id,1,8))
+          COLLATE NOCASE,u.id
       `);
     },
     async ownNeeds(userId: string, after: { updatedAt: string; id: string } | null) {
@@ -165,12 +167,14 @@ export function schoolNeedsRepository(binding: D1Database) {
             locationMode: schoolNeed.locationMode,
             locationDetails: schoolNeed.locationDetails,
             staffContactUserId: schoolNeed.staffContactUserId,
-            staffContactName: schoolNeed.staffContactName,
+            staffContactName: sql<string>`COALESCE(NULLIF(trim(${user.name}),''),
+              'Akun staf ' || substr(${user.id},1,8))`,
             participationTerms: schoolNeed.participationTerms,
             paidDetails: schoolNeed.paidDetails,
             initiativeLink: schoolNeed.initiativeLink,
           })
-          .from(schoolNeed).where(sql`
+          .from(schoolNeed)
+          .leftJoin(user, eq(user.id, schoolNeed.staffContactUserId)).where(sql`
             ${schoolNeed.id}=${needId}
             AND EXISTS(SELECT 1 FROM role_assignment r
               WHERE r.user_id=${actorId}

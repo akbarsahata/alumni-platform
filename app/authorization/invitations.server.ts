@@ -12,7 +12,7 @@ export async function issueInvitation(request: Request, env: Env, input: unknown
   const fields = parseInput(
     invitationInput,
     input,
-    "Isi email, peran sekolah, dan alasan yang valid."
+    "Isi email, nama perwakilan, peran sekolah, dan alasan yang valid."
   );
   const invitation = await invitationRepository(env.DB).issue({
     ...fields,
@@ -24,7 +24,7 @@ export async function issueInvitation(request: Request, env: Env, input: unknown
     await sendEmail(env, {
       to: invitation.email,
       subject: "Undangan perwakilan sekolah",
-      text: `Anda diundang sebagai ${roleLabels[invitation.role]}. Masuk dengan kode menggunakan email ini, lalu buka ${new URL(`/invitations/${invitation.id}`, env.BETTER_AUTH_URL)} untuk menerima. Undangan berlaku tujuh hari hingga ${invitation.expiresAt}. Tidak perlu pengajuan atau profil alumni.`,
+      text: `Anda diundang sebagai ${roleLabels[invitation.role]} dengan nama perwakilan ${invitation.representativeName}. Masuk dengan kode menggunakan email ini, lalu buka ${new URL(`/invitations/${invitation.id}`, env.BETTER_AUTH_URL)} untuk menerima. Undangan berlaku tujuh hari hingga ${invitation.expiresAt}. Tidak perlu pengajuan atau profil alumni.`,
     });
   } catch {
     delivered = false;
@@ -39,6 +39,7 @@ export async function readInvitation(request: Request, env: Env, id: string) {
     throw new Response("Undangan tidak tersedia untuk akun ini.", { status: 404 });
   return {
     role: invitation.role,
+    representativeName: invitation.representativeName,
     expiresAt: invitation.expiresAt,
     accepted: !!invitation.acceptedBy,
     expired: invitation.expiresAt <= new Date().toISOString(),

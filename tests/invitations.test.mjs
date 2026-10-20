@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { membershipReviewers } from "./helpers/membership.mjs";
-import { login, call, capturedMail } from "./helpers/accounts.mjs";
+import { base, login, call, capturedMail } from "./helpers/accounts.mjs";
 
 test("primary issues a captured email invitation and verified recipient accepts only its school role", async () => {
   const { primary, reviewer } = await membershipReviewers();
@@ -12,17 +12,28 @@ test("primary issues a captured email invitation and verified recipient accepts 
     { mode: 0o600 }
   );
   const recipient = await login("invited-staff");
-  const input = { email: recipient.email, role: "staff", reason: "Penunjukan wakil sekolah" };
+  const input = {
+    email: recipient.email,
+    representativeName: "Siti Rahma",
+    role: "staff",
+    reason: "Penunjukan wakil sekolah",
+  };
   assert.equal((await call(reviewer, "/api/admin/invitations", input)).status, 403);
   const issued = await call(primary, "/api/admin/invitations", input);
   assert.equal(issued.status, 200);
   const invitation = await issued.json();
-  assert.match((await capturedMail(recipient.email)).text, new RegExp(invitation.id));
+  const invitationMail = await capturedMail(recipient.email);
+  assert.match(invitationMail.text, new RegExp(invitation.id));
+  assert.match(invitationMail.text, /Siti Rahma/);
+  const view = await (await call(recipient, `/api/invitations/${invitation.id}`)).json();
+  assert.equal(view.representativeName, "Siti Rahma");
   const accepted = await call(recipient, `/api/invitations/${invitation.id}`, {});
   assert.equal(accepted.status, 200);
   const access = await (await call(recipient, "/api/access")).json();
   assert.deepEqual(access.roles, ["staff"]);
   assert.equal(access.membership.status, "none");
+  const accounts = await (await call(primary, "/api/admin/roles")).json();
+  assert.equal(accounts.accounts.find((account) => account.id === recipient.id).name, "Siti Rahma");
   assert.equal(
     (await (await call(recipient, "/api/membership/application")).json()).application,
     null
@@ -49,7 +60,12 @@ test("invitations deny wrong email, tampering, unverified visitors and cross-ori
   const { primary, reviewer } = await membershipReviewers();
   const recipient = await login("invited-student"),
     other = await login("wrong-invite-email");
-  const input = { email: recipient.email, role: "student", reason: "Mandat siswa" };
+  const input = {
+    email: recipient.email,
+    representativeName: "Budi Santoso",
+    role: "student",
+    reason: "Mandat siswa",
+  };
   for (const role of [
     "finance-coordinator",
     "directory-coordinator",
@@ -60,6 +76,22 @@ test("invitations deny wrong email, tampering, unverified visitors and cross-ori
     assert.equal((await call(primary, "/api/admin/invitations", { ...input, role })).status, 400);
   for (const email of ["invalid", "", "x".repeat(255)])
     assert.equal((await call(primary, "/api/admin/invitations", { ...input, email })).status, 400);
+  for (const representativeName of [undefined, "", "   ", ` ${"x".repeat(201)} `, 42])
+    assert.equal(
+      (await call(primary, "/api/admin/invitations", { ...input, representativeName })).status,
+      400
+    );
+  const invalidForm = await fetch(`${base}/admin/invitations`, {
+    method: "POST",
+    headers: { Cookie: primary.cookie, Origin: base },
+    body: new URLSearchParams({
+      email: other.email,
+      representativeName: "   ",
+      role: "staff",
+      reason: "Invalid representative name",
+    }),
+  });
+  assert.equal(invalidForm.status, 400);
   const { id } = await (
     await call(primary, "/api/admin/invitations", {
       ...input,
@@ -70,7 +102,9 @@ test("invitations deny wrong email, tampering, unverified visitors and cross-ori
     for (const path of [`/api/invitations/${id}`, `/invitations/${id}.data`]) {
       const denied = await call(account, path);
       if (account || path.startsWith("/api")) assert.equal(denied.status, account ? 404 : 401);
-      assert.doesNotMatch(await denied.text(), new RegExp(recipient.email));
+      const deniedText = await denied.text();
+      assert.doesNotMatch(deniedText, new RegExp(recipient.email));
+      assert.doesNotMatch(deniedText, /Budi Santoso/);
       assert.equal(denied.headers.get("cache-control"), "no-store");
     }
     assert.equal((await call(account, `/api/invitations/${id}`, {})).status, account ? 404 : 401);
@@ -110,7 +144,12 @@ test("concurrent acceptance records one intended role grant and restricted UTC i
   const recipient = await login("concurrent-invitation");
   const reason = `Mandat sekolah ${crypto.randomUUID()}`;
   const { id, expiresAt } = await (
-    await call(primary, "/api/admin/invitations", { email: recipient.email, role: "staff", reason })
+    await call(primary, "/api/admin/invitations", {
+      email: recipient.email,
+      representativeName: "Perwakilan Bersamaan",
+      role: "staff",
+      reason,
+    })
   ).json();
   const days = (Date.parse(expiresAt) - Date.now()) / 86400000;
   assert.ok(days > 6.99 && days <= 7);
@@ -133,6 +172,11 @@ test("concurrent acceptance records one intended role grant and restricted UTC i
   assert.equal(events.find((e) => e.action === "invitation-issued").actorUserId, primary.id);
   assert.equal(events.find((e) => e.action === "invitation-accepted").actorUserId, recipient.id);
   assert.equal(events.find((e) => e.action === "grant").actorUserId, primary.id);
+  const accounts = await (await call(primary, "/api/admin/roles")).json();
+  assert.equal(
+    accounts.accounts.find((account) => account.id === recipient.id).name,
+    "Perwakilan Bersamaan"
+  );
   assert.equal((await call(recipient, "/api/admin/audit")).status, 403);
 });
 
@@ -143,6 +187,7 @@ test("expired invitations cannot grant a role", async () => {
   const issued = await (
     await call(primary, "/api/admin/invitations", {
       email: recipient.email,
+      representativeName: "Undangan Kedaluwarsa",
       role: "student",
       reason: "Expired appointment",
     })
@@ -167,6 +212,7 @@ test("expired invitations cannot grant a role", async () => {
   );
   const view = await (await call(recipient, `/api/invitations/${id}`)).json();
   assert.equal(view.expired, true);
+  assert.equal(view.representativeName, null);
   assert.equal((await call(recipient, `/api/invitations/${id}`, {})).status, 409);
   assert.deepEqual((await (await call(recipient, "/api/access")).json()).roles, []);
 });

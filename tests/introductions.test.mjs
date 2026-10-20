@@ -189,6 +189,53 @@ test("failed sharing evidence rolls back mail capture before an ordinary retry",
   );
 });
 
+test("coordinator revocation after claim prevents sharing and leaves the introduction pending", async () => {
+  const f = await setup();
+  const recipient = await member("intro-revoked-coordinator");
+  const needId = await approvedNeed(f);
+  const { requestId } = await (await send(f, needId, recipient)).json();
+  assert.equal((await respond(recipient, requestId)).status, 200);
+  await queueIntroduction(requestId);
+  const before = await capturedMail(f.staff.email);
+
+  await fixtureSql(`CREATE TRIGGER revoke_coordinator_after_claim
+    AFTER UPDATE OF delivery_state ON outreach_introduction
+    WHEN NEW.request_id='${requestId}' AND NEW.delivery_state='claimed'
+    BEGIN
+      DELETE FROM role_assignment
+      WHERE user_id='${f.coordinator.id}' AND role='directory-coordinator';
+    END`);
+  try {
+    const retry = await retryIntroduction(f.coordinator, requestId);
+    assert.equal(retry.status, 200, await retry.clone().text());
+    assert.deepEqual(await retry.json(), { changed: true, shared: false, pending: true });
+    assert.deepEqual(await capturedMail(f.staff.email), before);
+    const detail = await (await call(recipient, `/api/outreach/requests/${requestId}`)).json();
+    assert.equal(detail.sharing[0].deliveryState, "pending");
+    assert.equal(detail.sharing[0].sharedAt, null);
+    const events = await auditEvents(f.primary);
+    assert.equal(
+      events.filter((event) => event.action === "introduction-shared" && event.needId === needId)
+        .length,
+      0
+    );
+  } finally {
+    await fixtureSql("DROP TRIGGER IF EXISTS revoke_coordinator_after_claim");
+  }
+
+  await role(f.coordinator, "directory-coordinator", f.primary);
+  const retry = await retryIntroduction(f.coordinator, requestId);
+  assert.equal(retry.status, 200, await retry.clone().text());
+  assert.equal((await retry.json()).shared, true);
+  assert.match((await capturedMail(f.staff.email)).text, new RegExp(escape(recipient.email)));
+  const events = await auditEvents(f.primary);
+  assert.equal(
+    events.filter((event) => event.action === "introduction-shared" && event.needId === needId)
+      .length,
+    1
+  );
+});
+
 test("withdrawal is allowed while pending, blocked after sharing, and races stay consistent", async () => {
   const f = await setup();
   const recipient = await member("intro-withdraw");

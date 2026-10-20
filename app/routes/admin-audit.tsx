@@ -24,6 +24,7 @@ const actionLabels: Record<string, string> = {
   "email-change-expired": "Verifikasi perubahan email kedaluwarsa",
   "email-change-replaced": "Permintaan perubahan email diganti",
   "email-change-collision": "Perubahan email ditolak karena alamat digunakan",
+  "representative-name-changed": "Perubahan nama perwakilan",
   grant: "Pemberian peran",
   revoke: "Pencabutan peran",
 };
@@ -34,7 +35,9 @@ export default function AdminAudit({ loaderData }: Route.ComponentProps) {
       <Link className="underline" to="/admin/roles">
         Kelola peran
       </Link>
-      <p>Riwayat penunjukan dan perubahan peran. Waktu ditampilkan dalam UTC.</p>
+      <p>
+        Riwayat penunjukan, perubahan peran, dan identitas perwakilan. Waktu ditampilkan dalam UTC.
+      </p>
       <ol className="space-y-6">
         {loaderData.events.map((event) => (
           <li key={event.id} className="border rounded p-4 space-y-2">
@@ -48,14 +51,16 @@ export default function AdminAudit({ loaderData }: Route.ComponentProps) {
               <p>
                 {event.action === "email-change-completed"
                   ? "Email lama → baru"
-                  : event.action.startsWith("email-change")
-                    ? "Pemeriksaan identitas"
-                    : "Operator"}
+                  : event.action === "representative-name-changed"
+                    ? "Nama lama → baru"
+                    : event.action.startsWith("email-change")
+                      ? "Pemeriksaan identitas"
+                      : "Operator"}
                 : {event.operator}
               </p>
             )}
             {event.house && <p>House: {event.house}</p>}
-            <p>Alasan: {event.reason}</p>
+            {event.reason && <p>Alasan: {event.reason}</p>}
             <time dateTime={event.occurredAt}>{event.occurredAt}</time>
           </li>
         ))}

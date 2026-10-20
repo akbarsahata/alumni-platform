@@ -34,7 +34,9 @@ export default function Invitations({ actionData }: Route.ComponentProps) {
       <Link to="/admin/roles">Kelola peran</Link>
       <p>
         Undangan berlaku tujuh hari, hanya untuk satu email dan satu peran. Penerima memverifikasi
-        email dengan kode masuk; pengajuan atau profil alumni tidak diperlukan.
+        email dengan kode masuk; pengajuan atau profil alumni tidak diperlukan. Nama perwakilan
+        hanya mengisi akun yang belum memiliki nama; koreksi nama akun yang sudah ada dilakukan
+        melalui Kelola peran.
       </p>
       {actionData?.error && <p role="alert">{actionData.error}</p>}
       {actionData?.invitation && (
@@ -50,6 +52,10 @@ export default function Invitations({ actionData }: Route.ComponentProps) {
         <label className="block">
           Email penerima
           <Input name="email" type="email" required maxLength={254} />
+        </label>
+        <label className="block">
+          Nama perwakilan
+          <Input name="representativeName" required maxLength={200} />
         </label>
         <label className="block">
           Peran sekolah

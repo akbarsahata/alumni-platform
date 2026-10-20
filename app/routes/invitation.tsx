@@ -43,6 +43,7 @@ export default function Invitation({ loaderData, actionData }: Route.ComponentPr
       ) : (
         <>
           <p>Peran: {roleLabels[invitation.role]}</p>
+          {invitation.representativeName && <p>Nama perwakilan: {invitation.representativeName}</p>}
           <p>Berlaku hingga {invitation.expiresAt} (UTC).</p>
           {actionData?.error && <p role="alert">{actionData.error}</p>}
           {invitation.accepted ? (

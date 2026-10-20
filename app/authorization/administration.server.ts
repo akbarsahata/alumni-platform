@@ -1,7 +1,7 @@
 import { administrationRepository } from "../db/administration.repository.server";
 import { hasTrustedOrigin } from "../auth/auth.server";
 import { requirePrimary } from "./permissions.server";
-import { parseInput, roleInput, auditCursor } from "../http/validation";
+import { parseInput, roleInput, representativeNameInput, auditCursor } from "../http/validation";
 
 export async function listAccounts(env: Env) {
   // Only called after requirePrimary; no membership/house fields in this list.
@@ -42,4 +42,32 @@ export async function changeRole(request: Request, env: Env, input: unknown) {
     reason: reason.trim(),
   });
   return { changed: result };
+}
+
+export async function setRepresentativeName(request: Request, env: Env, input: unknown) {
+  if (!hasTrustedOrigin(request, env))
+    throw new Response("Permintaan tidak diizinkan.", { status: 403 });
+  const { account } = await requirePrimary(request, env);
+  const { targetUserId, representativeName } = parseInput(
+    representativeNameInput,
+    input,
+    "Isi nama perwakilan yang valid (1-200 karakter)."
+  );
+  const repository = administrationRepository(env.DB);
+  // The conditional insert rechecks primary authority and current target eligibility.
+  const changed = await repository.changeRepresentativeName({
+    id: crypto.randomUUID().replaceAll("-", ""),
+    actorId: account.id,
+    targetId: targetUserId,
+    name: representativeName,
+  });
+  if (changed) return { changed: true };
+  const target = await repository.representativeAccount({ userId: targetUserId });
+  if (!target) throw new Response("Akun terverifikasi tidak ditemukan.", { status: 400 });
+  if (target.representative !== 1)
+    throw new Response("Akun bukan perwakilan staf atau siswa saat ini.", { status: 409 });
+  if (target.name.trim() === representativeName) return { changed: false };
+  throw new Response("Nama perwakilan atau kewenangan akun berubah. Muat ulang dan coba lagi.", {
+    status: 409,
+  });
 }

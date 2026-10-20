@@ -27,6 +27,7 @@ test("primary invites a new school representative who verifies email and accepts
   await gotoReady(page, "/admin/roles");
   await page.getByRole("link", { name: "Undang perwakilan sekolah" }).click();
   await page.getByLabel("Email penerima").fill(email);
+  await page.getByLabel("Nama perwakilan").fill("Siti Rahma");
   await page.getByLabel("Peran sekolah").selectOption("student");
   await page.getByLabel("Alasan undangan").fill("Penunjukan siswa untuk uji browser");
   await page.getByRole("button", { name: "Kirim undangan" }).click();
@@ -56,6 +57,7 @@ test("primary invites a new school representative who verifies email and accepts
   await page.getByRole("button", { name: "Masuk", exact: true }).click();
   await expect(page).toHaveURL(new RegExp(`${invitationPath}$`));
   await expect(page.getByText("Peran: Perwakilan siswa")).toBeVisible();
+  await expect(page.getByText("Nama perwakilan: Siti Rahma")).toBeVisible();
   await page.getByRole("button", { name: "Terima undangan" }).click();
   await expect(page.getByRole("status")).toContainText("Undangan telah diterima.");
   const access = await (await page.request.get("/api/access")).json();

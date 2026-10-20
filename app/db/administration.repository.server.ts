@@ -9,7 +9,7 @@ export function administrationRepository(binding: D1Database) {
     async accounts() {
       const [accounts, assignments] = await db.batch([
         db
-          .select({ id: user.id, email: user.email })
+          .select({ id: user.id, email: user.email, name: user.name })
           .from(user)
           .where(eq(user.emailVerified, true))
           .orderBy(asc(user.email)),
@@ -21,17 +21,18 @@ export function administrationRepository(binding: D1Database) {
       }));
     },
     async audit(input: { time: string | null; id: string | null }) {
-      return db.all<{
-        id: string;
-        actorUserId: string;
-        targetUserId: string;
-        action: string;
-        role: string | null;
-        house: string | null;
-        operator: string | null;
-        reason: string;
-        occurredAt: string;
-      }>(sql`SELECT id, actor_user_id AS actorUserId, target_user_id AS targetUserId,
+      const [rows, nameRows] = await Promise.all([
+        db.all<{
+          id: string;
+          actorUserId: string;
+          targetUserId: string;
+          action: string;
+          role: string | null;
+          house: string | null;
+          operator: string | null;
+          reason: string;
+          occurredAt: string;
+        }>(sql`SELECT id, actor_user_id AS actorUserId, target_user_id AS targetUserId,
     action, role, house, operator, reason, occurred_at AS occurredAt FROM (
       SELECT * FROM (
         SELECT * FROM authorization_audit
@@ -51,7 +52,34 @@ export function administrationRepository(binding: D1Database) {
         WHERE status != 'pending' OR expires_at <= strftime('%Y-%m-%dT%H:%M:%fZ','now')
     )
     WHERE ${input.time} IS NULL OR occurred_at < ${input.time} OR (occurred_at = ${input.time} AND id < ${input.id})
-    ORDER BY occurred_at DESC, id DESC LIMIT 101`);
+    ORDER BY occurred_at DESC, id DESC LIMIT 101`),
+        db.all<{
+          id: string;
+          actorUserId: string;
+          targetUserId: string;
+          action: string;
+          role: string | null;
+          house: string | null;
+          operator: string | null;
+          reason: string;
+          occurredAt: string;
+        }>(sql`SELECT id, actor_user_id AS actorUserId, target_user_id AS targetUserId,
+          'representative-name-changed' AS action, NULL AS role, NULL AS house,
+          COALESCE(NULLIF(old_name,''),'(kosong)') || ' → ' || new_name AS operator,
+          '' AS reason, occurred_at AS occurredAt
+          FROM representative_name_change
+          WHERE ${input.time} IS NULL OR occurred_at < ${input.time}
+            OR (occurred_at = ${input.time} AND id < ${input.id})
+          ORDER BY occurred_at DESC, id DESC LIMIT 101`),
+      ]);
+      return [...rows, ...nameRows]
+        .sort((left, right) => {
+          if (left.occurredAt !== right.occurredAt)
+            return left.occurredAt < right.occurredAt ? 1 : -1;
+          if (left.id === right.id) return 0;
+          return left.id < right.id ? 1 : -1;
+        })
+        .slice(0, 101);
     },
     async verifiedAccount(input: { userId: string }) {
       return (
@@ -59,6 +87,34 @@ export function administrationRepository(binding: D1Database) {
           sql`SELECT id FROM user WHERE id = ${input.userId} AND email_verified = 1`
         )) ?? null
       );
+    },
+    async representativeAccount(input: { userId: string }) {
+      return (
+        (await db.get<{ id: string; name: string; representative: number } | undefined>(
+          sql`SELECT u.id,COALESCE(u.name,'') AS name,
+            EXISTS(SELECT 1 FROM role_assignment r
+              WHERE r.user_id=u.id AND r.role IN('staff','student')) AS representative
+            FROM user u WHERE u.id=${input.userId} AND u.email_verified=1`
+        )) ?? null
+      );
+    },
+    async changeRepresentativeName(input: {
+      id: string;
+      actorId: string;
+      targetId: string;
+      name: string;
+    }) {
+      const result = await db.run(sql`
+        INSERT INTO representative_name_change(id,target_user_id,actor_user_id,old_name,new_name)
+        SELECT ${input.id},u.id,${input.actorId},COALESCE(trim(u.name),''),${input.name}
+        FROM user u
+        WHERE u.id=${input.targetId} AND u.email_verified=1
+          AND EXISTS(SELECT 1 FROM organization_bootstrap b JOIN user a ON a.id=b.primary_user_id
+            WHERE b.primary_user_id=${input.actorId} AND a.email_verified=1)
+          AND EXISTS(SELECT 1 FROM role_assignment r
+            WHERE r.user_id=u.id AND r.role IN('staff','student'))
+          AND COALESCE(trim(u.name),'') != ${input.name}`);
+      return result.meta.changes > 0;
     },
     async changeRole(input: {
       id: string;

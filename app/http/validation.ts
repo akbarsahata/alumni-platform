@@ -10,6 +10,7 @@ export function parseInput<T>(schema: z.ZodType<T>, input: unknown, message: str
   return result.data;
 }
 const requiredText = (max: number) => z.string().max(max).trim().min(1);
+const representativeNameText = z.string().trim().min(1).max(200);
 const integer = (min: number, max = Number.MAX_SAFE_INTEGER) =>
   z
     .union([z.number(), z.string().min(1)])
@@ -115,11 +116,18 @@ export const houseCorrectionInput = z.object({
 export const invitationInput = z
   .object({
     email: referenceInput.shape.email,
+    representativeName: representativeNameText,
     role: z.enum(["staff", "student"]),
     reason: requiredText(1000),
   })
   .strict();
 export const invitationAcceptanceInput = z.object({}).strict();
+export const representativeNameInput = z
+  .object({
+    targetUserId: z.string().min(1).max(200),
+    representativeName: representativeNameText,
+  })
+  .strict();
 export const schoolNeedInput = z
   .object({
     category: z.enum(needCategories),
