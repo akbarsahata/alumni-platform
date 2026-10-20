@@ -1,3 +1,40 @@
+# Coordinator retry authorization review fix — 2026-10-20
+
+PR [#26](https://github.com/akbarsahata/alumni-platform/pull/26) review comment
+[discussion_r4320783352](https://github.com/akbarsahata/alumni-platform/pull/26#discussion_r4320783352)
+identified a real revocation window in the pre-existing #17 introduction code.
+Implementation is on `feat/school-representative-names-25` from `3afb631`.
+
+- `retryIntroduction` previously checked the coordinator role before delivery, but
+  `claimIntroduction` and `captureIntroduction` did not recheck it. A coordinator
+  revoked between the access check and capture could still share the member email.
+- `deliverIntroduction` now receives the initiating coordinator ID. Member-initiated
+  delivery after consent passes null; coordinator retries pass the current account.
+- Both conditional writes require the initiating coordinator to still hold
+  `directory-coordinator`. If the role disappears after claim, capture returns no
+  rows, no mail or sharing evidence is written, and the claim is released back to
+  pending. Restoring the role allows a later retry to share exactly once.
+- Added an HTTP regression that revokes the coordinator immediately after the claim
+  via a disposable D1 trigger. It asserts `{ shared: false, pending: true }`, no
+  captured mail, pending/unshared evidence and no `introduction-shared` audit event;
+  after restoring the role, the retry shares successfully. No migration or
+  environment change is required.
+- Documentation in [outreach.md](outreach.md) now states the claim/capture recheck
+  and the member-initiated exception.
+
+Verification:
+
+- Focused `node scripts/test.mjs tests/introductions.test.mjs tests/browser/introductions.spec.ts`
+  passes 12 HTTP journeys and all three Chromium journeys.
+- Full `npm test` passes six helper tests, 95 HTTP tests and all 20 Chromium
+  journeys, with no failures or skips. An initial full run hit an unrelated 30-second
+  timeout in the suspensions browser journey; the focused suspensions rerun and the
+  complete rerun passed.
+- `npm run typecheck`, `npm run build`, `npm run lint` and
+  `npm run format:check` pass.
+
+---
+
 # School representative names — 2026-10-20
 
 Issue [#25](https://github.com/akbarsahata/alumni-platform/issues/25) is implemented

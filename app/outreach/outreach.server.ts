@@ -172,11 +172,15 @@ export async function respondOutreach(
   return { changed: true };
 }
 
-async function deliverIntroduction(env: Env, requestId: string) {
+async function deliverIntroduction(
+  env: Env,
+  requestId: string,
+  initiatingCoordinatorId: string | null
+) {
   const repository = outreachRepository(env.DB);
   await repository.reconcile();
   const now = new Date().toISOString();
-  const claim = await repository.claimIntroduction(requestId, now);
+  const claim = await repository.claimIntroduction(requestId, now, initiatingCoordinatorId);
   if (!claim) return { shared: false, pending: await repository.hasPendingIntroduction(requestId) };
   const delivery = await repository.introductionDelivery(claim.id);
   if (!delivery) {
@@ -190,7 +194,7 @@ async function deliverIntroduction(env: Env, requestId: string) {
       text: `Kepada ${delivery.staffName},\n\n${delivery.memberName} (${delivery.memberEmail}) menyetujui emailnya dibagikan kepada Anda untuk kebutuhan sekolah berikut.\n\nKebutuhan: ${delivery.title}\nTujuan sekolah: ${delivery.purpose}\nBantuan yang diminta: ${delivery.requestedHelp}\n\nAlumni tersebut telah memberikan persetujuan eksplisit untuk perkenalan ini. Silakan hubungi langsung melalui email di atas.`,
     };
     const shared = await sendEmail(env, message, () =>
-      repository.captureIntroduction(claim.id, message)
+      repository.captureIntroduction(claim.id, message, initiatingCoordinatorId)
     );
     if (!shared) await repository.releaseIntroduction(claim.id);
     return { shared, pending: await repository.hasPendingIntroduction(requestId) };
@@ -252,7 +256,7 @@ export async function giveConsent(request: Request, env: Env, requestId: string,
       { status: 409 }
     );
   }
-  return { changed: true, ...(await deliverIntroduction(env, requestId)) };
+  return { changed: true, ...(await deliverIntroduction(env, requestId, null)) };
 }
 
 export async function withdrawConsent(
@@ -299,7 +303,7 @@ export async function retryIntroduction(
   parseInput(outreachActionInput, input, "Tindakan tidak valid.");
   if (!(await outreachRepository(env.DB).request(requestId, access.account.id)))
     throw new Response("Permintaan tidak ditemukan.", { status: 404 });
-  return { changed: true, ...(await deliverIntroduction(env, requestId)) };
+  return { changed: true, ...(await deliverIntroduction(env, requestId, access.account.id)) };
 }
 
 export async function changeStaffRecipient(
