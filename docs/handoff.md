@@ -1,3 +1,38 @@
+# Outcome review fixes — 2026-10-20
+
+Remediation of the Standards and Spec review of `700c93a`, on
+`codex/issue-19-technical-spec`.
+
+- Outcome mutations now check request access and the selected operation's role or
+  member authority before validating privileged outcome fields. Malformed requests
+  from unrelated accounts retain 404; malformed actions forbidden to coordinators,
+  ordinary recipients or suspended recipients retain 403. Authorized invalid input
+  still returns 400. Conditional-write authority checks remain in place.
+- The coordinator need route revalidates its loader on 409, refreshing the current
+  outcome and expected revision. Directory search excludes React Router's `_routes`
+  transport parameter before strict business-filter validation; otherwise the
+  selective conflict reload returned 400 instead of restoring the form.
+- HTTP regression additions first failed against the original validation order.
+  The browser regression first failed because the old outcome remained visible;
+  after the reload override it exposed the transport-parameter rejection. The final
+  focused run passes all seven outcome HTTP journeys and the Chromium journey,
+  including refreshed state/revision and a successful reviewed retry.
+- Post-fix Standards and Spec reviews both report zero findings. No migration,
+  bindings, secrets, deployment or live email are required. All verification uses
+  synthetic accounts and disposable D1; ordinary local data is unchanged.
+
+Verification: `node scripts/test.mjs tests/outcomes.test.mjs
+ tests/browser/outcomes.spec.ts` passes seven HTTP journeys and one Chromium
+journey. Final `npm test` passes all 108 Node tests (including helper and migration
+checks) and all 21 Chromium journeys with no failures or skips, including the real
+five-minute OTP expiry and rate-limit windows. Final `npm run typecheck`,
+`npm run build`, `npm run lint`, and `npm run format:check` pass.
+
+Changes are committed locally on the current branch; no push or tracker mutation
+is included.
+
+---
+
 # Outreach outcomes and school-need closure — 2026-10-20
 
 Issue [#19](https://github.com/akbarsahata/alumni-platform/issues/19) is implemented

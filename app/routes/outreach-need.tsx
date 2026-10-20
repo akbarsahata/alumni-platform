@@ -1,5 +1,12 @@
 import { env } from "cloudflare:workers";
-import { Form, Link, data, useNavigation, useSearchParams } from "react-router";
+import {
+  Form,
+  Link,
+  data,
+  useNavigation,
+  useSearchParams,
+  type ShouldRevalidateFunctionArgs,
+} from "react-router";
 import type { Route } from "./+types/outreach-need";
 import {
   readOutreachNeed,
@@ -24,6 +31,12 @@ import { OutcomeStateSelect, OutcomeSummary } from "../outreach/outcome-summary"
 import { pageTitle } from "../content/page-title";
 export function meta() {
   return [{ title: pageTitle("Penjangkauan sekolah") }];
+}
+export function shouldRevalidate({
+  actionStatus,
+  defaultShouldRevalidate,
+}: ShouldRevalidateFunctionArgs) {
+  return actionStatus === 409 || defaultShouldRevalidate;
 }
 export async function loader({ request, params }: Route.LoaderArgs) {
   const detail = await readOutreachNeed(request, env, params.needId);

@@ -229,13 +229,16 @@ test("outcome validation, ownership, stale revisions and races leave one committ
     ],
     [f.coordinator, { action: "record", expectedRevision: 0, state: "unknown", note }, 400],
     [f.coordinator, { action: "record", expectedRevision: -1, state: "help-confirmed", note }, 400],
-    [f.coordinator, { action: "confirm", expectedRevision: 0, state: "completed" }, 400],
+    [f.coordinator, { action: "confirm", expectedRevision: 0, state: "completed" }, 403],
     [
       f.coordinator,
       { action: "record", expectedRevision: 0, state: "completed", note, actorId: f.primary.id },
       400,
     ],
     [outsider, { action: "confirm", expectedRevision: 0 }, 404],
+    [outsider, { action: "correct", expectedRevision: -1, state: "unknown" }, 404],
+    [recipient, { action: "record", expectedRevision: -1, state: "unknown" }, 403],
+    [recipient, { action: "correct", expectedRevision: -1, state: "unknown" }, 400],
     [f.staff, { action: "confirm", expectedRevision: 0 }, 404],
     [f.primary, { action: "record", expectedRevision: 0, state: "completed", note }, 404],
     [f.coordinator, { action: "record", expectedRevision: 9, state: "completed", note }, 409],
@@ -408,6 +411,13 @@ test("outcome projections enforce access, suspension, no-store and aggregate-onl
   assert.equal(suspended.outcome.state, "completed");
   assert.equal(suspended.access.canConfirm, false);
   assert.equal(suspended.access.canCorrect, false);
+  const deniedCorrection = await outcome(recipient, requestId, {
+    action: "correct",
+    expectedRevision: -1,
+    state: "unknown",
+  });
+  assert.equal(deniedCorrection.status, 403);
+  assert.equal(deniedCorrection.headers.get("cache-control"), "no-store");
   assert.equal(
     (
       await outcome(recipient, requestId, {

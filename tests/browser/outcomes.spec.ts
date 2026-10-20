@@ -33,6 +33,16 @@ test("coordinator records and closes while the member confirms, corrects and the
     await other.getByLabel("Catatan hasil bantuan (1-500 karakter)").fill("Form lama");
     await other.getByRole("button", { name: "Catat hasil" }).click();
     await expect(other.getByRole("alert")).toContainText("Muat ulang");
+    await expect(other.getByText(/Status saat ini: Selesai/)).toBeVisible();
+    await expect(other.locator('input[name="expectedRevision"]')).toHaveValue("1");
+    await other.getByLabel("Catat hasil bantuan").selectOption("completed");
+    await other
+      .getByLabel("Catatan hasil bantuan (1-500 karakter)")
+      .fill("Bantuan selesai di sekolah");
+    await other.getByRole("button", { name: "Catat hasil" }).click();
+    await expect(
+      other.getByRole("status").filter({ hasText: "Hasil bantuan dicatat: Selesai." })
+    ).toBeVisible();
 
     await coordinator.getByRole("button", { name: "Tutup kebutuhan" }).click();
     await expect(
@@ -60,7 +70,7 @@ test("coordinator records and closes while the member confirms, corrects and the
         .getByRole("status")
         .filter({ hasText: "Koreksi hasil bantuan disimpan: Tidak berlanjut." })
     ).toBeVisible();
-    await member.getByText("Riwayat hasil bantuan (3)").click();
+    await member.getByText("Riwayat hasil bantuan (4)").click();
     await expect(member.getByText("Dikonfirmasi alumni")).toBeVisible();
     await member.screenshot({ path: "test-results/outcomes-mobile.png", fullPage: true });
     expect(await member.evaluate("document.documentElement.scrollWidth <= window.innerWidth")).toBe(

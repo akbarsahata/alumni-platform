@@ -381,18 +381,14 @@ export async function recordOutreachOutcome(
 ) {
   origin(request, env);
   const access = await getAccess(request, env);
-  const body = parseInput(
-    outreachOutcomeInput,
-    input,
-    "Pilih hasil bantuan dan isi catatan 1-500 karakter."
-  );
   const detail = await readOutreachRequest(request, env, requestId);
-  if (body.action === "record") {
+  const action = input && typeof input === "object" && "action" in input ? input.action : null;
+  if (action === "record") {
     if (!access.permissions.directory)
       throw new Response("Peran koordinator direktori diperlukan untuk mencatat hasil.", {
         status: 403,
       });
-  } else {
+  } else if (action === "confirm" || action === "correct") {
     if (!detail.viewer.isRecipient)
       throw new Response("Hanya alumni penerima yang dapat mengonfirmasi atau mengoreksi hasil.", {
         status: 403,
@@ -403,6 +399,11 @@ export async function recordOutreachOutcome(
         { status: 403 }
       );
   }
+  const body = parseInput(
+    outreachOutcomeInput,
+    input,
+    "Pilih hasil bantuan dan isi catatan 1-500 karakter."
+  );
   if (!detail.outcome)
     throw new Response("Hasil bantuan baru tersedia setelah perkenalan dikirim.", { status: 409 });
   const rows = await outcomeRepository(env.DB).append({
