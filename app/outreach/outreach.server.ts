@@ -135,7 +135,8 @@ export async function readOutreachRequest(request: Request, env: Env, requestId:
     !sharedWithCurrent &&
     row.eligible &&
     !!row.staffRecipient?.active;
-  const canWithdraw = isRecipient && !!active && active.deliveryState === "pending";
+  const canWithdraw =
+    isRecipient && !!active && ["pending", "claimed"].includes(active.deliveryState);
   const canRespond = isRecipient && row.request.status === "pending" && !expired;
   return {
     ...row,
@@ -179,30 +180,33 @@ async function deliverIntroduction(env: Env, requestId: string) {
   if (!claim) return { shared: false, pending: await repository.hasPendingIntroduction(requestId) };
   const delivery = await repository.introductionDelivery(claim.id);
   if (!delivery) {
-    await repository.finishIntroduction(claim.id, "pending", now);
+    await repository.releaseIntroduction(claim.id);
     return { shared: false, pending: await repository.hasPendingIntroduction(requestId) };
   }
   try {
-    await sendEmail(env, {
+    const message = {
       to: delivery.staffEmail,
       subject: `Perkenalan alumni: ${delivery.title}`,
       text: `Kepada ${delivery.staffName},\n\n${delivery.memberName} (${delivery.memberEmail}) menyetujui emailnya dibagikan kepada Anda untuk kebutuhan sekolah berikut.\n\nKebutuhan: ${delivery.title}\nTujuan sekolah: ${delivery.purpose}\nBantuan yang diminta: ${delivery.requestedHelp}\n\nAlumni tersebut telah memberikan persetujuan eksplisit untuk perkenalan ini. Silakan hubungi langsung melalui email di atas.`,
-    });
-    const rows = await repository.finishIntroduction(claim.id, "captured", now);
-    return { shared: rows.length > 0, pending: false };
+    };
+    const shared = await sendEmail(env, message, () =>
+      repository.captureIntroduction(claim.id, message)
+    );
+    if (!shared) await repository.releaseIntroduction(claim.id);
+    return { shared, pending: await repository.hasPendingIntroduction(requestId) };
   } catch {
-    await repository.finishIntroduction(claim.id, "pending", now);
-    return { shared: false, pending: true };
+    await repository.releaseIntroduction(claim.id);
+    return { shared: false, pending: await repository.hasPendingIntroduction(requestId) };
   }
 }
 
 export async function giveConsent(request: Request, env: Env, requestId: string, input: unknown) {
   origin(request, env);
   const access = await getAccess(request, env);
-  parseInput(outreachConsentInput, input, "Centang persetujuan berbagi email.");
   const detail = await readOutreachRequest(request, env, requestId);
   if (!detail.viewer.isRecipient)
     throw new Response("Permintaan tidak ditemukan.", { status: 404 });
+  const body = parseInput(outreachConsentInput, input, "Centang persetujuan berbagi email.");
   if (detail.request.status === "pending")
     throw new Response("Nyatakan minat terlebih dahulu sebelum memberikan persetujuan.", {
       status: 409,
@@ -219,11 +223,23 @@ export async function giveConsent(request: Request, env: Env, requestId: string,
     });
   if (!detail.staffRecipient?.active)
     throw new Response("Kontak staf penerima perkenalan tidak aktif.", { status: 409 });
+  if (
+    body.expectedStaffUserId !== detail.staffRecipient.userId ||
+    body.expectedMemberEmail !== detail.viewer.email
+  )
+    throw new Response(
+      "Kontak staf atau email Anda berubah. Periksa kembali dan centang persetujuan baru.",
+      {
+        status: 409,
+      }
+    );
   const repository = outreachRepository(env.DB);
   const rows = await repository.consent({
     id: crypto.randomUUID(),
     requestId,
     memberId: access.account.id,
+    expectedStaffUserId: body.expectedStaffUserId,
+    expectedMemberEmail: body.expectedMemberEmail,
     now: new Date().toISOString(),
   });
   if (!rows.length) {
@@ -232,7 +248,7 @@ export async function giveConsent(request: Request, env: Env, requestId: string,
       throw new Response("Email sudah dibagikan kepada kontak staf ini.", { status: 409 });
     if (active) throw new Response("Persetujuan sudah tercatat.", { status: 409 });
     throw new Response(
-      "Persetujuan belum dapat dicatat. Periksa minat, batas respons, kelayakan, dan kontak staf.",
+      "Persetujuan belum dapat dicatat. Muat ulang dan periksa minat, batas respons, kelayakan, dan kontak staf.",
       { status: 409 }
     );
   }

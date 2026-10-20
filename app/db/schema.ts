@@ -302,3 +302,11 @@ export const outreachAudit = sqliteTable("outreach_audit", {
   action: text("action").notNull(),
   occurredAt: text("occurred_at").notNull(),
 });
+
+export const localIntroductionMail = sqliteTable("local_introduction_mail", {
+  recipient: text("recipient").primaryKey(),
+  introductionId: text("introduction_id").notNull(),
+  message: text("message").notNull(),
+  capturedAt: integer("captured_at").notNull(),
+  expiresAt: integer("expires_at").notNull(),
+});

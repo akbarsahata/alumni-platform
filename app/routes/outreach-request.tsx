@@ -1,5 +1,5 @@
 import { env } from "cloudflare:workers";
-import { Form, Link, data, useNavigation } from "react-router";
+import { Form, Link, data, useNavigation, type ShouldRevalidateFunctionArgs } from "react-router";
 import type { Route } from "./+types/outreach-request";
 import {
   giveConsent,
@@ -13,6 +13,13 @@ import { pageTitle } from "../content/page-title";
 export function meta() {
   return [{ title: pageTitle("Tanggapi permintaan bantuan") }];
 }
+// Conflicts mean the displayed consent details or delivery state may be stale.
+export function shouldRevalidate({
+  actionStatus,
+  defaultShouldRevalidate,
+}: ShouldRevalidateFunctionArgs) {
+  return actionStatus === 409 || defaultShouldRevalidate;
+}
 export async function loader({ request, params }: Route.LoaderArgs) {
   return readOutreachRequest(request, env, params.requestId);
 }
@@ -23,6 +30,8 @@ export async function action({ request, params }: Route.ActionArgs) {
     if (intent === "consent") {
       const result = await giveConsent(request, env, params.requestId, {
         consent: f.get("consent") === "true",
+        expectedStaffUserId: f.get("expectedStaffUserId"),
+        expectedMemberEmail: f.get("expectedMemberEmail"),
       });
       return {
         error: null,
@@ -92,19 +101,15 @@ export default function OutreachRequest({ loaderData: d, actionData }: Route.Com
               <p role="status">
                 Persetujuan tercatat pada {active.consentedAt} untuk {active.staffName}.
               </p>
-              {active.deliveryState === "claimed" ? (
-                <p>Pengiriman sedang berlangsung; persetujuan belum dapat ditarik.</p>
-              ) : (
-                d.access.canWithdraw && (
-                  <Form method="post" className="space-y-2">
-                    <input type="hidden" name="intent" value="withdraw-consent" />
-                    <p>
-                      Anda dapat menarik persetujuan ini sebelum email dikirim. Email yang sudah
-                      dibagikan tidak dapat ditarik kembali.
-                    </p>
-                    <button disabled={busy}>Tarik persetujuan</button>
-                  </Form>
-                )
+              {d.access.canWithdraw && (
+                <Form method="post" className="space-y-2">
+                  <input type="hidden" name="intent" value="withdraw-consent" />
+                  <p>
+                    Anda dapat menarik persetujuan ini sebelum email dikirim. Email yang sudah
+                    dibagikan tidak dapat ditarik kembali.
+                  </p>
+                  <button disabled={busy}>Tarik persetujuan</button>
+                </Form>
               )}
               {!d.staffRecipient?.active && (
                 <p>
@@ -114,8 +119,14 @@ export default function OutreachRequest({ loaderData: d, actionData }: Route.Com
             </>
           )}
           {d.access.canConsent && (
-            <Form method="post" className="space-y-3">
+            <Form
+              key={`${d.staffRecipient?.userId}:${d.viewer.email}`}
+              method="post"
+              className="space-y-3"
+            >
               <input type="hidden" name="intent" value="consent" />
+              <input type="hidden" name="expectedStaffUserId" value={d.staffRecipient?.userId} />
+              <input type="hidden" name="expectedMemberEmail" value={d.viewer.email ?? ""} />
               <label className="flex items-start gap-2">
                 <input type="checkbox" name="consent" value="true" required />
                 <span>

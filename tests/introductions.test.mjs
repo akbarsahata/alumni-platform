@@ -96,6 +96,33 @@ test("interest alone does not share email; consent is initially unchecked and se
   assert.doesNotMatch(JSON.stringify(events), new RegExp(escape(recipient.email)));
 });
 
+test("stale consent cannot share with a replacement staff recipient or changed member email", async () => {
+  const f = await setup();
+  const recipient = await member("intro-stale-consent");
+  const needId = await approvedNeed(f);
+  const { requestId } = await (await send(f, needId, recipient)).json();
+  assert.equal((await respond(recipient, requestId)).status, 200);
+  const displayed = await (await call(recipient, `/api/outreach/requests/${requestId}`)).json();
+  const replacement = await staffAccount("intro-stale-staff", f.primary);
+  const before = await capturedMail(replacement.email);
+  assert.equal((await changeStaff(f.coordinator, needId, f.staff.id, replacement.id)).status, 200);
+  const response = await call(recipient, `/api/outreach/requests/${requestId}/consent`, {
+    consent: true,
+    expectedStaffUserId: displayed.staffRecipient.userId,
+    expectedMemberEmail: displayed.viewer.email,
+  });
+  assert.equal(response.status, 409, await response.clone().text());
+  const staleEmail = await call(recipient, `/api/outreach/requests/${requestId}/consent`, {
+    consent: true,
+    expectedStaffUserId: replacement.id,
+    expectedMemberEmail: `old-${recipient.id}@example.test`,
+  });
+  assert.equal(staleEmail.status, 409, await staleEmail.clone().text());
+  const detail = await (await call(recipient, `/api/outreach/requests/${requestId}`)).json();
+  assert.equal(detail.sharing.length, 0);
+  assert.deepEqual(await capturedMail(replacement.email), before);
+});
+
 test("repeated and concurrent consent share once; retries are idempotent", async () => {
   const f = await setup();
   const recipient = await member("intro-repeat");
@@ -123,6 +150,40 @@ test("repeated and concurrent consent share once; retries are idempotent", async
   const events = await auditEvents(f.primary);
   assert.equal(
     events.filter((event) => event.action === "introduction-shared" && event.needId === needId)
+      .length,
+    1
+  );
+});
+
+test("failed sharing evidence rolls back mail capture before an ordinary retry", async () => {
+  const f = await setup();
+  const recipient = await member("intro-capture-rollback");
+  const needId = await approvedNeed(f);
+  const { requestId } = await (await send(f, needId, recipient)).json();
+  assert.equal((await respond(recipient, requestId)).status, 200);
+  const before = await capturedMail(f.staff.email);
+  await fixtureSql(`CREATE TRIGGER fail_introduction_evidence BEFORE INSERT ON outreach_audit
+    WHEN NEW.action='introduction-shared' AND NEW.need_id='${needId}' BEGIN
+    SELECT RAISE(ABORT,'synthetic sharing evidence failure'); END`);
+  try {
+    const response = await giveConsent(recipient, requestId);
+    assert.equal(response.status, 200);
+    const result = await response.json();
+    assert.equal(result.shared, false);
+    assert.equal(result.pending, true);
+    assert.deepEqual(await capturedMail(f.staff.email), before);
+    const detail = await (await call(recipient, `/api/outreach/requests/${requestId}`)).json();
+    assert.equal(detail.sharing[0].sharedAt, null);
+    assert.equal(detail.sharing[0].deliveryState, "pending");
+  } finally {
+    await fixtureSql("DROP TRIGGER fail_introduction_evidence");
+  }
+  assert.equal((await (await retryIntroduction(f.coordinator, requestId)).json()).shared, true);
+  assert.match((await capturedMail(f.staff.email)).text, new RegExp(escape(recipient.email)));
+  assert.equal((await (await retryIntroduction(f.coordinator, requestId)).json()).shared, false);
+  const events = await auditEvents(f.primary);
+  assert.equal(
+    events.filter((event) => event.needId === needId && event.action === "introduction-shared")
       .length,
     1
   );
@@ -183,6 +244,29 @@ test("withdrawal is allowed while pending, blocked after sharing, and races stay
     assert.equal(raceWithdraw.status, 409);
     assert.equal(shared, true);
   }
+});
+
+test("a claimed but unshared introduction can still be withdrawn", async () => {
+  const f = await setup();
+  const recipient = await member("intro-withdraw-claimed");
+  const needId = await approvedNeed(f);
+  const { requestId } = await (await send(f, needId, recipient)).json();
+  assert.equal((await respond(recipient, requestId)).status, 200);
+  await queueIntroduction(requestId);
+  await fixtureSql(`UPDATE outreach_introduction SET delivery_state='claimed',
+    claimed_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE request_id='${requestId}'`);
+  const before = await capturedMail(f.staff.email);
+  const detail = await (await call(recipient, `/api/outreach/requests/${requestId}`)).json();
+  assert.equal(detail.access.canWithdraw, true);
+  const page = await (await call(recipient, `/outreach/requests/${requestId}`)).text();
+  assert.match(page, /Tarik persetujuan/);
+  const withdrawn = await withdrawConsent(recipient, requestId);
+  assert.equal(withdrawn.status, 200, await withdrawn.clone().text());
+  assert.equal((await (await retryIntroduction(f.coordinator, requestId)).json()).shared, false);
+  const after = await (await call(recipient, `/api/outreach/requests/${requestId}`)).json();
+  assert.ok(after.sharing[0].withdrawnAt);
+  assert.equal(after.sharing[0].sharedAt, null);
+  assert.deepEqual(await capturedMail(f.staff.email), before);
 });
 
 test("expiry blocks new consent but an introduction authorized before expiry may finish", async () => {

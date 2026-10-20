@@ -92,8 +92,13 @@ export async function staffAccount(label, primary) {
 export function respond(account, requestId, outcome = "interested", reason = "") {
   return call(account, `/api/outreach/requests/${requestId}/respond`, { outcome, reason });
 }
-export function giveConsent(account, requestId) {
-  return call(account, `/api/outreach/requests/${requestId}/consent`, { consent: true });
+export async function giveConsent(account, requestId) {
+  const detail = await (await call(account, `/api/outreach/requests/${requestId}`)).json();
+  return call(account, `/api/outreach/requests/${requestId}/consent`, {
+    consent: true,
+    expectedStaffUserId: detail.staffRecipient.userId,
+    expectedMemberEmail: detail.viewer.email,
+  });
 }
 export function withdrawConsent(account, requestId) {
   return call(account, `/api/outreach/requests/${requestId}/withdraw-consent`, {});
@@ -119,7 +124,7 @@ export async function queueIntroduction(
     JOIN user u ON u.id=r.recipient_user_id WHERE r.id='${requestId}'`);
 }
 
-// Time/queue fixtures only: writes are guarded to this runner's disposable D1.
+// Time/queue and capture-failure fixtures: writes are guarded to this runner's disposable D1.
 export async function fixtureSql(sql) {
   assert.ok(process.env.ALUMNI_TEST_STATE?.includes("integration-state-"));
   const { execFileSync } = await import("node:child_process");

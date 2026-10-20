@@ -11,6 +11,7 @@ import {
   outreachStaffRecipient,
   user,
 } from "./schema";
+import type { EmailMessage } from "../email/email.server";
 import type { OutreachAuditCursor, OutreachStatus } from "../outreach/model";
 
 const needColumns = {
@@ -99,12 +100,13 @@ export function outreachRepository(binding: D1Database) {
         sql`${user.id}=COALESCE(${outreachStaffRecipient.userId},${schoolNeed.staffContactUserId})`
       )
       .where(requestAccess(requestId, actorId));
-  const sharingForRequest = (requestId: string) =>
+  const sharingForRequest = (requestId: string, actorId: string) =>
     db
       .select(sharingColumns)
       .from(outreachIntroduction)
       .innerJoin(user, eq(user.id, outreachIntroduction.staffUserId))
-      .where(eq(outreachIntroduction.requestId, requestId))
+      .innerJoin(outreachRequest, eq(outreachRequest.id, outreachIntroduction.requestId))
+      .where(requestAccess(requestId, actorId))
       .orderBy(desc(outreachIntroduction.consentedAt), desc(outreachIntroduction.id));
   const sharingForNeed = (needId: string) =>
     db
@@ -259,7 +261,7 @@ export function outreachRepository(binding: D1Database) {
         invalidation_reason=CASE WHEN member_email!=(SELECT email FROM user WHERE id=member_user_id)
           THEN 'email-changed' ELSE 'eligibility-changed' END,
         delivery_state='cancelled'
-     WHERE delivery_state='pending' AND shared_at IS NULL AND withdrawn_at IS NULL
+     WHERE delivery_state IN('pending','claimed') AND shared_at IS NULL AND withdrawn_at IS NULL
        AND invalidated_at IS NULL
        AND (member_user_id NOT IN (SELECT user_id FROM outreach_eligible_recipient)
          OR member_email!=(SELECT email FROM user WHERE id=member_user_id))`);
@@ -322,7 +324,7 @@ export function outreachRepository(binding: D1Database) {
           .from(outreachRequest)
           .innerJoin(schoolNeed, eq(schoolNeed.id, outreachRequest.needId))
           .where(requestAccess(requestId, actorId)),
-        sharingForRequest(requestId),
+        sharingForRequest(requestId, actorId),
         staffRecipientForRequest(requestId, actorId),
       ]);
       if (!requests[0]) return undefined;
@@ -422,7 +424,14 @@ export function outreachRepository(binding: D1Database) {
           WHERE outreach_staff_recipient.user_id=${input.expectedStaffUserId}
         RETURNING need_id AS needId`);
     },
-    async consent(input: { id: string; requestId: string; memberId: string; now: string }) {
+    async consent(input: {
+      id: string;
+      requestId: string;
+      memberId: string;
+      now: string;
+      expectedStaffUserId: string;
+      expectedMemberEmail: string;
+    }) {
       return db.all<{ id: string }>(sql`
         INSERT INTO outreach_introduction(id,need_id,request_id,member_user_id,staff_user_id,
           member_email,consented_at,delivery_state)
@@ -435,6 +444,7 @@ export function outreachRepository(binding: D1Database) {
         JOIN user su ON su.id=sr.user_id AND su.email_verified=1
         WHERE r.id=${input.requestId} AND r.recipient_user_id=${input.memberId}
           AND r.status='interested' AND r.expires_at>${input.now}
+          AND sr.user_id=${input.expectedStaffUserId} AND mu.email=${input.expectedMemberEmail}
           AND EXISTS(SELECT 1 FROM outreach_eligible_recipient er
             WHERE er.user_id=r.recipient_user_id)
           AND NOT EXISTS(SELECT 1 FROM outreach_introduction i
@@ -449,7 +459,7 @@ export function outreachRepository(binding: D1Database) {
       return db.all<{ id: string }>(sql`
         UPDATE outreach_introduction SET withdrawn_at=${now},delivery_state='cancelled'
         WHERE request_id=${requestId} AND member_user_id=${memberId}
-          AND delivery_state='pending' AND shared_at IS NULL
+          AND delivery_state IN('pending','claimed') AND shared_at IS NULL
           AND withdrawn_at IS NULL AND invalidated_at IS NULL
         RETURNING id`);
     },
@@ -531,13 +541,28 @@ export function outreachRepository(binding: D1Database) {
               WHERE rr.user_id=i.staff_user_id AND rr.role='staff')`)
       )[0];
     },
-    async finishIntroduction(id: string, state: "pending" | "captured", now: string) {
-      if (state === "captured")
-        return db.all<{ id: string }>(sql`
-          UPDATE outreach_introduction SET delivery_state='captured',shared_at=${now}
-          WHERE id=${id} AND delivery_state='claimed' AND shared_at IS NULL
-            AND withdrawn_at IS NULL AND invalidated_at IS NULL
-          RETURNING id`);
+    async captureIntroduction(id: string, message: EmailMessage) {
+      const now = Date.now();
+      const rows = await db.all<{ recipient: string }>(sql`
+        INSERT OR REPLACE INTO local_introduction_mail(
+          recipient,introduction_id,message,captured_at,expires_at)
+        SELECT lower(su.email),i.id,${JSON.stringify(message)},${now},${now + 600_000}
+        FROM outreach_introduction i
+        JOIN outreach_request r ON r.id=i.request_id
+        JOIN outreach_staff_recipient sr ON sr.need_id=i.need_id AND sr.user_id=i.staff_user_id
+        JOIN user mu ON mu.id=i.member_user_id
+        JOIN user su ON su.id=i.staff_user_id
+        WHERE i.id=${id} AND i.delivery_state='claimed'
+          AND i.shared_at IS NULL AND i.withdrawn_at IS NULL AND i.invalidated_at IS NULL
+          AND r.status='interested' AND i.consented_at<=r.expires_at
+          AND i.member_email=mu.email AND su.email=${message.to}
+          AND mu.email_verified=1 AND su.email_verified=1
+          AND EXISTS(SELECT 1 FROM outreach_eligible_recipient er WHERE er.user_id=i.member_user_id)
+          AND EXISTS(SELECT 1 FROM role_assignment rr WHERE rr.user_id=i.staff_user_id AND rr.role='staff')
+        RETURNING recipient`);
+      return rows.length > 0;
+    },
+    async releaseIntroduction(id: string) {
       return db.all<{ id: string }>(sql`
         UPDATE outreach_introduction SET delivery_state='pending',claimed_at=NULL
         WHERE id=${id} AND delivery_state='claimed' AND shared_at IS NULL

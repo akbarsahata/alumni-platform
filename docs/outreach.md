@@ -70,6 +70,9 @@ requests. Completed responses remain historical records.
   unchecked consent box naming the current verified staff recipient and the
   member's own account email. Consent is a separate authenticated,
   origin-protected action; it may be added at any time before the request expires.
+  API consent submissions include `expectedStaffUserId` and `expectedMemberEmail`
+  from the displayed request. Conditional insertion rejects a stale recipient or
+  email; members must review the new details and check consent again.
 - `outreach_introduction` retains restricted evidence: the member email, named
   staff user, consent time, withdrawal or invalidation, delivery state and sharing
   time. It is never exposed through coordinator/student projections or general
@@ -81,10 +84,19 @@ requests. Completed responses remain historical records.
   role and verified email, and that the account email still matches the consented
   email.
 - Failed capture leaves the introduction pending. A current directory coordinator
-  can retry it from the need page. Withdrawal is allowed while delivery is pending,
-  including after request expiry. A claimed delivery is in progress and a shared
-  email cannot be recalled. A claimed row left by a process crash requires
-  operator recovery; general provider recovery remains outside this slice.
+  can retry it from the need page. Withdrawal is allowed until capture, including
+  while claimed and after request expiry. Capture rechecks eligibility, consent,
+  staff authority and both email destinations in the conditional write. Migration
+  `0019_atomic_introduction_capture.sql` adds the local introduction mailbox; its
+  insert and sharing/audit evidence commit atomically, so withdrawal and capture
+  cannot both win. A shared email cannot be recalled. A claimed row left by a
+  process crash remains withdrawable; general provider recovery is outside scope.
+- Introduction captures use D1; other local mail uses KV. The authenticated local
+  mailbox returns the latest capture across both stores, with ten-minute visibility.
+  Expired introduction captures are removed lazily on subsequent captures. This is
+  development-only capture, not a live provider or a domain-retention purge job.
+  Migration 0019 also invalidates claimed consents on profile/membership eligibility
+  loss and staff replacement. It adds no configuration or remote resources.
 - Expiry blocks new responses and consent. Interest without consent expires
   without an introduction. A consent recorded before expiry may finish afterward
   only while eligibility and consent still hold. An authorized introduction may

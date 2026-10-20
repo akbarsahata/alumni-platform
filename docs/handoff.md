@@ -1,3 +1,52 @@
+# Introduction review fixes — 2026-10-20
+
+Review remediation for commits `c8ada19`, `9556cec`, and `77f9856`, based on
+`77f9856` on the current `master` branch. This section supersedes the earlier
+pending-only withdrawal boundary. Changes are local; no push, deployment or live
+email.
+
+- Request consent-history queries now apply the same actor access predicate as
+  request/need queries before selecting private sharing records.
+- Consent API/form submissions bind `expectedStaffUserId` and
+  `expectedMemberEmail` to the details shown to the member. Conditional insertion
+  rejects changed values. A 409 refreshes the request loader; changed consent
+  details remount the form with an unchecked box, requiring a fresh decision.
+- Members can withdraw pending or claimed introductions until capture, including
+  after expiry. Introduction capture rechecks current eligibility, consent, staff
+  authority and email destinations in its conditional write. Local D1 mailbox
+  insertion and sharing/audit evidence commit atomically: successful withdrawal
+  prevents capture, and failed evidence persistence leaves no captured message.
+- Migration `0019_atomic_introduction_capture.sql` adds the development-only
+  introduction mailbox and extends eligibility/replacement invalidation to claimed
+  consents. Ordinary local mail remains in KV; the protected mailbox projects the
+  newest capture across both stores. D1 mailbox visibility is ten minutes; expired
+  captures are removed lazily on subsequent introduction captures. No new config.
+- Migration 0019 was applied to ordinary localhost D1 with `npm run db:migrate`.
+  Existing local data was preserved. General live-provider delivery/recovery
+  remains outside this slice; crashed claims remain withdrawable.
+
+Verification:
+
+- Stale recipient, claimed withdrawal and stale browser-state regressions were
+  observed failing before their fixes. Public HTTP/mail assertions also verify
+  that a sharing-evidence failure rolls back capture and an ordinary retry shares
+  once.
+- Focused `node scripts/test.mjs tests/introductions.test.mjs
+tests/browser/introductions.spec.ts` passes 11 HTTP journeys and all three
+  Chromium journeys. Mobile capture was visually checked; the browser verifies
+  no horizontal overflow at 375px.
+- `npm run typecheck`, `npm run build`, `npm run lint` and
+  `npm run format:check` pass. Separate Standards and Spec sub-agent reviews of
+  the staged diff against `77f9856` report zero actionable findings on either axis.
+- Ordinary localhost smoke checks pass against the existing IPv6 development
+  server: `/` and `/login` return 200; signed-out `/outreach` returns 401. The
+  existing server and normal local data were preserved.
+- Full `npm test` passes six helper tests, 90 HTTP tests and all 19 Chromium
+  journeys, with no failures or skips. This includes the real five-minute OTP
+  expiry and rate-limit window checks.
+
+---
+
 # Consented introductions — 2026-10-20
 
 Issue [#17](https://github.com/akbarsahata/alumni-platform/issues/17) is

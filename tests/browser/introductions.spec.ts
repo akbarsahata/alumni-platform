@@ -19,11 +19,12 @@ async function screenshotTop(page: import("@playwright/test").Page, path: string
   await page.screenshot({ path, fullPage: true });
 }
 
-test("member grants consent from an unchecked box; coordinator sees sharing without member email", async ({
+test("stale consent is rejected; fresh unchecked consent shares without exposing member email", async ({
   browser,
 }) => {
   const f = await fixture();
   const context = await browser.newContext();
+  const replacementContext = await browser.newContext();
   try {
     const member = await useAccount(context, f.consentMember);
     await member.setViewportSize({ width: 375, height: 812 });
@@ -33,6 +34,22 @@ test("member grants consent from an unchecked box; coordinator sees sharing with
     await expect(consentSection).toContainText(staffName(f.staff));
     await expect(consentSection).toContainText(f.consentMember.email);
     const checkbox = member.getByLabel(/Saya setuju email saya/);
+    await expect(checkbox).not.toBeChecked();
+    await checkbox.check();
+    const replacementCoordinator = await useAccount(replacementContext, f.coordinator);
+    await gotoReady(replacementCoordinator, `/outreach/needs/${f.consentNeed}`);
+    await replacementCoordinator
+      .getByLabel("Ganti kontak staf penerima")
+      .selectOption(f.replacement.id);
+    await replacementCoordinator.getByRole("button", { name: "Simpan kontak penerima" }).click();
+    await expect(
+      replacementCoordinator.getByText(
+        "Kontak staf penerima perkenalan diperbarui. Persetujuan yang belum terkirim dibatalkan."
+      )
+    ).toBeVisible();
+    await consentSection.getByRole("button", { name: "Setujui perkenalan" }).click();
+    await expect(member.getByRole("alert")).toBeVisible();
+    await expect(consentSection).toContainText(staffName(f.replacement));
     await expect(checkbox).not.toBeChecked();
     await checkbox.check();
     await consentSection.getByRole("button", { name: "Setujui perkenalan" }).click();
@@ -58,6 +75,7 @@ test("member grants consent from an unchecked box; coordinator sees sharing with
     await gotoReady(student, `/school-needs/${f.consentNeed}`);
     await expect(student.locator("main")).not.toContainText(f.consentMember.email);
   } finally {
+    await replacementContext.close();
     await context.close();
   }
 });
