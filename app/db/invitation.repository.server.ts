@@ -8,6 +8,7 @@ export function invitationRepository(binding: D1Database) {
     async issue(input: {
       id: string;
       email: string;
+      representativeName: string;
       role: "staff" | "student";
       issuerId: string;
       reason: string;

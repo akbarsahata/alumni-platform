@@ -76,7 +76,9 @@ requests. Completed responses remain historical records.
 - `outreach_introduction` retains restricted evidence: the member email, named
   staff user, consent time, withdrawal or invalidation, delivery state and sharing
   time. It is never exposed through coordinator/student projections or general
-  audits. Audit events carry only actor ID, need ID, action and UTC time.
+  audits. Audit events carry only actor ID, need ID, action and UTC time. Displayed
+  staff names resolve from the current verified account identity; a primary name
+  correction does not rewrite consent or sharing evidence.
 - Consent immediately records the evidence and attempts one introduction through
   the captured email abstraction to the named staff recipient only. The delivery
   claim rechecks approved membership, participation, availability, profile

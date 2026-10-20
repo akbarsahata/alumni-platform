@@ -1,3 +1,74 @@
+# School representative names — 2026-10-20
+
+Issue [#25](https://github.com/akbarsahata/alumni-platform/issues/25) is implemented
+in the local working tree from starting commit `db70831` on the current `master`
+branch, following the [agreed specification](school-representative-names-spec.md).
+Changes are uncommitted and unpushed; no deployment or live email occurred.
+
+## Behavior
+
+- School invitations now require **Nama perwakilan** (trimmed, 1-200 characters)
+  through the shared JSON/form schema. The email-bound invitation stores the name
+  and exposes it only to the matching authenticated recipient; guests and wrong
+  emails retain 401/404 privacy. Captured invitation mail includes the name.
+- Acceptance atomically consumes the invitation, grants only the stored role and
+  sets `user.name` when the account has no name yet. An existing non-empty name is
+  preserved; the primary administrator can correct it explicitly.
+- **Kelola peran** (`/admin/roles`) now sets or corrects names for verified accounts
+  with a current `staff` or `student` role, including direct role appointments.
+  `POST /api/admin/representative-names` uses the same validation. No membership,
+  application or expertise profile is required.
+- The conditional name-change insert rechecks current primary authority and target
+  eligibility. Successful changes write `representative_name_change` evidence
+  (actor, target, old/new name and UTC time); repeated same-name submissions are
+  no-ops. The primary audit view merges this evidence with existing history in a
+  separate query to stay within D1's compound-SELECT limit.
+- Staff selectors, school-need summaries/detail, introduction consent and captured
+  introduction mail resolve the current verified account name, with the existing
+  `Akun staf <id-prefix>` fallback for legacy unnamed accounts. Historical
+  `school_need.staff_contact_name`, approvals, invitation bindings, staff-recipient
+  IDs and consent/sharing evidence are not rewritten. Name correction preserves
+  email, roles, membership and profile fields.
+- Migration `0020_representative_names.sql` adds the nullable invitation name for
+  legacy rows, extends invitation issue/accept/apply triggers, and adds the
+  restricted name-change table and triggers. It was applied to ordinary local D1
+  with `npm run db:migrate`; existing local data and legacy null-name invitations
+  were preserved. No new environment variables.
+
+## Verification
+
+- Focused HTTP/browser journeys pass:
+  - `node scripts/test.mjs tests/invitations.test.mjs tests/browser/invitations.spec.ts`
+    — 4 HTTP and the named invitation Chromium journey.
+  - `node scripts/test.mjs tests/representative-names.test.mjs tests/browser/representative-names.spec.ts`
+    — 4 HTTP and 1 Chromium journey covering named acceptance, existing-name
+    preservation, invalid input, primary-only correction, revocation, concurrency,
+    legacy records, selectors, school needs, consent, captured introduction mail,
+    audit privacy and preserved profile/membership data.
+  - `node scripts/test.mjs tests/school-needs.test.mjs tests/browser/school-needs.spec.ts`
+    — 5 HTTP and 1 Chromium journey.
+  - `node scripts/test.mjs tests/introductions.test.mjs tests/browser/introductions.spec.ts`
+    — 11 HTTP and 3 Chromium journeys.
+  - `node scripts/test.mjs tests/roles.test.mjs tests/browser/roles.spec.ts`
+    — 7 HTTP and 1 Chromium journey.
+- Chromium evidence: `test-results/representative-names-desktop.png` and
+  `test-results/representative-names-mobile.png` were visually inspected; the mobile
+  layout has no horizontal overflow.
+- Full `npm test` passes six helper tests, 94 HTTP tests and all 20 Chromium
+  journeys, with no failures or skips. This includes the real five-minute OTP
+  expiry and rate-limit windows.
+- `npm run typecheck`, `npm run build`, `npm run lint` and
+  `npm run format:check` pass.
+- Ordinary localhost remains available after the migration: `/login` and `/` return
+  200 with no-store, while signed-out `/outreach` and `/admin/roles` return 401 with
+  no-store. Normal local data was preserved; all automated accounts and captured
+  mail were synthetic.
+
+The next local implementation frontier remains **#18** (private clarification).
+Issue #25 is implemented locally; its code and evidence are not pushed.
+
+---
+
 # Introduction review fixes — 2026-10-20
 
 Review remediation for commits `c8ada19`, `9556cec`, and `77f9856`, based on

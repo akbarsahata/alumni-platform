@@ -37,7 +37,7 @@ Only the primary can open `/admin/roles` and grant/revoke roles on verified acco
 | staff                    | Validate school content      |
 | student                  | Propose student content      |
 
-The primary appointment grants role management and authorization audit access only. Assign membership-administrator separately for membership review, and finance/directory separately as needed. Staff/student assignments here are explicit primary actions on verified accounts; email-bound invitations remain issue #7. The primary role cannot be assigned/revoked through the screen/API.
+The primary appointment grants role management and authorization audit access only. Assign membership-administrator separately for membership review, and finance/directory separately as needed. Staff/student assignments here are explicit primary actions on verified accounts; email-bound invitations remain issue #7. The same primary-only screen also sets or corrects **Nama perwakilan** for verified staff/student accounts, including direct appointments, without requiring membership or a profile. See [representative names](representative-names.md). The primary role cannot be assigned/revoked through the screen/API.
 
 Email ownership, approved/suspended alumni membership and roles are separate records. Membership enables endorsement only while approved. School, membership-administrator and primary roles do not imply finance/directory access. Multiple explicit roles may coexist; revoking one leaves others intact.
 
