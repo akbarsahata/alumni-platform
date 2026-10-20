@@ -54,9 +54,18 @@ test("administrator suspends and restores membership after a member requests rev
       member.getByRole("button", { name: "Minta tinjauan penangguhan", exact: true })
     ).toHaveCount(0);
     await gotoReady(reviewer, "/admin/membership");
-    await reviewer
-      .getByRole("link", { name: `Tinjau anggota ${fixture.member.id}`, exact: true })
-      .click();
+    const memberLink = reviewer.getByRole("link", {
+      name: `Tinjau anggota ${fixture.member.id}`,
+      exact: true,
+    });
+    for (let page = 0; page < 20 && !(await memberLink.isVisible()); page++) {
+      const next = reviewer.getByRole("link", { name: "Anggota berikutnya" });
+      if (!(await next.count())) break;
+      const href = await next.getAttribute("href");
+      if (!href) break;
+      await gotoReady(reviewer, new URL(href, reviewer.url()).href);
+    }
+    await memberLink.click();
     await expect(reviewer.getByText("Mohon periksa ulang dengan staf sekolah.")).toBeVisible();
     await reviewer
       .getByLabel("Alasan perubahan status (privat)")

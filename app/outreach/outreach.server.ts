@@ -1,5 +1,6 @@
 import { getAccess, requireDirectory, requirePrimary } from "../authorization/permissions.server";
 import { hasTrustedOrigin } from "../auth/auth.server";
+import { outcomeRepository } from "../db/outcome.repository.server";
 import { outreachRepository } from "../db/outreach.repository.server";
 import { schoolNeedsRepository } from "../db/school-needs.repository.server";
 import {
@@ -8,6 +9,7 @@ import {
   outreachResponseInput,
   outreachActionInput,
   outreachConsentInput,
+  outreachOutcomeInput,
   outreachStaffRecipientInput,
   outreachTakeoverInput,
   outreachPageCursor,
@@ -91,24 +93,32 @@ export async function sendOutreach(request: Request, env: Env, needId: string, i
 export async function readOutreachNeed(request: Request, env: Env, needId: string) {
   const access = await requireDirectory(request, env);
   const repository = outreachRepository(env.DB);
-  const [detail, staffContacts] = await Promise.all([
+  const [detail, staffContacts, outcomeRows] = await Promise.all([
     repository.needWorkspace(needId),
     schoolNeedsRepository(env.DB).staffContacts(),
+    outcomeRepository(env.DB).forNeed(needId, access.account.id),
   ]);
   if (!detail.available && !detail.frozen && !detail.closed)
     throw new Response("Kebutuhan tidak tersedia untuk penjangkauan.", { status: 404 });
   const need = detail.need;
   if (!need) throw new Response("Kebutuhan tidak ditemukan.", { status: 404 });
+  const outcomes = detail.requests.map((request) => {
+    const current = outcomeRows.current.find((row) => row.requestId === request.id) ?? null;
+    const events = outcomeRows.events.filter((event) => event.requestId === request.id);
+    return { requestId: request.id, current, events, latest: events.at(-1) ?? null };
+  });
   return {
     need: detail.staffRecipient ? { ...need, staffContactName: detail.staffRecipient.name } : need,
     actorId: access.account.id,
     canSend: detail.available,
     closed: detail.closed,
+    closedAt: detail.closedAt,
     requests: detail.requests,
     notifications: detail.notifications,
     staffRecipient: detail.staffRecipient,
     staffContacts,
     sharing: detail.sharing,
+    outcomes,
     canChangeStaff: detail.requests.length > 0,
   };
 }
@@ -116,7 +126,10 @@ export async function readOutreachRequest(request: Request, env: Env, requestId:
   const access = await getAccess(request, env);
   const repository = outreachRepository(env.DB);
   await repository.reconcile();
-  const row = await repository.requestDetail(requestId, access.account.id);
+  const [row, outcomeRows] = await Promise.all([
+    repository.requestDetail(requestId, access.account.id),
+    outcomeRepository(env.DB).forRequest(requestId, access.account.id),
+  ]);
   if (!row) throw new Response("Permintaan tidak ditemukan.", { status: 404 });
   const isRecipient = row.request.recipientUserId === access.account.id;
   const expired = Date.parse(row.request.expiresAt) <= Date.now();
@@ -131,6 +144,7 @@ export async function readOutreachRequest(request: Request, env: Env, requestId:
     isRecipient &&
     row.request.status === "interested" &&
     !expired &&
+    !row.closed &&
     !active &&
     !sharedWithCurrent &&
     row.eligible &&
@@ -138,13 +152,34 @@ export async function readOutreachRequest(request: Request, env: Env, requestId:
   const canWithdraw =
     isRecipient && !!active && ["pending", "claimed"].includes(active.deliveryState);
   const canRespond = isRecipient && row.request.status === "pending" && !expired;
+  const outcome = outcomeRows.current
+    ? {
+        ...outcomeRows.current,
+        events: outcomeRows.events,
+        latest: outcomeRows.events.at(-1) ?? null,
+      }
+    : null;
+  const canWriteOutcome =
+    isRecipient &&
+    access.membership.status === "approved" &&
+    row.request.status === "interested" &&
+    !!outcome;
   return {
     ...row,
     need: row.staffRecipient
       ? { ...row.need, staffContactName: row.staffRecipient.name }
       : row.need,
     viewer: { isRecipient, email: isRecipient ? access.account.email : null },
-    access: { canConsent, canWithdraw, canRespond, expired },
+    outcome,
+    access: {
+      canConsent,
+      canWithdraw,
+      canRespond,
+      expired,
+      canConfirm: canWriteOutcome && outcome.latest?.kind !== "confirm",
+      canCorrect: canWriteOutcome,
+      canRecord: access.permissions.directory && !!outcome,
+    },
   };
 }
 export async function respondOutreach(
@@ -217,6 +252,11 @@ export async function giveConsent(request: Request, env: Env, requestId: string,
     });
   if (["declined", "cancelled", "expired"].includes(detail.request.status))
     throw new Response("Permintaan ini sudah ditutup.", { status: 409 });
+  if (detail.closed)
+    throw new Response(
+      "Kebutuhan sudah ditutup. Persetujuan perkenalan baru tidak dapat diberikan, tetapi hasil bantuan tetap dapat dikonfirmasi.",
+      { status: 409 }
+    );
   if (detail.access.expired)
     throw new Response("Batas respons telah lewat. Persetujuan baru tidak dapat diberikan.", {
       status: 409,
@@ -331,6 +371,56 @@ export async function changeStaffRecipient(
       status: 409,
     });
   return { changed: true };
+}
+
+export async function recordOutreachOutcome(
+  request: Request,
+  env: Env,
+  requestId: string,
+  input: unknown
+) {
+  origin(request, env);
+  const access = await getAccess(request, env);
+  const body = parseInput(
+    outreachOutcomeInput,
+    input,
+    "Pilih hasil bantuan dan isi catatan 1-500 karakter."
+  );
+  const detail = await readOutreachRequest(request, env, requestId);
+  if (body.action === "record") {
+    if (!access.permissions.directory)
+      throw new Response("Peran koordinator direktori diperlukan untuk mencatat hasil.", {
+        status: 403,
+      });
+  } else {
+    if (!detail.viewer.isRecipient)
+      throw new Response("Hanya alumni penerima yang dapat mengonfirmasi atau mengoreksi hasil.", {
+        status: 403,
+      });
+    if (access.membership.status !== "approved")
+      throw new Response(
+        "Keanggotaan Anda sedang ditinjau. Riwayat hasil dapat dilihat, tetapi belum dapat diubah.",
+        { status: 403 }
+      );
+  }
+  if (!detail.outcome)
+    throw new Response("Hasil bantuan baru tersedia setelah perkenalan dikirim.", { status: 409 });
+  const rows = await outcomeRepository(env.DB).append({
+    id: crypto.randomUUID(),
+    requestId,
+    actorId: access.account.id,
+    actorKind: body.action === "record" ? "coordinator" : "member",
+    kind: body.action,
+    expectedRevision: body.expectedRevision,
+    state: body.action === "confirm" ? null : body.state,
+    note: body.action === "confirm" ? null : body.note,
+  });
+  if (!rows)
+    throw new Response(
+      "Hasil bantuan atau kewenangan telah berubah. Muat ulang, tinjau hasil terbaru, lalu simpan lagi.",
+      { status: 409 }
+    );
+  return { changed: true, revision: rows.revision, state: rows.state };
 }
 
 export async function closeOutreachNeed(

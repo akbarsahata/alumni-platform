@@ -1,4 +1,5 @@
 import { helpTypes, availabilityChoices } from "../profiles/model";
+import { outcomeStates } from "../outreach/model";
 import { z } from "zod";
 import { houses } from "../membership/model";
 import { roles } from "../authorization/roles";
@@ -303,6 +304,30 @@ export const outreachStaffRecipientInput = z
   })
   .strict();
 
+export const outreachOutcomeInput = z.discriminatedUnion("action", [
+  z
+    .object({
+      action: z.literal("confirm"),
+      expectedRevision: integer(0, Number.MAX_SAFE_INTEGER - 1),
+    })
+    .strict(),
+  z
+    .object({
+      action: z.literal("record"),
+      expectedRevision: integer(0, Number.MAX_SAFE_INTEGER - 1),
+      state: z.enum(outcomeStates),
+      note: requiredText(500),
+    })
+    .strict(),
+  z
+    .object({
+      action: z.literal("correct"),
+      expectedRevision: integer(0, Number.MAX_SAFE_INTEGER - 1),
+      state: z.enum(outcomeStates),
+      note: requiredText(500),
+    })
+    .strict(),
+]);
 export const outreachTakeoverInput = z
   .object({ expectedCoordinatorUserId: requiredText(200) })
   .strict();

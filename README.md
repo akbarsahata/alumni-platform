@@ -10,8 +10,9 @@ English.
 **Currently implemented:** the local Cloudflare application, email-code login, private administrator
 bootstrap, role management, membership applications/manual review, same-house references, reviewed
 house corrections, school invitations, profiles, expertise discovery, independently approved
-school needs, and bounded school outreach with private interest/decline responses. Initiatives,
-finance, and broader engagement workflows remain planned. The latest entries in the
+school needs, and bounded school outreach with private interest/decline responses, consented
+introductions, and append-only outcome tracking with need closure. Initiatives, finance, and
+broader engagement workflows remain planned. The latest entries in the
 [session handoff](docs/handoff.md) describe implementation and verification; earlier planning statuses
 are historical.
 

@@ -1,4 +1,28 @@
 export type OutreachStatus = "pending" | "interested" | "declined" | "cancelled" | "expired";
+export type OutcomeState = "introduced" | "help-confirmed" | "completed" | "did-not-proceed";
+export const outcomeStates = [
+  "introduced",
+  "help-confirmed",
+  "completed",
+  "did-not-proceed",
+] as const satisfies readonly OutcomeState[];
+export const outcomeStateLabels: Record<OutcomeState, string> = {
+  introduced: "Sudah diperkenalkan",
+  "help-confirmed": "Bantuan dikonfirmasi",
+  completed: "Selesai",
+  "did-not-proceed": "Tidak berlanjut",
+};
+export type OutcomeEventKind = "record" | "confirm" | "correct";
+export const outcomeEventKindLabels: Record<OutcomeEventKind, string> = {
+  record: "Dicatat koordinator",
+  confirm: "Dikonfirmasi alumni",
+  correct: "Dikoreksi alumni",
+};
+export type OutcomeActorKind = "member" | "coordinator";
+export const outcomeActorKindLabels: Record<OutcomeActorKind, string> = {
+  member: "Alumni",
+  coordinator: "Koordinator direktori",
+};
 export const outreachStatusLabels: Record<OutreachStatus, string> = {
   pending: "Menunggu respons",
   interested: "Berminat",

@@ -1,3 +1,99 @@
+# Outreach outcomes and school-need closure — 2026-10-20
+
+Issue [#19](https://github.com/akbarsahata/alumni-platform/issues/19) is implemented
+locally on branch `codex/issue-19-technical-spec` from starting commit `aac9f18`,
+following [the agreed outcome specification](outreach-outcomes-spec.md). Changes are
+in one local commit; nothing is pushed or deployed, no live email was sent, and the
+issue remains open remotely until a separate tracker update.
+
+## Behavior
+
+- A committed introduction creates one `introduced` baseline per request using the
+  earliest sharing time. Consent-only, pending/claimed, withdrawn and invalidated
+  delivery never create outcomes. Subsequent staff shares do not reset the baseline,
+  revision or history.
+- Current directory coordinators **Catat hasil**; the recipient member
+  **Konfirmasi hasil** or **Koreksi hasil**. Current states are introduced,
+  help-confirmed, completed, or did-not-proceed. Confirmation covers the displayed
+  revision, does not grant email consent, and becomes historical after a later edit.
+  Append-only events retain actor ID/source, previous/current state, bounded note and
+  UTC time. Notes are trimmed, 1-500 characters, required for records/corrections,
+  and visible only to the recipient and current coordinators.
+- Conditional writes recheck request access, owner or coordinator authority,
+  approved membership for member actions, shared evidence and `expectedRevision` in
+  one statement. Stale, competing or revoked-authority writes return 409 with no
+  event or audit residue. Outcomes remain editable after opt-out, unavailability,
+  staleness, expiry and closure. Suspended membership is read-only for member
+  outcome actions; coordinator authority remains independent.
+- Closure still uses `outreach_closure` as the one authority. It cancels unanswered
+  requests and pending/claimed request or reminder notifications while preserving
+  responses, introductions, outcomes and history. New consent is blocked after
+  closure, but consent recorded before closure may finish delivery. Repeated closure
+  conflicts.
+- School need pages show response totals separately from mutually exclusive outcome
+  buckets, `introducedTotal`, and closure time. School JSON/HTML/data remains
+  aggregate-only. Primary audit adds `outcome-recorded`, `outcome-confirmed` and
+  `outcome-corrected` with only event/actor/need IDs, action and UTC time.
+
+## Persistence and interface
+
+- Migration `0021_outreach_outcomes.sql` adds `outreach_outcome` and
+  `outreach_outcome_event`, backfills existing shared requests once from the earliest
+  `shared_at`, installs the first-share baseline trigger, append-only history,
+  conditional revision validation, derived-projection guards and minimal audit
+  trigger. There are no new bindings, secrets or environment variables.
+- `app/db/outcome.repository.server.ts` owns outcome persistence;
+  `app/outreach/outcomes.server.ts` was not needed because the thin workflow lives
+  beside the existing outreach workflows in `app/outreach/outreach.server.ts`.
+- The existing request API/page now returns the current outcome, revision, history and
+  server-derived action permissions. The coordinator need API/page returns each
+  request's outcome and history. `POST /api/outreach/requests/:requestId/outcome`
+  and both page actions submit the shared strict schema. Unsupported methods remain
+  405; mutations keep origin protection and private responses keep `no-store`.
+- Existing request, coordinator need, school need and audit pages were extended with
+  **Hasil bantuan**, **Tutup kebutuhan**, closure time and aggregate outcomes. No new
+  dashboard, breadcrumb, navigation destination or email was added.
+
+## Verification
+
+- Migration `0021` first applied successfully to disposable D1 through the test
+  runner. A separate disposable pre-0021 fixture verified one backfilled baseline
+  using the earliest of two shared times and zero invented history events. It was
+  then applied to ordinary local D1 with `npm run db:migrate`; existing local data was
+  preserved.
+- Focused `node scripts/test.mjs tests/outcomes.test.mjs tests/browser/outcomes.spec.ts`
+  passes seven real Worker/D1/Better Auth HTTP journeys and the Chromium outcome
+  journey. Coverage includes baselines, multiple shares, coordinator/member history,
+  confirmation invalidation, corrections, combined roles, notes/validation, races,
+  stale revisions, forged fields, role/ownership privacy, suspension read-only,
+  no-store, hostile origins, closure/cancellation, post-closure/pre-expiry outcomes,
+  pre-closure delivery, replacement needs and aggregate-only school projections.
+- Final full `npm test` passes all HTTP suites and all 21 Chromium journeys with no
+  failures or skips, including the real five-minute OTP expiry and rate-limit
+  windows. Two earlier full runs exposed pre-existing browser pagination fragility
+  as the fixture set grew (outreach need/request list and suspensions member queue).
+  Those specs now use supported direct URLs or follow **Anggota berikutnya**; the
+  final full run passed.
+- `npm run typecheck`, `npm run build`, `npm run lint` and `npm run format:check`
+  pass. Desktop and 390px outcome screenshots were visually inspected; the mobile
+  layout has no horizontal overflow.
+- Temporary localhost smoke on the migrated ordinary D1 returned 200/no-store for
+  `/` and `/login`, and 401/no-store for signed-out `/outreach` and
+  `/admin/outreach-audit`. Synthetic accounts and captured mail were used only in
+  disposable integration state.
+
+## Remaining boundaries
+
+No deployment, remote migration, live mail, scheduled job, automated retention or
+entire-account deletion is included. Outcome and event history is guarded as
+append-only during normal operation; the separately authorized #20 manual
+deletion/anonymization procedure must deliberately adjust those guards. Closure time
+anchors the existing manual 12-month retention policy but expiry does not delete
+anything automatically. Private clarification (#18) and deletion/retention (#20)
+remain separate.
+
+---
+
 # Coordinator retry authorization review fix — 2026-10-20
 
 PR [#26](https://github.com/akbarsahata/alumni-platform/pull/26) review comment

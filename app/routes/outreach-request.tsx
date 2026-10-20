@@ -4,11 +4,18 @@ import type { Route } from "./+types/outreach-request";
 import {
   giveConsent,
   readOutreachRequest,
+  recordOutreachOutcome,
   respondOutreach,
   withdrawConsent,
 } from "../outreach/outreach.server";
 import { NeedDetails } from "../outreach/need-details";
-import { invalidationReasonLabels, outreachStatusLabels } from "../outreach/model";
+import {
+  invalidationReasonLabels,
+  outcomeStateLabels,
+  outreachStatusLabels,
+  type OutcomeState,
+} from "../outreach/model";
+import { OutcomeStateSelect, OutcomeSummary } from "../outreach/outcome-summary";
 import { pageTitle } from "../content/page-title";
 export function meta() {
   return [{ title: pageTitle("Tanggapi permintaan bantuan") }];
@@ -26,6 +33,10 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 export async function action({ request, params }: Route.ActionArgs) {
   const f = await request.formData();
   const intent = f.get("intent");
+  const submittedOutcome =
+    intent === "correct-outcome" || intent === "record-outcome"
+      ? { state: String(f.get("state") ?? ""), note: String(f.get("note") ?? "") }
+      : null;
   try {
     if (intent === "consent") {
       const result = await giveConsent(request, env, params.requestId, {
@@ -38,6 +49,7 @@ export async function action({ request, params }: Route.ActionArgs) {
         message: result.shared
           ? "Persetujuan tercatat. Perkenalan telah dikirim kepada kontak staf."
           : "Persetujuan tercatat. Pengiriman perkenalan menunggu.",
+        values: null,
       };
     }
     if (intent === "withdraw-consent") {
@@ -45,20 +57,54 @@ export async function action({ request, params }: Route.ActionArgs) {
       return {
         error: null,
         message: "Persetujuan ditarik. Email belum dibagikan dan tidak akan dikirim.",
+        values: null,
       };
+    }
+    if (intent === "confirm-outcome") {
+      await recordOutreachOutcome(request, env, params.requestId, {
+        action: "confirm",
+        expectedRevision: f.get("expectedRevision"),
+      });
+      return { error: null, message: "Hasil bantuan dikonfirmasi.", values: null };
+    }
+    if (intent === "correct-outcome") {
+      const result = await recordOutreachOutcome(request, env, params.requestId, {
+        action: "correct",
+        expectedRevision: f.get("expectedRevision"),
+        state: f.get("state"),
+        note: f.get("note"),
+      });
+      return {
+        error: null,
+        message: `Koreksi hasil bantuan disimpan: ${outcomeStateLabels[result.state]}.`,
+        values: null,
+      };
+    }
+    if (intent === "record-outcome") {
+      await recordOutreachOutcome(request, env, params.requestId, {
+        action: "record",
+        expectedRevision: f.get("expectedRevision"),
+        state: f.get("state"),
+        note: f.get("note"),
+      });
+      return { error: null, message: "Hasil bantuan dicatat.", values: null };
     }
     await respondOutreach(request, env, params.requestId, {
       outcome: f.get("outcome"),
       reason: f.get("outcome") === "declined" ? (f.get("reason") ?? "") : "",
     });
-    return { error: null, message: null };
+    return { error: null, message: null, values: null };
   } catch (e) {
     if (!(e instanceof Response) || ![400, 403, 404, 409].includes(e.status)) throw e;
-    return data({ error: await e.text(), message: null }, { status: e.status });
+    return data(
+      { error: await e.text(), message: null, values: submittedOutcome },
+      { status: e.status }
+    );
   }
 }
 export default function OutreachRequest({ loaderData: d, actionData }: Route.ComponentProps) {
   const busy = useNavigation().state !== "idle";
+  const submitted = actionData?.values ?? null;
   const active = d.sharing.find(
     (item) => !item.sharedAt && !item.withdrawnAt && !item.invalidatedAt
   );
@@ -168,6 +214,86 @@ export default function OutreachRequest({ loaderData: d, actionData }: Route.Com
           )}
           {!d.staffRecipient?.active && !active && !shared.length && (
             <p>Perkenalan belum dapat dilakukan karena kontak staf tidak aktif.</p>
+          )}
+          {!!d.closed && !active && !shared.length && (
+            <p>Kebutuhan sudah ditutup. Persetujuan perkenalan baru tidak dapat diberikan.</p>
+          )}
+        </section>
+      )}
+      {d.outcome && (
+        <section aria-label="Hasil bantuan" className="space-y-3 rounded border p-4">
+          <h2 className="text-xl font-semibold">Hasil bantuan</h2>
+          <OutcomeSummary outcome={d.outcome} />
+          <p>Konfirmasi hasil bantuan tidak memberikan izin berbagi email.</p>
+          {d.access.canConfirm && (
+            <Form method="post">
+              <input type="hidden" name="intent" value="confirm-outcome" />
+              <input type="hidden" name="expectedRevision" value={d.outcome.revision} />
+              <button disabled={busy}>Konfirmasi hasil</button>
+            </Form>
+          )}
+          {!d.access.canConfirm && d.viewer.isRecipient && d.outcome.latest?.kind === "confirm" && (
+            <p>Hasil saat ini sudah Anda konfirmasi.</p>
+          )}
+          {d.access.canCorrect && (
+            <Form method="post" className="space-y-2">
+              <input type="hidden" name="intent" value="correct-outcome" />
+              <input type="hidden" name="expectedRevision" value={d.outcome.revision} />
+              <label className="block" htmlFor="outcome-correction-state">
+                Koreksi hasil bantuan
+              </label>
+              <OutcomeStateSelect
+                id="outcome-correction-state"
+                defaultValue={(submitted?.state as OutcomeState | undefined) || d.outcome.state}
+              />
+              <label className="block" htmlFor="outcome-correction-note">
+                Penjelasan koreksi (1-500 karakter)
+              </label>
+              <textarea
+                id="outcome-correction-note"
+                name="note"
+                required
+                maxLength={500}
+                rows={3}
+                defaultValue={submitted?.note ?? ""}
+              />
+              <p>
+                Catatan terlihat oleh Anda dan koordinator direktori. Jangan tulis kontak, alamat
+                rumah, atau isi klarifikasi pribadi.
+              </p>
+              <button disabled={busy}>Koreksi hasil</button>
+            </Form>
+          )}
+          {d.viewer.isRecipient && !d.access.canCorrect && (
+            <p>
+              Keanggotaan Anda sedang ditinjau. Riwayat hasil bantuan dapat dilihat, tetapi belum
+              dapat diubah.
+            </p>
+          )}
+          {d.access.canRecord && (
+            <Form method="post" className="space-y-2 border-t pt-3">
+              <input type="hidden" name="intent" value="record-outcome" />
+              <input type="hidden" name="expectedRevision" value={d.outcome.revision} />
+              <label className="block" htmlFor="outcome-record-state">
+                Catat hasil bantuan
+              </label>
+              <OutcomeStateSelect
+                id="outcome-record-state"
+                defaultValue={(submitted?.state as OutcomeState | undefined) || d.outcome.state}
+              />
+              <label className="block" htmlFor="outcome-record-note">
+                Catatan hasil bantuan (1-500 karakter)
+              </label>
+              <textarea
+                id="outcome-record-note"
+                name="note"
+                required
+                maxLength={500}
+                rows={3}
+                defaultValue={submitted?.note ?? ""}
+              />
+              <button disabled={busy}>Catat hasil</button>
+            </Form>
           )}
         </section>
       )}

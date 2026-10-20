@@ -2,6 +2,8 @@
 
 Issue [#16](https://github.com/akbarsahata/alumni-platform/issues/16) implements the
 outreach/response slice of [the agreed specification](profiles-expertise-outreach-spec.md).
+Outcomes and need closure [#19](https://github.com/akbarsahata/alumni-platform/issues/19)
+extend the same workflow; see [the outcome specification](outreach-outcomes-spec.md).
 
 ## Workflow
 
@@ -16,8 +18,8 @@ outreach/response slice of [the agreed specification](profiles-expertise-outreac
   in the Pribadi menu. Captured email links directly to the authenticated request.
   Members can express interest or decline once; an optional decline reason is
   visible only to the member and current directory coordinators. Interest does not
-  share email. Consented introductions are implemented in #17; private
-  clarification remains #18.
+  share email. Consented introductions are implemented in #17 and outcomes in #19;
+  private clarification remains #18.
 - Each need has at most ten recipients, each member receives one request per need,
   and each member receives at most three new requests in a rolling 30-day period
   across all coordinators and replacement needs. Cancelled, declined and expired
@@ -117,6 +119,45 @@ requests. Completed responses remain historical records.
   display/school name, email and need title/purpose/requested help; it excludes
   house, profile text and decline reasons.
 
+## Outcomes and closure
+
+- A committed introduction creates one `introduced` baseline per request. Consent
+  alone, pending/claimed delivery, withdrawal or a replacement consent never creates
+  or resets an outcome. The baseline uses the earliest sharing time.
+- The current outcome is one of **Sudah diperkenalkan**, **Bantuan dikonfirmasi**,
+  **Selesai**, or **Tidak berlanjut**. Current directory coordinators use
+  **Catat hasil**; the recipient member can **Konfirmasi hasil** or **Koreksi hasil**.
+  Confirming records agreement with the displayed revision and does not grant email
+  consent. A later coordinator record or correction makes the earlier confirmation
+  historical rather than relabelling the changed value as member-confirmed.
+- Human changes are append-only events with actor, source, previous/current state,
+  optional bounded note and UTC time. Coordinator records and member corrections
+  require a trimmed 1-500 character note; confirmation needs no note. Notes are
+  visible only to the recipient and current directory coordinators and must describe
+  the arrangement, not contact details or private clarification.
+- Every mutation supplies the displayed revision. Conditional insertion rechecks the
+  request, current outcome revision, actor ownership or current coordinator role,
+  membership status and shared evidence in one write. A stale or competing edit
+  returns 409 with no event or audit residue; reload and review before retrying.
+  Confirmation advances the revision. Outcomes remain editable after opt-out,
+  unavailability, staleness, request expiry and need closure. Suspended membership
+  keeps the existing read-only member boundary; separately assigned coordinator
+  authority remains independent.
+- **Tutup kebutuhan** remains the only closure authority. Closure atomically cancels
+  still-unanswered requests and their pending or claimed request/reminder
+  notifications, while preserving declined/interested responses, introductions,
+  outcomes and history. Repeated closure returns 409. Closure blocks new sends,
+  responses, reminders and new sharing consent, but a consent recorded before
+  closure may still finish delivery under the existing eligibility checks.
+- School need pages show aggregate response counts plus mutually exclusive current
+  outcome counts (`introduced`, `helpConfirmed`, `completed`, `didNotProceed`), the
+  distinct `introducedTotal`, and closure time. Outcome buckets sum to the distinct
+  requests with shared evidence; response counts are never added to outcome counts.
+  School projections contain no request/member IDs, names, notes, authors, emails or
+  individual timestamps. Primary audit events distinguish `outcome-recorded`,
+  `outcome-confirmed` and `outcome-corrected` but retain only event/actor/need IDs,
+  action and UTC time.
+
 ## Local setup and verification
 
 Migration `0015_outreach.sql` adds requests, notification intents, closures, minimal
@@ -127,8 +168,12 @@ checks. `0017_outreach_staff_recipients.sql` adds the current named introduction
 recipient and replaces the approved-need view so historical staff validation
 survives recipient replacement while current recipient authority is still checked.
 `0018_outreach_introductions.sql` adds consent/sharing evidence, delivery state,
-partial uniqueness indexes and eligibility/replacement/audit triggers. There are no
-new environment variables. Use the existing local setup and captured-mail adapter:
+partial uniqueness indexes and eligibility/replacement/audit triggers.
+`0019_atomic_introduction_capture.sql` adds the development-only introduction
+mailbox. `0021_outreach_outcomes.sql` adds the outcome projection, append-only event
+history, introduced-baseline/share trigger, conditional revision enforcement,
+projection guards and minimal outcome audit actions. There are no new environment
+variables. Use the existing local setup and captured-mail adapter:
 
 ```sh
 npm run local:setup
@@ -142,6 +187,7 @@ routes and Chromium, with synthetic accounts:
 ```sh
 node scripts/test.mjs tests/outreach.test.mjs tests/browser/outreach.spec.ts
 node scripts/test.mjs tests/introductions.test.mjs tests/browser/introductions.spec.ts
+node scripts/test.mjs tests/outcomes.test.mjs tests/browser/outcomes.spec.ts
 npm run typecheck
 npm run build
 ```

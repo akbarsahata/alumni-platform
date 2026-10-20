@@ -10,10 +10,17 @@ import {
   deliverOutreach,
   changeStaffRecipient,
   retryIntroduction,
+  recordOutreachOutcome,
 } from "../outreach/outreach.server";
 import { searchDirectory } from "../profiles/directory.server";
-import { invalidationReasonLabels, outreachStatusLabels } from "../outreach/model";
+import {
+  invalidationReasonLabels,
+  outcomeStateLabels,
+  outreachStatusLabels,
+  type OutcomeState,
+} from "../outreach/model";
 import { NeedDetails } from "../outreach/need-details";
+import { OutcomeStateSelect, OutcomeSummary } from "../outreach/outcome-summary";
 import { pageTitle } from "../content/page-title";
 export function meta() {
   return [{ title: pageTitle("Penjangkauan sekolah") }];
@@ -26,6 +33,14 @@ export async function action({ request, params }: Route.ActionArgs) {
   const f = await request.formData();
   const intent = f.get("intent");
   const requestId = String(f.get("requestId") ?? "");
+  const submittedOutcome =
+    intent === "record-outcome"
+      ? {
+          requestId,
+          state: String(f.get("state") ?? ""),
+          note: String(f.get("note") ?? ""),
+        }
+      : null;
   try {
     let result: { notificationPending?: boolean; shared?: boolean; pending?: boolean } = {};
     let message = "Status penjangkauan diperbarui.";
@@ -60,6 +75,14 @@ export async function action({ request, params }: Route.ActionArgs) {
           : result.pending
             ? "Perkenalan masih menunggu pengiriman."
             : "Tidak ada persetujuan yang menunggu pengiriman.";
+      } else if (intent === "record-outcome") {
+        const outcome = await recordOutreachOutcome(request, env, requestId, {
+          action: "record",
+          expectedRevision: f.get("expectedRevision"),
+          state: f.get("state"),
+          note: f.get("note"),
+        });
+        message = `Hasil bantuan dicatat: ${outcomeStateLabels[outcome.state]}.`;
       } else throw new Response("Tindakan tidak valid.", { status: 400 });
     }
     return {
@@ -67,10 +90,14 @@ export async function action({ request, params }: Route.ActionArgs) {
       message: result.notificationPending
         ? "Permintaan tersimpan. Notifikasi menunggu pengiriman."
         : message,
+      values: null,
     };
   } catch (e) {
     if (!(e instanceof Response) || ![400, 403, 404, 409].includes(e.status)) throw e;
-    return data({ error: await e.text(), message: null }, { status: e.status });
+    return data(
+      { error: await e.text(), message: null, values: submittedOutcome },
+      { status: e.status }
+    );
   }
 }
 export default function OutreachNeed({ loaderData: d, actionData }: Route.ComponentProps) {
@@ -127,7 +154,7 @@ export default function OutreachNeed({ loaderData: d, actionData }: Route.Compon
       </section>
       <p>
         {d.closed
-          ? "Kebutuhan ditutup."
+          ? `Kebutuhan ditutup pada ${d.closedAt ?? "waktu yang tercatat"}.`
           : "Maksimal 10 penerima per kebutuhan dan 3 permintaan baru per alumni dalam 30 hari."}
       </p>
       {!!d.requests.length && (
@@ -145,6 +172,8 @@ export default function OutreachNeed({ loaderData: d, actionData }: Route.Compon
           );
           const shared = sharing.filter((item) => !!item.sharedAt);
           const latestInactive = sharing.find((item) => item.withdrawnAt || item.invalidatedAt);
+          const outcome = d.outcomes.find((item) => item.requestId === r.id);
+          const submitted = actionData?.values?.requestId === r.id ? actionData.values : null;
           return (
             <article className="rounded border p-4 space-y-2" key={r.id}>
               <p>
@@ -195,6 +224,56 @@ export default function OutreachNeed({ loaderData: d, actionData }: Route.Compon
                 </p>
               )}
               {!sharing.length && <p>Perkenalan: belum ada persetujuan.</p>}
+              <section aria-label="Hasil bantuan" className="space-y-2">
+                <h3 className="text-lg font-semibold">Hasil bantuan</h3>
+                {outcome?.current ? (
+                  <>
+                    <OutcomeSummary
+                      outcome={{
+                        ...outcome.current,
+                        events: outcome.events,
+                        latest: outcome.latest,
+                      }}
+                    />
+                    <Form method="post" className="space-y-2">
+                      <input type="hidden" name="intent" value="record-outcome" />
+                      <input type="hidden" name="requestId" value={r.id} />
+                      <input
+                        type="hidden"
+                        name="expectedRevision"
+                        value={outcome.current.revision}
+                      />
+                      <label className="block" htmlFor={`outcome-state-${r.id}`}>
+                        Catat hasil bantuan
+                      </label>
+                      <OutcomeStateSelect
+                        id={`outcome-state-${r.id}`}
+                        defaultValue={
+                          (submitted?.state as OutcomeState | undefined) || outcome.current.state
+                        }
+                      />
+                      <label className="block" htmlFor={`outcome-note-${r.id}`}>
+                        Catatan hasil bantuan (1-500 karakter)
+                      </label>
+                      <textarea
+                        id={`outcome-note-${r.id}`}
+                        name="note"
+                        required
+                        maxLength={500}
+                        rows={3}
+                        defaultValue={submitted?.note ?? ""}
+                      />
+                      <p>
+                        Catatan ini hanya terlihat oleh alumni penerima dan koordinator direktori.
+                        Jangan tulis kontak, alamat rumah, atau isi klarifikasi pribadi.
+                      </p>
+                      <button disabled={busy}>Catat hasil</button>
+                    </Form>
+                  </>
+                ) : (
+                  <p>Hasil bantuan dapat dicatat setelah perkenalan terkirim.</p>
+                )}
+              </section>
               <Form method="post" className="flex flex-wrap gap-3">
                 <input type="hidden" name="requestId" value={r.id} />
                 <input type="hidden" name="expectedCoordinatorUserId" value={r.coordinatorUserId} />
@@ -227,12 +306,14 @@ export default function OutreachNeed({ loaderData: d, actionData }: Route.Compon
         })}
       </section>
       {!d.closed && (
-        <Form method="post">
+        <Form method="post" className="space-y-2 rounded border border-dashed p-4">
           <button name="intent" value="close" disabled={busy}>
             Tutup kebutuhan
           </button>
           <p>
-            Penutupan membatalkan permintaan yang belum dijawab dan mempertahankan riwayat respons.
+            Penutupan menghentikan permintaan yang belum dijawab dan pengingat yang masih menunggu.
+            Pengaturan yang sudah berjalan dapat berlanjut, dan hasil bantuan tetap dapat dicatat
+            atau dikoreksi setelah kebutuhan ditutup.
           </p>
         </Form>
       )}

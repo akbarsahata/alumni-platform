@@ -8,6 +8,7 @@ import {
   outreachClosure,
   outreachAudit,
   outreachIntroduction,
+  outreachOutcome,
   outreachStaffRecipient,
   user,
 } from "./schema";
@@ -61,7 +62,7 @@ export function outreachRepository(binding: D1Database) {
   const db = database(binding);
   const closedNeed = (needId: string) =>
     db
-      .select({ id: outreachClosure.needId })
+      .select({ id: outreachClosure.needId, closedAt: outreachClosure.closedAt })
       .from(outreachClosure)
       .where(eq(outreachClosure.needId, needId))
       .limit(1);
@@ -193,6 +194,7 @@ export function outreachRepository(binding: D1Database) {
         available: !!available[0],
         frozen: !!frozen[0],
         closed: !!closed[0],
+        closedAt: closed[0]?.closedAt ?? null,
         requests,
         notifications,
         staffRecipient: recipientFromRow(recipients[0]),
@@ -200,13 +202,28 @@ export function outreachRepository(binding: D1Database) {
       };
     },
     async aggregate(needId: string) {
-      const [rows, closures] = await db.batch([
+      const [rows, closures, outcomeRows, introductionRows] = await db.batch([
         db
           .select({ status: requestColumns.status, count: count() })
           .from(outreachRequest)
           .where(eq(outreachRequest.needId, needId))
           .groupBy(requestColumns.status),
         closedNeed(needId),
+        db
+          .select({ state: outreachOutcome.state, count: count() })
+          .from(outreachOutcome)
+          .innerJoin(outreachRequest, eq(outreachRequest.id, outreachOutcome.requestId))
+          .where(eq(outreachRequest.needId, needId))
+          .groupBy(outreachOutcome.state),
+        db
+          .select({ total: sql<number>`count(DISTINCT ${outreachIntroduction.requestId})` })
+          .from(outreachIntroduction)
+          .where(
+            and(
+              eq(outreachIntroduction.needId, needId),
+              sql`${outreachIntroduction.sharedAt} IS NOT NULL`
+            )
+          ),
       ]);
       const counts: Record<OutreachStatus, number> = {
         pending: 0,
@@ -220,7 +237,26 @@ export function outreachRepository(binding: D1Database) {
         total += row.count;
         counts[row.status] = row.count;
       }
-      return { total, ...counts, closed: !!closures[0] };
+      const outcomes = {
+        introduced: 0,
+        helpConfirmed: 0,
+        completed: 0,
+        didNotProceed: 0,
+      };
+      for (const row of outcomeRows) {
+        if (row.state === "introduced") outcomes.introduced = row.count;
+        else if (row.state === "help-confirmed") outcomes.helpConfirmed = row.count;
+        else if (row.state === "completed") outcomes.completed = row.count;
+        else outcomes.didNotProceed = row.count;
+      }
+      return {
+        total,
+        ...counts,
+        ...outcomes,
+        introducedTotal: introductionRows[0]?.total ?? 0,
+        closed: !!closures[0],
+        closedAt: closures[0]?.closedAt ?? null,
+      };
     },
     async remind(requestId: string, actorId: string) {
       return db.all<{
@@ -317,7 +353,7 @@ export function outreachRepository(binding: D1Database) {
       )[0];
     },
     async requestDetail(requestId: string, actorId: string) {
-      const [requests, needs, sharing, recipients] = await db.batch([
+      const [requests, needs, sharing, recipients, closures] = await db.batch([
         db.select(requestColumns).from(outreachRequest).where(requestAccess(requestId, actorId)),
         db
           .select(needColumns)
@@ -326,6 +362,11 @@ export function outreachRepository(binding: D1Database) {
           .where(requestAccess(requestId, actorId)),
         sharingForRequest(requestId, actorId),
         staffRecipientForRequest(requestId, actorId),
+        db
+          .select({ needId: outreachClosure.needId, closedAt: outreachClosure.closedAt })
+          .from(outreachClosure)
+          .innerJoin(outreachRequest, eq(outreachRequest.needId, outreachClosure.needId))
+          .where(requestAccess(requestId, actorId)),
       ]);
       if (!requests[0]) return undefined;
       return {
@@ -334,6 +375,8 @@ export function outreachRepository(binding: D1Database) {
         sharing,
         staffRecipient: recipientFromRow(recipients[0]),
         eligible: recipients[0]?.eligible === 1,
+        closed: !!closures[0],
+        closedAt: closures[0]?.closedAt ?? null,
       };
     },
     async respond(input: {
@@ -447,6 +490,7 @@ export function outreachRepository(binding: D1Database) {
           AND sr.user_id=${input.expectedStaffUserId} AND mu.email=${input.expectedMemberEmail}
           AND EXISTS(SELECT 1 FROM outreach_eligible_recipient er
             WHERE er.user_id=r.recipient_user_id)
+          AND NOT EXISTS(SELECT 1 FROM outreach_closure c WHERE c.need_id=r.need_id)
           AND NOT EXISTS(SELECT 1 FROM outreach_introduction i
             WHERE i.request_id=r.id AND i.shared_at IS NULL
               AND i.withdrawn_at IS NULL AND i.invalidated_at IS NULL)
