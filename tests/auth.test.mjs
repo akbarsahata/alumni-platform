@@ -1,6 +1,7 @@
 import { test, describe } from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import { fixtureQuery, fixtureSql } from "./helpers/d1.mjs";
 const vars = Object.fromEntries(
   (await readFile(process.env.ALUMNI_TEST_VARS || ".dev.vars", "utf8"))
     .split("\n")
@@ -11,7 +12,7 @@ const vars = Object.fromEntries(
     })
 );
 const base = process.env.TEST_BASE_URL || "http://127.0.0.1:5173";
-describe("main Workers authentication", { concurrency: true }, () => {
+describe("main Workers authentication", () => {
   test("email-code login is available in Bahasa Indonesia", async () => {
     const response = await fetch(`${base}/login`);
     assert.equal(response.status, 200);
@@ -39,6 +40,22 @@ describe("main Workers authentication", { concurrency: true }, () => {
     const mail = await response.json();
     assert.equal(mail.to, email);
     return mail.text.match(/\b\d{6}\b/)[0];
+  }
+  const sqlText = (value) => value.replaceAll("'", "''");
+  function storedVerification(email) {
+    return fixtureQuery(
+      `SELECT expires_at AS expiresAt,created_at AS createdAt FROM verification WHERE identifier='sign-in-otp-${sqlText(email)}'`
+    )[0];
+  }
+  function expireVerification(email) {
+    fixtureSql(
+      `UPDATE verification SET expires_at=(unixepoch('now')-1)*1000 WHERE identifier='sign-in-otp-${sqlText(email)}'`
+    );
+  }
+  function resetRateLimit(path) {
+    fixtureSql(
+      `UPDATE rate_limit SET last_request=last_request-61000 WHERE key LIKE '%${sqlText(path)}'`
+    );
   }
 
   test("an emailed code creates a verified account and logout revokes its session", async () => {
@@ -140,22 +157,24 @@ describe("main Workers authentication", { concurrency: true }, () => {
 
   test(
     "the production limiter rejects the fourth send and resets after its window",
-    { timeout: 75_000 },
+    { timeout: 30_000 },
     async () => {
       const call = client();
       const email = `limited-${Date.now()}@example.test`;
       for (let i = 0; i < 3; i++) await requestCode(call, email);
       const limited = await call(sendPath, { email, type: "sign-in" });
       assert.equal(limited.status, 429);
-      assert.ok(Number(limited.headers.get("x-retry-after")) > 0);
-      await new Promise((resolve) => setTimeout(resolve, 61_000));
+      const retryAfter = Number(limited.headers.get("x-retry-after"));
+      assert.ok(retryAfter > 0 && retryAfter <= 60);
+      // Age the disposable limiter row instead of waiting for the real window.
+      resetRateLimit("/email-otp/send-verification-otp");
       await requestCode(call, email);
     }
   );
 
   test(
     "three wrong guesses exhaust the code budget even after rate-limit reset",
-    { timeout: 75_000 },
+    { timeout: 30_000 },
     async () => {
       const call = client();
       const email = `attempts-${Date.now()}@example.test`;
@@ -164,7 +183,8 @@ describe("main Workers authentication", { concurrency: true }, () => {
       for (let i = 0; i < 3; i++)
         assert.equal((await call(signInPath, { email, otp: wrong })).status, 400);
       assert.equal((await call(signInPath, { email, otp })).status, 429);
-      await new Promise((resolve) => setTimeout(resolve, 61_000));
+      // Age the disposable limiter row; the per-code attempt budget must remain.
+      resetRateLimit("/sign-in/email-otp");
       const exhausted = await call(signInPath, { email, otp });
       assert.equal(exhausted.status, 403);
       assert.equal((await exhausted.json()).code, "TOO_MANY_ATTEMPTS");
@@ -245,14 +265,19 @@ describe("main Workers authentication", { concurrency: true }, () => {
   });
 
   test(
-    "expired codes are rejected after the installed five-minute lifetime",
-    { timeout: 330_000 },
+    "the installed five-minute lifetime is enforced without wall-clock waiting",
+    { timeout: 30_000 },
     async () => {
       const call = client();
       const email = `expiry-${Date.now()}@example.test`;
       const otp = await requestCode(call, email);
-      // Real wall time at the agreed HTTP seam; no private database or clock edits.
-      await new Promise((resolve) => setTimeout(resolve, 301_000));
+      const verification = storedVerification(email);
+      assert.ok(verification.createdAt);
+      const lifetime = verification.expiresAt - verification.createdAt;
+      assert.ok(lifetime >= 299_000 && lifetime <= 301_000, `lifetime ${lifetime}`);
+      // Assert the installed lifetime from persisted evidence, then age the
+      // disposable verification row instead of sleeping for five minutes.
+      expireVerification(email);
       const response = await call(signInPath, { email, otp });
       assert.equal(response.status, 400);
       assert.equal((await response.json()).code, "OTP_EXPIRED");

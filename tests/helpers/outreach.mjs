@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { login, call } from "./accounts.mjs";
+import { fixtureSql } from "./d1.mjs";
 import { membershipReviewers, application, decision } from "./membership.mjs";
 
 export const profile = {
@@ -124,22 +125,4 @@ export async function queueIntroduction(
     JOIN user u ON u.id=r.recipient_user_id WHERE r.id='${requestId}'`);
 }
 
-// Time/queue and capture-failure fixtures: writes are guarded to this runner's disposable D1.
-export async function fixtureSql(sql) {
-  assert.ok(process.env.ALUMNI_TEST_STATE?.includes("integration-state-"));
-  const { execFileSync } = await import("node:child_process");
-  return execFileSync(
-    "node_modules/.bin/wrangler",
-    [
-      "d1",
-      "execute",
-      "alumni_local",
-      "--local",
-      "--persist-to",
-      process.env.ALUMNI_TEST_STATE,
-      "--command",
-      sql,
-    ],
-    { stdio: "pipe", encoding: "utf8" }
-  );
-}
+export { fixtureSql };
