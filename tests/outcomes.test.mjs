@@ -279,11 +279,17 @@ test("outcome validation, ownership, stale revisions and races leave one committ
   assert.match(await retry.text(), /Muat ulang/);
   const afterRetry = await (await call(recipient, `/api/outreach/requests/${requestId}`)).json();
   assert.equal(afterRetry.outcome.events.length, 1);
-  await assert.rejects(
-    fixtureSql(`UPDATE outreach_outcome SET state='completed' WHERE request_id='${requestId}'`)
+  assert.throws(
+    () =>
+      fixtureSql(`UPDATE outreach_outcome SET state='completed' WHERE request_id='${requestId}'`),
+    /Outreach outcome projection is derived/
   );
-  await assert.rejects(
-    fixtureSql(`UPDATE outreach_outcome_event SET note='rewritten' WHERE request_id='${requestId}'`)
+  assert.throws(
+    () =>
+      fixtureSql(
+        `UPDATE outreach_outcome_event SET note='rewritten' WHERE request_id='${requestId}'`
+      ),
+    /Outreach outcome history must be retained/
   );
 });
 
