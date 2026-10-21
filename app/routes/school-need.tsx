@@ -3,6 +3,7 @@ import { Form, Link, data, useNavigation } from "react-router";
 import type { Route } from "./+types/school-need";
 import { pageTitle } from "../content/page-title";
 import { needCategoryLabels, needStatusLabels } from "../school-needs/model";
+import { outcomeStateLabels } from "../outreach/model";
 import { schoolNeedFormInput } from "../school-needs/form-input";
 import {
   approveSchoolNeed,
@@ -103,12 +104,23 @@ export default function SchoolNeed({ loaderData, actionData }: Route.ComponentPr
       </dl>
       <section aria-label="Progres penjangkauan" className="space-y-2">
         <h2>Progres penjangkauan</h2>
-        <p>{loaderData.outreach.closed ? "Kebutuhan ditutup" : "Kebutuhan terbuka"}</p>
         <p>
-          Total: {loaderData.outreach.total} · Menunggu: {loaderData.outreach.pending} · Berminat:{" "}
-          {loaderData.outreach.interested} · Ditolak: {loaderData.outreach.declined} · Dibatalkan:{" "}
-          {loaderData.outreach.cancelled} · Kedaluwarsa: {loaderData.outreach.expired}
+          {loaderData.outreach.closed
+            ? `Kebutuhan ditutup${loaderData.outreach.closedAt ? ` pada ${loaderData.outreach.closedAt}` : ""}`
+            : "Kebutuhan terbuka"}
         </p>
+        <p>
+          Respons — Total: {loaderData.outreach.total} · Menunggu: {loaderData.outreach.pending} ·
+          Berminat: {loaderData.outreach.interested} · Ditolak: {loaderData.outreach.declined} ·
+          Dibatalkan: {loaderData.outreach.cancelled} · Kedaluwarsa: {loaderData.outreach.expired}
+        </p>
+        <p>
+          Hasil bantuan — {outcomeStateLabels.introduced}: {loaderData.outreach.introduced} ·{" "}
+          {outcomeStateLabels["help-confirmed"]}: {loaderData.outreach.helpConfirmed} ·{" "}
+          {outcomeStateLabels.completed}: {loaderData.outreach.completed} ·{" "}
+          {outcomeStateLabels["did-not-proceed"]}: {loaderData.outreach.didNotProceed}
+        </p>
+        <p>Total perkenalan: {loaderData.outreach.introducedTotal}</p>
       </section>
       <section aria-label="Status persetujuan">
         <h2 className="text-xl font-semibold">Persetujuan versi {need.version}</h2>

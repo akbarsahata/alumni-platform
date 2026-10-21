@@ -8,6 +8,8 @@ import { matchesDirectoryLocation } from "./location-search";
 export async function searchDirectory(request: Request, env: Env, profileId?: string) {
   await requireDirectory(request, env);
   const params = new URL(request.url).searchParams;
+  // React Router includes this transport parameter when revalidating selected loaders.
+  params.delete("_routes");
   const query = parseInput(
     directorySearchInput,
     {

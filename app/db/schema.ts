@@ -1,4 +1,11 @@
-import { sqliteTable, text, integer, primaryKey, sqliteView } from "drizzle-orm/sqlite-core";
+import {
+  sqliteTable,
+  text,
+  integer,
+  primaryKey,
+  sqliteView,
+  uniqueIndex,
+} from "drizzle-orm/sqlite-core";
 import { roles } from "../authorization/roles";
 import { houses } from "../membership/model";
 export { user } from "../auth/schema";
@@ -279,6 +286,35 @@ export const outreachIntroduction = sqliteTable("outreach_introduction", {
   claimedAt: text("claimed_at"),
   sharedAt: text("shared_at"),
 });
+export const outreachOutcome = sqliteTable("outreach_outcome", {
+  requestId: text("request_id").primaryKey(),
+  revision: integer("revision").notNull(),
+  state: text("state", {
+    enum: ["introduced", "help-confirmed", "completed", "did-not-proceed"],
+  }).notNull(),
+  introducedAt: text("introduced_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
+});
+export const outreachOutcomeEvent = sqliteTable(
+  "outreach_outcome_event",
+  {
+    id: text("id").primaryKey(),
+    requestId: text("request_id").notNull(),
+    revision: integer("revision").notNull(),
+    kind: text("kind", { enum: ["record", "confirm", "correct"] }).notNull(),
+    actorUserId: text("actor_user_id").notNull(),
+    actorKind: text("actor_kind", { enum: ["member", "coordinator"] }).notNull(),
+    previousState: text("previous_state", {
+      enum: ["introduced", "help-confirmed", "completed", "did-not-proceed"],
+    }).notNull(),
+    state: text("state", {
+      enum: ["introduced", "help-confirmed", "completed", "did-not-proceed"],
+    }).notNull(),
+    note: text("note"),
+    occurredAt: text("occurred_at").notNull(),
+  },
+  (table) => [uniqueIndex("outreach_outcome_event_revision").on(table.requestId, table.revision)]
+);
 export const outreachRequest = sqliteTable("outreach_request", {
   id: text("id").primaryKey(),
   needId: text("need_id").notNull(),

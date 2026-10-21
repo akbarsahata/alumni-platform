@@ -10,21 +10,18 @@ test("coordinator selects a recipient and member declines privately on mobile", 
   const context = await browser.newContext();
   try {
     const coordinator = await useAccount(context, f.coordinator);
-    await gotoReady(coordinator, "/outreach");
-    await coordinator
-      .getByRole("link", { name: "Mentor robotika untuk siswa", exact: true })
-      .click();
+    await gotoReady(coordinator, `/outreach/needs/${f.needId}`);
     await expect(coordinator.getByRole("heading", { name: "Pilih penerima" })).toBeVisible();
     const candidate = coordinator
       .getByRole("article")
       .filter({ has: coordinator.locator(`input[value="${f.recipient.id}"]`) });
     await candidate.getByRole("button", { name: "Kirim permintaan" }).click();
     await expect(coordinator.getByRole("status")).toContainText("Permintaan berhasil dikirim");
+    const requestId = await coordinator.locator('input[name="requestId"]').first().inputValue();
     await coordinator.screenshot({ path: "test-results/outreach-desktop.png", fullPage: true });
     const member = await useAccount(context, f.recipient);
     await member.setViewportSize({ width: 375, height: 812 });
-    await gotoReady(member, "/outreach");
-    await member.getByRole("link", { name: "Mentor robotika untuk siswa", exact: true }).click();
+    await gotoReady(member, `/outreach/requests/${requestId}`);
     await expect(
       member.getByText("Menyatakan minat tidak membagikan email Anda.", { exact: true })
     ).toBeVisible();

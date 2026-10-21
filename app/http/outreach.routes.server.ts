@@ -14,6 +14,7 @@ import {
   withdrawConsent,
   retryIntroduction,
   changeStaffRecipient,
+  recordOutreachOutcome,
 } from "../outreach/outreach.server";
 export const outreachRoutes = new Hono<{ Bindings: Env }>()
   .get("/", async (c) => c.json(await readOutreach(c.req.raw, c.env)))
@@ -127,6 +128,17 @@ export const outreachRoutes = new Hono<{ Bindings: Env }>()
     )
   )
   .all("/requests/:requestId/respond", () => new Response(null, { status: 405 }))
+  .post("/requests/:requestId/outcome", async (c) =>
+    c.json(
+      await recordOutreachOutcome(
+        c.req.raw,
+        c.env,
+        c.req.param("requestId"),
+        await c.req.json().catch(() => null)
+      )
+    )
+  )
+  .all("/requests/:requestId/outcome", () => new Response(null, { status: 405 }))
   .post("/requests/:requestId/deliver", async (c) =>
     c.json(
       await deliverOutreach(

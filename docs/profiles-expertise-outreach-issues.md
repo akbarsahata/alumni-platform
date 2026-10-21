@@ -32,10 +32,12 @@ Issue **#17 is implemented locally** on `master`; its code and evidence are also
 unpushed. The implementation keeps historical staff validation while checking the
 current named introduction recipient's verified staff role, requires separate
 member consent before sharing email, and requires fresh consent after a recipient
-replacement. The next local implementation frontier is **#18**; #19 follows #17,
-and #20 follows both #18 and #19. Issues #17–#20 remain open on GitHub. The table
-above retains the declared prerequisite relationships even when those prerequisites
-are complete locally.
+replacement. Issue **#19 is implemented locally** on
+`codex/issue-19-technical-spec`, adding append-only outcome history, member
+confirmation/correction, aggregate outcomes, and verified closure behavior. The next
+local implementation frontier is **#18**; #20 follows both #18 and #19. Issues
+#17–#20 remain open on GitHub. The table above retains the declared prerequisite
+relationships even when those prerequisites are complete locally.
 
 See [outreach.md](outreach.md) for the request/response operating procedure and
 [handoff.md](handoff.md) for verification and local/remote delivery boundaries.

@@ -153,7 +153,13 @@ test("school views reveal aggregates only, decline reasons stay private, and coo
     declined: 1,
     cancelled: 0,
     expired: 0,
+    introduced: 0,
+    helpConfirmed: 0,
+    completed: 0,
+    didNotProceed: 0,
+    introducedTotal: 0,
     closed: false,
+    closedAt: null,
   });
   assert.doesNotMatch(
     JSON.stringify(school),
