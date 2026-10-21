@@ -20,11 +20,12 @@ pushed and proposed in a PR. No deployment or live email occurred.
   the clarification table. It never changes request status, response, decline
   reason, deadline, need version or fields, consent, or introduction evidence.
 - A thread is writable only while the request is `pending` or `interested`, the
-  deadline has not passed, and its need is still open. Declined, cancelled, closed,
-  and expired requests remain readable but read-only, including an interested
-  request whose need was closed after the response. Role revocation blocks the next
-  read and write because access is rechecked through the existing request-scoped
-  predicate.
+  deadline has not passed, its need is still open, and the recipient remains
+  eligible. Declined, cancelled, closed, expired, or no-longer-eligible requests
+  remain readable but read-only, including an interested request whose need was
+  closed or whose recipient lost eligibility after the response. Role revocation
+  blocks the next read and write because access is rechecked through the existing
+  request-scoped predicate.
 - A member message notifies the current assigned coordinator if they still hold the
   role. A coordinator message notifies the recipient. Self-notification is skipped.
   Notification mail contains no message text, need details, names, school name, or
@@ -49,6 +50,9 @@ pushed and proposed in a PR. No deployment or live email occurred.
 - Audit, takeover, revocation, self-notification, validation, origin, no-store, and
   read-only behavior are covered in the HTTP suite. Notification targeting and
   privacy are asserted through captured mail.
+- The eligibility-loss regression covers an interested request whose recipient opts
+  out: member and coordinator posts return 409, `canClarify` is false for both, and
+  the earlier message plus interested status remain readable.
 - A deterministic local notification-capture failure could not be produced through
   supported request behavior without replacing the mail adapter. The write commits
   before capture and the catch preserves the message, but this slice has no

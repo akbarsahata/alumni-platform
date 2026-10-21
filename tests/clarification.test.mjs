@@ -434,6 +434,73 @@ test("clarification becomes read-only after decline, closure, eligibility loss, 
   assert.equal(optOutDetail.request.status, "cancelled");
   assert.equal(optOutDetail.clarification.length, 1);
 
+  const interestedOptOutMember = await member("clarify-optout-interested");
+  const interestedOptOutNeed = await approvedNeed(f, {
+    title: "Klarifikasi opt-out setelah minat",
+  });
+  const { requestId: interestedOptOutRequestId } = await (
+    await send(f, interestedOptOutNeed, interestedOptOutMember)
+  ).json();
+  const interestedOptOutPath = `/api/outreach/requests/${interestedOptOutRequestId}/clarification`;
+  assert.equal(
+    (
+      await call(
+        interestedOptOutMember,
+        `/api/outreach/requests/${interestedOptOutRequestId}/respond`,
+        {
+          outcome: "interested",
+        }
+      )
+    ).status,
+    200
+  );
+  assert.equal(
+    (
+      await call(interestedOptOutMember, interestedOptOutPath, {
+        body: "Pertanyaan sebelum opt-out",
+      })
+    ).status,
+    200
+  );
+  const beforeEligibilityLoss = await (
+    await call(interestedOptOutMember, `/api/outreach/requests/${interestedOptOutRequestId}`)
+  ).json();
+  assert.equal(beforeEligibilityLoss.request.status, "interested");
+  assert.equal(beforeEligibilityLoss.access.canClarify, true);
+  assert.equal(
+    (
+      await call(interestedOptOutMember, "/api/profile", {
+        ...profile,
+        participation: false,
+        participationConsent: false,
+      })
+    ).status,
+    200
+  );
+  const memberBlocked = await call(interestedOptOutMember, interestedOptOutPath, {
+    body: "Setelah opt-out",
+  });
+  assert.equal(memberBlocked.status, 409);
+  assert.match(await memberBlocked.text(), /tidak lagi tersedia/);
+  const coordinatorBlocked = await call(f.coordinator, interestedOptOutPath, {
+    body: "Pesan koordinator setelah opt-out",
+  });
+  assert.equal(coordinatorBlocked.status, 409);
+  assert.match(await coordinatorBlocked.text(), /tidak lagi tersedia/);
+  const afterEligibilityLoss = await (
+    await call(interestedOptOutMember, `/api/outreach/requests/${interestedOptOutRequestId}`)
+  ).json();
+  assert.equal(afterEligibilityLoss.request.status, "interested");
+  assert.equal(afterEligibilityLoss.request.expiresAt, beforeEligibilityLoss.request.expiresAt);
+  assert.equal(afterEligibilityLoss.access.canClarify, false);
+  assert.equal(afterEligibilityLoss.clarification.length, 1);
+  assert.equal(afterEligibilityLoss.clarification[0].body, "Pertanyaan sebelum opt-out");
+  const coordinatorEligibilityView = await (
+    await call(f.coordinator, `/api/outreach/requests/${interestedOptOutRequestId}`)
+  ).json();
+  assert.equal(coordinatorEligibilityView.access.canClarify, false);
+  assert.equal(coordinatorEligibilityView.clarification.length, 1);
+
   const expiredMember = await member("clarify-expired");
   const expiredNeed = await approvedNeed(f, { title: "Klarifikasi kedaluwarsa" });
   const { requestId: expiredRequestId } = await (await send(f, expiredNeed, expiredMember)).json();

@@ -100,10 +100,11 @@ declined, cancelled, closed, or expired. No automated purge is introduced.
 ### When the thread is writable
 
 - New messages are accepted only while the request status is `pending` or
-  `interested` and the response deadline has not passed.
-- A declined, cancelled, closed, or expired request leaves the thread readable but
-  read-only. This prevents clarification from appearing to extend the deadline or
-  bypass cancellation and expiry.
+  `interested`, the response deadline has not passed, the need remains open, and
+  the recipient remains in the outreach eligibility projection.
+- A declined, cancelled, closed, expired, or no-longer-eligible request leaves the
+  thread readable but read-only. This prevents clarification from appearing to
+  extend the deadline or bypass cancellation, closure, or eligibility rules.
 - Posting a message does not alter request status, response, decline reason,
   deadline, coordinator assignment, need version, need fields, consent, or sharing
   evidence. Clarification is never interest or consent.

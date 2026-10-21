@@ -154,7 +154,8 @@ export async function readOutreachRequest(request: Request, env: Env, requestId:
   const canWithdraw =
     isRecipient && !!active && ["pending", "claimed"].includes(active.deliveryState);
   const canRespond = isRecipient && row.request.status === "pending" && !expired;
-  const canClarify = isClarificationOpenStatus(row.request.status) && !expired && !row.closed;
+  const canClarify =
+    isClarificationOpenStatus(row.request.status) && !expired && !row.closed && row.eligible;
   const outcome = outcomeRows.current
     ? {
         ...outcomeRows.current,
@@ -238,7 +239,7 @@ export async function clarifyOutreach(
   if (!row) {
     if (!(await repository.requestDetail(requestId, access.account.id)))
       throw new Response("Permintaan tidak ditemukan.", { status: 404 });
-    throw new Response("Percakapan klarifikasi sudah ditutup.", { status: 409 });
+    throw new Response("Percakapan klarifikasi tidak lagi tersedia.", { status: 409 });
   }
   const counterpart = await repository.clarificationCounterpart(
     requestId,

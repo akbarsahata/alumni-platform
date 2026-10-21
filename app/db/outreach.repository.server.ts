@@ -431,6 +431,8 @@ export function outreachRepository(binding: D1Database) {
           AND r.status IN('pending','interested')
           AND r.expires_at>${input.now}
           AND NOT EXISTS(SELECT 1 FROM outreach_closure WHERE need_id=r.need_id)
+          AND EXISTS(SELECT 1 FROM outreach_eligible_recipient
+            WHERE user_id=r.recipient_user_id)
           AND (r.recipient_user_id=${input.actorId} OR EXISTS(
             SELECT 1 FROM role_assignment
             WHERE user_id=${input.actorId} AND role='directory-coordinator'))

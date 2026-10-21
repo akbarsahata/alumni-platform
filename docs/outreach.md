@@ -168,8 +168,9 @@ requests. Completed responses remain historical records.
 - Clarification is separate from responding and consent. Posting never changes the
   request status, decline reason, deadline, need version or fields, consent, or
   introduction evidence. New messages are accepted only while the request is
-  pending or interested, unexpired, and its need is still open. Declined, cancelled,
-  closed, and expired requests keep the thread readable but read-only.
+  pending or interested, unexpired, its need is still open, and the recipient
+  remains eligible. Declined, cancelled, closed, expired, or no-longer-eligible
+  requests keep the thread readable but read-only.
 - Member messages notify the request's current assigned coordinator; coordinator
   messages notify the recipient. Notification mail contains no message text, need
   details, member name, school name, or account email. It links to the authenticated
