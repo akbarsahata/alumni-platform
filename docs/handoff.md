@@ -1,3 +1,86 @@
+# Private outreach clarification — 2026-10-21
+
+Issue [#18](https://github.com/akbarsahata/alumni-platform/issues/18) is implemented
+on branch `feat/private-outreach-clarification`, following
+[the local specification](clarify-outreach-privately-spec.md). The user's delivery
+instruction supersedes the specification's local-only boundary: this branch is
+pushed and proposed in a PR. No deployment or live email occurred.
+
+## Behavior
+
+- Each outreach request now has one private clarification thread on the
+  authenticated request page. The request recipient and any current directory
+  coordinator can read and post plain-text messages of 1–2,000 characters. Messages
+  are ordered by UTC timestamp and rendered with whitespace preserved.
+- Message projections expose only role label, body, timestamp, and whether the
+  viewer authored the message. Author account IDs and emails are not returned to
+  either party. The account menu continues to show the signed-in viewer's own email;
+  that is existing navigation behavior, not a clarification projection.
+- Clarification is independent of response and consent. The write path updates only
+  the clarification table. It never changes request status, response, decline
+  reason, deadline, need version or fields, consent, or introduction evidence.
+- A thread is writable only while the request is `pending` or `interested`, the
+  deadline has not passed, its need is still open, and the recipient remains
+  eligible. Declined, cancelled, closed, expired, or no-longer-eligible requests
+  remain readable but read-only, including an interested request whose need was
+  closed or whose recipient lost eligibility after the response. Role revocation
+  blocks the next read and write because access is rechecked through the existing
+  request-scoped predicate.
+- A member message notifies the current assigned coordinator if they still hold the
+  role. A coordinator message notifies the recipient. Self-notification is skipped.
+  Notification mail contains no message text, need details, names, school name, or
+  account email; it links to the authenticated request. Capture is best effort with
+  no clarification outbox or retry, as agreed.
+- Staff and students receive no clarification text or identities. The coordinator
+  need workspace links to the request page but does not render the thread. Primary
+  administrators receive only a minimal `clarification-message` audit event with
+  actor, need, and UTC time; primary status alone grants no thread access.
+- Migration `0022_outreach_clarifications.sql` adds the immutable message table,
+  request chronology index, and minimal audit trigger. There is no automated purge;
+  timestamps and rows remain for the later manual retention/deletion workflow.
+  No environment variables or remote resources were added.
+
+## Verification
+
+- Focused HTTP and Chromium journey:
+  `node scripts/test.mjs tests/clarification.test.mjs tests/browser/clarification.spec.ts`
+  passes 6 HTTP journeys and the clarification Chromium journey. The journey covers
+  mobile member posting, coordinator discovery through the need page and reply,
+  thread visibility, staff/student absence, form reset, and no horizontal overflow.
+- Audit, takeover, revocation, self-notification, validation, origin, no-store, and
+  read-only behavior are covered in the HTTP suite. Notification targeting and
+  privacy are asserted through captured mail.
+- The eligibility-loss regression covers an interested request whose recipient opts
+  out: member and coordinator posts return 409, `canClarify` is false for both, and
+  the earlier message plus interested status remain readable.
+- A deterministic local notification-capture failure could not be produced through
+  supported request behavior without replacing the mail adapter. The write commits
+  before capture and the catch preserves the message, but this slice has no
+  failure-injection test for that branch.
+- Chromium evidence: `test-results/clarification-mobile.png` and
+  `test-results/clarification-desktop.png` were visually inspected. The mobile
+  layout has no horizontal overflow; the skip link is not left focused in the
+  evidence.
+- After rebasing onto the #19 outcome merge, the full HTTP suite passes, including
+  both outcome and clarification journeys and the existing five-minute
+  authentication-expiry checks. The merged Chromium set has 22 journeys; the final
+  full run passed 20 and hit two unrelated timing flakes (`corrections` and
+  `outreach`). Both flaky specs passed in isolated reruns on the rebased branch.
+  Because the ordinary localhost dev server occupied port 5173 and existing browser
+  specs hardcode that origin, verification used a disposable Worker on port 5174
+  with a temporary, uncommitted copy of those specs adjusted to the isolated origin.
+- `npm run typecheck`, `npm run build`, `npm run lint`, and
+  `npm run format:check` pass.
+- Ordinary localhost remains available. Automated verification used disposable D1
+  state and synthetic accounts. No deployment or live email occurred.
+
+The next local implementation frontier is **#20** (directory deletion and manual
+retention). This branch was rebased onto `master` after the #19 outcome merge
+([PR #27](https://github.com/akbarsahata/alumni-platform/pull/27)); its migration is
+renumbered to `0022_outreach_clarifications.sql`.
+
+---
+
 # Outcome review fixes — 2026-10-20
 
 Remediation of the Standards and Spec review of `700c93a`, on

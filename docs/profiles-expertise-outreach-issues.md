@@ -32,10 +32,13 @@ Issue **#17 is implemented locally** on `master`; its code and evidence are also
 unpushed. The implementation keeps historical staff validation while checking the
 current named introduction recipient's verified staff role, requires separate
 member consent before sharing email, and requires fresh consent after a recipient
-replacement. Issue **#19 is implemented locally** on
-`codex/issue-19-technical-spec`, adding append-only outcome history, member
-confirmation/correction, aggregate outcomes, and verified closure behavior. The next
-local implementation frontier is **#18**; #20 follows both #18 and #19. Issues
+replacement. Issue **#19 is implemented on `master`** via
+[PR #27](https://github.com/akbarsahata/alumni-platform/pull/27), adding append-only
+outcome history, member confirmation/correction, aggregate outcomes, and verified
+closure behavior. Issue **#18 is implemented locally** on
+`feat/private-outreach-clarification`, with a private per-request clarification
+thread, captured-email notifications, minimal audit, and read-only thread history
+after the request ends. The next local implementation frontier is **#20**. Issues
 #17–#20 remain open on GitHub. The table above retains the declared prerequisite
 relationships even when those prerequisites are complete locally.
 

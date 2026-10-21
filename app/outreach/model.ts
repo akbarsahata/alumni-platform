@@ -23,6 +23,10 @@ export const outcomeActorKindLabels: Record<OutcomeActorKind, string> = {
   member: "Alumni",
   coordinator: "Koordinator direktori",
 };
+export function isClarificationOpenStatus(status: OutreachStatus) {
+  return status === "pending" || status === "interested";
+}
+export type ClarificationAuthorRole = "member" | "coordinator";
 export const outreachStatusLabels: Record<OutreachStatus, string> = {
   pending: "Menunggu respons",
   interested: "Berminat",

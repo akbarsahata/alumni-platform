@@ -198,6 +198,7 @@ export default function OutreachNeed({ loaderData: d, actionData }: Route.Compon
               <p>
                 Koordinator (ID): <span className="break-all">{r.coordinatorUserId}</span>
               </p>
+              <Link to={`/outreach/requests/${r.id}`}>Buka klarifikasi privat</Link>
               {d.notifications
                 .filter((n) => n.requestId === r.id)
                 .map((n) => (

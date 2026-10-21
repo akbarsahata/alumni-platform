@@ -7,13 +7,18 @@ import {
   outreachNotification,
   outreachClosure,
   outreachAudit,
+  outreachClarification,
   outreachIntroduction,
   outreachOutcome,
   outreachStaffRecipient,
   user,
 } from "./schema";
 import type { EmailMessage } from "../email/email.server";
-import type { OutreachAuditCursor, OutreachStatus } from "../outreach/model";
+import type {
+  ClarificationAuthorRole,
+  OutreachAuditCursor,
+  OutreachStatus,
+} from "../outreach/model";
 
 const needColumns = {
   id: schoolNeed.id,
@@ -57,6 +62,13 @@ const sharingColumns = {
   invalidationReason: outreachIntroduction.invalidationReason,
   deliveryState: outreachIntroduction.deliveryState,
   sharedAt: outreachIntroduction.sharedAt,
+};
+const clarificationColumns = {
+  id: outreachClarification.id,
+  authorUserId: outreachClarification.authorUserId,
+  authorRole: outreachClarification.authorRole,
+  body: outreachClarification.body,
+  createdAt: outreachClarification.createdAt,
 };
 export function outreachRepository(binding: D1Database) {
   const db = database(binding);
@@ -116,6 +128,13 @@ export function outreachRepository(binding: D1Database) {
       .innerJoin(user, eq(user.id, outreachIntroduction.staffUserId))
       .where(eq(outreachIntroduction.needId, needId))
       .orderBy(desc(outreachIntroduction.consentedAt), desc(outreachIntroduction.id));
+  const clarificationForRequest = (requestId: string, actorId: string) =>
+    db
+      .select(clarificationColumns)
+      .from(outreachClarification)
+      .innerJoin(outreachRequest, eq(outreachRequest.id, outreachClarification.requestId))
+      .where(requestAccess(requestId, actorId))
+      .orderBy(asc(outreachClarification.createdAt), asc(outreachClarification.id));
   const recipientFromRow = (row: { userId: string; name: string; active: number } | undefined) =>
     row ? { userId: row.userId, name: row.name, active: row.active === 1 } : null;
   return {
@@ -353,7 +372,7 @@ export function outreachRepository(binding: D1Database) {
       )[0];
     },
     async requestDetail(requestId: string, actorId: string) {
-      const [requests, needs, sharing, recipients, closures] = await db.batch([
+      const [requests, needs, sharing, recipients, clarification, closures] = await db.batch([
         db.select(requestColumns).from(outreachRequest).where(requestAccess(requestId, actorId)),
         db
           .select(needColumns)
@@ -362,6 +381,7 @@ export function outreachRepository(binding: D1Database) {
           .where(requestAccess(requestId, actorId)),
         sharingForRequest(requestId, actorId),
         staffRecipientForRequest(requestId, actorId),
+        clarificationForRequest(requestId, actorId),
         db
           .select({ needId: outreachClosure.needId, closedAt: outreachClosure.closedAt })
           .from(outreachClosure)
@@ -377,6 +397,7 @@ export function outreachRepository(binding: D1Database) {
         eligible: recipients[0]?.eligible === 1,
         closed: !!closures[0],
         closedAt: closures[0]?.closedAt ?? null,
+        clarification,
       };
     },
     async respond(input: {
@@ -392,6 +413,53 @@ export function outreachRepository(binding: D1Database) {
      WHERE id=${input.requestId} AND recipient_user_id=${input.actorId} AND status='pending' AND expires_at>${input.now}
      AND EXISTS(SELECT 1 FROM outreach_eligible_recipient WHERE user_id=${input.actorId})
      AND EXISTS(SELECT 1 FROM outreach_approved_need WHERE id=outreach_request.need_id) RETURNING id`);
+    },
+    async clarify(input: {
+      id: string;
+      requestId: string;
+      actorId: string;
+      body: string;
+      now: string;
+    }) {
+      return db.all<{ authorRole: ClarificationAuthorRole }>(sql`
+        INSERT INTO outreach_clarification(id,need_id,request_id,author_user_id,author_role,body,created_at)
+        SELECT ${input.id},r.need_id,r.id,${input.actorId},
+          CASE WHEN r.recipient_user_id=${input.actorId} THEN 'member' ELSE 'coordinator' END,
+          ${input.body},${input.now}
+        FROM outreach_request r
+        WHERE r.id=${input.requestId}
+          AND r.status IN('pending','interested')
+          AND r.expires_at>${input.now}
+          AND NOT EXISTS(SELECT 1 FROM outreach_closure WHERE need_id=r.need_id)
+          AND EXISTS(SELECT 1 FROM outreach_eligible_recipient
+            WHERE user_id=r.recipient_user_id)
+          AND (r.recipient_user_id=${input.actorId} OR EXISTS(
+            SELECT 1 FROM role_assignment
+            WHERE user_id=${input.actorId} AND role='directory-coordinator'))
+        RETURNING author_role AS authorRole`);
+    },
+    async clarificationCounterpart(
+      requestId: string,
+      authorId: string,
+      authorRole: ClarificationAuthorRole
+    ) {
+      if (authorRole === "member")
+        return (
+          await db.all<{ email: string }>(sql`
+            SELECT u.email
+            FROM outreach_request r
+            JOIN user u ON u.id=r.coordinator_user_id
+            WHERE r.id=${requestId} AND u.id!=${authorId}
+              AND EXISTS(SELECT 1 FROM role_assignment
+                WHERE user_id=u.id AND role='directory-coordinator')`)
+        )[0];
+      return (
+        await db.all<{ email: string }>(sql`
+          SELECT u.email
+          FROM outreach_request r
+          JOIN user u ON u.id=r.recipient_user_id
+          WHERE r.id=${requestId} AND u.id!=${authorId}`)
+      )[0];
     },
     async claim(requestId: string, actorId: string) {
       const rows = await db.all<{

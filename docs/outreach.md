@@ -18,8 +18,8 @@ extend the same workflow; see [the outcome specification](outreach-outcomes-spec
   in the Pribadi menu. Captured email links directly to the authenticated request.
   Members can express interest or decline once; an optional decline reason is
   visible only to the member and current directory coordinators. Interest does not
-  share email. Consented introductions are implemented in #17 and outcomes in #19;
-  private clarification remains #18.
+  share email. Consented introductions are implemented in #17, outcomes in #19,
+  and private clarification in #18.
 - Each need has at most ten recipients, each member receives one request per need,
   and each member receives at most three new requests in a rolling 30-day period
   across all coordinators and replacement needs. Cancelled, declined and expired
@@ -158,6 +158,34 @@ requests. Completed responses remain historical records.
   `outcome-confirmed` and `outcome-corrected` but retain only event/actor/need IDs,
   action and UTC time.
 
+## Private clarification
+
+- Each request has one private clarification thread on the authenticated request
+  page. The recipient and any current directory coordinator can read it and post
+  plain-text messages of up to 2,000 characters. Each message is timestamped and
+  attributed only as **Alumni**, **Koordinator direktori**, or **Anda**. Author
+  account IDs and emails are not projected to either party.
+- Clarification is separate from responding and consent. Posting never changes the
+  request status, decline reason, deadline, need version or fields, consent, or
+  introduction evidence. New messages are accepted only while the request is
+  pending or interested, unexpired, its need is still open, and the recipient
+  remains eligible. Declined, cancelled, closed, expired, or no-longer-eligible
+  requests keep the thread readable but read-only.
+- Member messages notify the request's current assigned coordinator; coordinator
+  messages notify the recipient. Notification mail contains no message text, need
+  details, member name, school name, or account email. It links to the authenticated
+  request. If the assigned coordinator no longer holds the role, no clarification
+  mail is sent; the thread remains available to current coordinators. Self-notify is
+  skipped. Capture is best effort, with no clarification outbox or retry.
+- Staff and students never receive clarification text or identities. The need
+  workspace links to the request page but does not render the thread. Primary
+  administrators see only a minimal **Pesan klarifikasi privat dikirim** audit event
+  with actor, need, and UTC time; primary status alone grants no thread access.
+- Messages are immutable and retained for the later manual deletion/retention
+  workflow. There is no automated purge. `0022_outreach_clarifications.sql` adds the
+  message table, request chronology index, and minimal audit trigger. No environment
+  variables are added.
+
 ## Local setup and verification
 
 Migration `0015_outreach.sql` adds requests, notification intents, closures, minimal
@@ -172,8 +200,9 @@ partial uniqueness indexes and eligibility/replacement/audit triggers.
 `0019_atomic_introduction_capture.sql` adds the development-only introduction
 mailbox. `0021_outreach_outcomes.sql` adds the outcome projection, append-only event
 history, introduced-baseline/share trigger, conditional revision enforcement,
-projection guards and minimal outcome audit actions. There are no new environment
-variables. Use the existing local setup and captured-mail adapter:
+projection guards and minimal outcome audit actions. `0022_outreach_clarifications.sql`
+adds private message retention and a minimal clarification audit trigger. There are
+no new environment variables. Use the existing local setup and captured-mail adapter:
 
 ```sh
 npm run local:setup
@@ -188,6 +217,7 @@ routes and Chromium, with synthetic accounts:
 node scripts/test.mjs tests/outreach.test.mjs tests/browser/outreach.spec.ts
 node scripts/test.mjs tests/introductions.test.mjs tests/browser/introductions.spec.ts
 node scripts/test.mjs tests/outcomes.test.mjs tests/browser/outcomes.spec.ts
+node scripts/test.mjs tests/clarification.test.mjs tests/browser/clarification.spec.ts
 npm run typecheck
 npm run build
 ```

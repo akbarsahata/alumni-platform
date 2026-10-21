@@ -290,6 +290,9 @@ export const outreachResponseInput = z
   .strict()
   .refine((v) => v.outcome === "declined" || !v.reason);
 export const outreachActionInput = z.object({}).strict();
+export const outreachClarificationInput = z
+  .object({ body: z.string().trim().max(2000).min(1) })
+  .strict();
 export const outreachConsentInput = z
   .object({
     consent: z.literal(true),
