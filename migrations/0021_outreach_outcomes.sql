@@ -49,7 +49,8 @@ WHEN OLD.shared_at IS NULL AND NEW.shared_at IS NOT NULL BEGIN
     WHERE request_id=NEW.request_id AND shared_at IS NOT NULL),
   (SELECT MIN(shared_at) FROM outreach_introduction
     WHERE request_id=NEW.request_id AND shared_at IS NOT NULL)
- WHERE EXISTS(SELECT 1 FROM outreach_introduction
+ WHERE NOT EXISTS(SELECT 1 FROM outreach_outcome o WHERE o.request_id=NEW.request_id)
+  AND EXISTS(SELECT 1 FROM outreach_introduction
    WHERE request_id=NEW.request_id AND shared_at IS NOT NULL);
 END;
 
