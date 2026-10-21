@@ -2,6 +2,7 @@ import { env } from "cloudflare:workers";
 import { Form, Link, data, useNavigation, type ShouldRevalidateFunctionArgs } from "react-router";
 import type { Route } from "./+types/outreach-request";
 import {
+  clarifyOutreach,
   giveConsent,
   readOutreachRequest,
   recordOutreachOutcome,
@@ -89,6 +90,18 @@ export async function action({ request, params }: Route.ActionArgs) {
       });
       return { error: null, message: "Hasil bantuan dicatat.", values: null };
     }
+    if (intent === "clarify") {
+      const result = await clarifyOutreach(request, env, params.requestId, {
+        body: f.get("body"),
+      });
+      return {
+        error: null,
+        message: result.notified
+          ? "Pesan klarifikasi tersimpan dan notifikasi email terkirim."
+          : "Pesan klarifikasi tersimpan, tetapi notifikasi email belum terkirim.",
+        values: null,
+      };
+    }
     await respondOutreach(request, env, params.requestId, {
       outcome: f.get("outcome"),
       reason: f.get("outcome") === "declined" ? (f.get("reason") ?? "") : "",
@@ -122,6 +135,55 @@ export default function OutreachRequest({ loaderData: d, actionData }: Route.Com
       <p>Penolakan dan alasannya hanya dilihat koordinator direktori.</p>
       {actionData?.error && <p role="alert">{actionData.error}</p>}
       {actionData?.message && <p role="status">{actionData.message}</p>}
+      {(d.access.canClarify || d.clarification.length > 0) && (
+        <section aria-label="Klarifikasi privat" className="space-y-3 rounded border p-4">
+          <h2 className="text-xl font-semibold">Klarifikasi privat</h2>
+          <p>
+            {d.viewer.isRecipient
+              ? "Pesan ini hanya dapat dibaca oleh Anda dan koordinator direktori. Staf dan siswa tidak dapat melihatnya."
+              : "Pesan ini hanya dapat dibaca oleh alumni penerima dan koordinator direktori. Staf dan siswa tidak dapat melihatnya."}
+          </p>
+          {d.viewer.isRecipient && (
+            <p>Klarifikasi tidak menyatakan minat dan tidak membagikan email Anda.</p>
+          )}
+          <p>
+            Klarifikasi tidak mengubah rincian yang sudah dikirim atau memperpanjang batas respons.
+            Untuk perubahan materi, tutup kebutuhan dan ajukan kebutuhan pengganti dengan validasi
+            baru, respons baru, dan persetujuan berbagi baru.
+          </p>
+          {d.clarification.length > 0 ? (
+            <ol className="space-y-3">
+              {d.clarification.map((message) => (
+                <li key={message.id} className="rounded border p-3">
+                  <p className="font-semibold">
+                    {message.mine
+                      ? "Anda"
+                      : message.authorRole === "coordinator"
+                        ? "Koordinator direktori"
+                        : "Alumni"}
+                  </p>
+                  <p className="text-sm">Waktu (UTC): {message.createdAt}</p>
+                  <p className="whitespace-pre-wrap">{message.body}</p>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p>Belum ada pesan klarifikasi.</p>
+          )}
+          {d.access.canClarify ? (
+            <Form key={`clarify-${d.clarification.length}`} method="post" className="space-y-2">
+              <input type="hidden" name="intent" value="clarify" />
+              <label className="block">
+                Pesan klarifikasi
+                <textarea name="body" maxLength={2000} rows={4} required />
+              </label>
+              <button disabled={busy}>Kirim klarifikasi</button>
+            </Form>
+          ) : (
+            <p>Permintaan ini sudah berakhir. Percakapan klarifikasi hanya dapat dibaca.</p>
+          )}
+        </section>
+      )}
       {d.viewer.isRecipient && d.access.canRespond && (
         <Form method="post" className="space-y-4">
           <label className="block">

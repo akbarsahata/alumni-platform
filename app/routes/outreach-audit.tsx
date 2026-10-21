@@ -25,6 +25,7 @@ const labels: Record<string, string> = {
   "outcome-recorded": "Hasil bantuan dicatat",
   "outcome-confirmed": "Hasil bantuan dikonfirmasi alumni",
   "outcome-corrected": "Hasil bantuan dikoreksi alumni",
+  "clarification-message": "Pesan klarifikasi privat dikirim",
 };
 export default function OutreachAudit({ loaderData: d }: Route.ComponentProps) {
   return (

@@ -12,12 +12,14 @@ import {
   outreachOutcomeInput,
   outreachStaffRecipientInput,
   outreachTakeoverInput,
+  outreachClarificationInput,
   outreachPageCursor,
   outreachAuditCursor,
 } from "../http/validation";
 import { sendEmail } from "../email/email.server";
 import {
   formatOutreachAuditCursor,
+  isClarificationOpenStatus,
   parseOutreachAuditCursor,
   type OutreachAuditCursor,
 } from "./model";
@@ -152,6 +154,7 @@ export async function readOutreachRequest(request: Request, env: Env, requestId:
   const canWithdraw =
     isRecipient && !!active && ["pending", "claimed"].includes(active.deliveryState);
   const canRespond = isRecipient && row.request.status === "pending" && !expired;
+  const canClarify = isClarificationOpenStatus(row.request.status) && !expired && !row.closed;
   const outcome = outcomeRows.current
     ? {
         ...outcomeRows.current,
@@ -166,6 +169,10 @@ export async function readOutreachRequest(request: Request, env: Env, requestId:
     !!outcome;
   return {
     ...row,
+    clarification: row.clarification.map(({ authorUserId, ...message }) => ({
+      ...message,
+      mine: authorUserId === access.account.id,
+    })),
     need: row.staffRecipient
       ? { ...row.need, staffContactName: row.staffRecipient.name }
       : row.need,
@@ -175,6 +182,7 @@ export async function readOutreachRequest(request: Request, env: Env, requestId:
       canConsent,
       canWithdraw,
       canRespond,
+      canClarify,
       expired,
       canConfirm: canWriteOutcome && outcome.latest?.kind !== "confirm",
       canCorrect: canWriteOutcome,
@@ -205,6 +213,55 @@ export async function respondOutreach(
   });
   if (!rows.length) conflict();
   return { changed: true };
+}
+
+export async function clarifyOutreach(
+  request: Request,
+  env: Env,
+  requestId: string,
+  input: unknown
+) {
+  origin(request, env);
+  const access = await getAccess(request, env);
+  const body = parseInput(outreachClarificationInput, input, "Tulis pesan klarifikasi yang valid.");
+  const repository = outreachRepository(env.DB);
+  await repository.reconcile();
+  const row = (
+    await repository.clarify({
+      id: crypto.randomUUID(),
+      requestId,
+      actorId: access.account.id,
+      body: body.body,
+      now: new Date().toISOString(),
+    })
+  )[0];
+  if (!row) {
+    if (!(await repository.requestDetail(requestId, access.account.id)))
+      throw new Response("Permintaan tidak ditemukan.", { status: 404 });
+    throw new Response("Percakapan klarifikasi sudah ditutup.", { status: 409 });
+  }
+  const counterpart = await repository.clarificationCounterpart(
+    requestId,
+    access.account.id,
+    row.authorRole
+  );
+  let notified = false;
+  if (counterpart) {
+    try {
+      await sendEmail(env, {
+        to: counterpart.email,
+        subject:
+          row.authorRole === "member"
+            ? "Klarifikasi baru pada permintaan bantuan sekolah"
+            : "Balasan klarifikasi permintaan bantuan sekolah",
+        text: `Ada pesan klarifikasi privat baru pada permintaan bantuan sekolah.\nBuka halaman permintaan untuk membacanya: ${new URL(`/outreach/requests/${requestId}`, env.BETTER_AUTH_URL).href}`,
+      });
+      notified = true;
+    } catch {
+      notified = false;
+    }
+  }
+  return { changed: true, notified };
 }
 
 async function deliverIntroduction(

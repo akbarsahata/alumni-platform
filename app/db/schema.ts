@@ -341,6 +341,15 @@ export const outreachClosure = sqliteTable("outreach_closure", {
   actorUserId: text("actor_user_id").notNull(),
   closedAt: text("closed_at").notNull(),
 });
+export const outreachClarification = sqliteTable("outreach_clarification", {
+  id: text("id").primaryKey(),
+  needId: text("need_id").notNull(),
+  requestId: text("request_id").notNull(),
+  authorUserId: text("author_user_id").notNull(),
+  authorRole: text("author_role", { enum: ["member", "coordinator"] }).notNull(),
+  body: text("body").notNull(),
+  createdAt: text("created_at").notNull(),
+});
 export const outreachAudit = sqliteTable("outreach_audit", {
   id: text("id").primaryKey(),
   needId: text("need_id").notNull(),

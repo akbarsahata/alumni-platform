@@ -15,6 +15,7 @@ import {
   retryIntroduction,
   changeStaffRecipient,
   recordOutreachOutcome,
+  clarifyOutreach,
 } from "../outreach/outreach.server";
 export const outreachRoutes = new Hono<{ Bindings: Env }>()
   .get("/", async (c) => c.json(await readOutreach(c.req.raw, c.env)))
@@ -102,6 +103,17 @@ export const outreachRoutes = new Hono<{ Bindings: Env }>()
     )
   )
   .all("/requests/:requestId/withdraw-consent", () => new Response(null, { status: 405 }))
+  .post("/requests/:requestId/clarification", async (c) =>
+    c.json(
+      await clarifyOutreach(
+        c.req.raw,
+        c.env,
+        c.req.param("requestId"),
+        await c.req.json().catch(() => null)
+      )
+    )
+  )
+  .all("/requests/:requestId/clarification", () => new Response(null, { status: 405 }))
   .post("/requests/:requestId/introduction/deliver", async (c) =>
     c.json(
       await retryIntroduction(
