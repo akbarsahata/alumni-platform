@@ -203,6 +203,9 @@ export const schoolNeed = sqliteTable("school_need", {
   timing: text("timing"),
   deadline: text("deadline"),
   locationMode: text("location_mode", { enum: ["remote", "on-site"] }).notNull(),
+  locationScope: text("location_scope", { enum: ["school", "outside"] })
+    .notNull()
+    .default("school"),
   locationDetails: text("location_details").notNull(),
   staffContactUserId: text("staff_contact_user_id").notNull(),
   staffContactName: text("staff_contact_name").notNull(),
@@ -228,6 +231,9 @@ export const schoolNeedRevision = sqliteTable(
     timing: text("timing"),
     deadline: text("deadline"),
     locationMode: text("location_mode", { enum: ["remote", "on-site"] }).notNull(),
+    locationScope: text("location_scope", { enum: ["school", "outside"] })
+      .notNull()
+      .default("school"),
     locationDetails: text("location_details").notNull(),
     staffContactUserId: text("staff_contact_user_id").notNull(),
     staffContactName: text("staff_contact_name").notNull(),

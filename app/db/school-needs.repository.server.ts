@@ -69,6 +69,12 @@ const summaryFields = sql`
   END AS status
 `;
 
+function storedLocation(locationMode: LocationMode) {
+  return locationMode === "off-site"
+    ? { locationMode: "on-site" as const, locationScope: "outside" as const }
+    : { locationMode, locationScope: "school" as const };
+}
+
 export function schoolNeedsRepository(binding: D1Database) {
   const db = database(binding);
   return {
@@ -164,7 +170,9 @@ export function schoolNeedsRepository(binding: D1Database) {
             timeCommitment: schoolNeed.timeCommitment,
             timing: schoolNeed.timing,
             deadline: schoolNeed.deadline,
-            locationMode: schoolNeed.locationMode,
+            locationMode: sql<LocationMode>`CASE WHEN ${schoolNeed.locationMode}='on-site'
+              AND ${schoolNeed.locationScope}='outside' THEN 'off-site'
+              ELSE ${schoolNeed.locationMode} END`,
             locationDetails: schoolNeed.locationDetails,
             staffContactUserId: schoolNeed.staffContactUserId,
             staffContactName: sql<string>`COALESCE(NULLIF(trim(${user.name}),''),
@@ -243,14 +251,16 @@ export function schoolNeedsRepository(binding: D1Database) {
       };
     },
     async submit(input: NeedInput & { id: string; actorId: string; occurredAt: string }) {
+      const location = storedLocation(input.locationMode);
       return await db.all<{ id: string }>(sql`
         INSERT INTO school_need(id,submitter_user_id,version,category,title,purpose,requested_help,
-          time_commitment,timing,deadline,location_mode,location_details,staff_contact_user_id,
-          staff_contact_name,
+          time_commitment,timing,deadline,location_mode,location_scope,location_details,
+          staff_contact_user_id,staff_contact_name,
           participation_terms,paid_details,initiative_link,created_at,updated_at,updated_by)
         SELECT ${input.id},${input.actorId},1,${input.category},${input.title},${input.purpose},
           ${input.requestedHelp},${input.timeCommitment},${input.timing || null},${input.deadline},
-          ${input.locationMode},${input.locationDetails},${input.staffContactUserId},
+          ${location.locationMode},${location.locationScope},${input.locationDetails},
+          ${input.staffContactUserId},
           COALESCE(NULLIF(trim(u.name),''),'Akun staf ' || substr(u.id,1,8)),
           ${input.participationTerms},${input.paidDetails},
           ${input.initiativeLink || null},
@@ -271,11 +281,13 @@ export function schoolNeedsRepository(binding: D1Database) {
         occurredAt: string;
       }
     ) {
+      const location = storedLocation(input.locationMode);
       return await db.all<{ id: string; version: number }>(sql`
         UPDATE school_need SET version=version+1,category=${input.category},title=${input.title},
           purpose=${input.purpose},requested_help=${input.requestedHelp},
           time_commitment=${input.timeCommitment},timing=${input.timing || null},
-          deadline=${input.deadline},location_mode=${input.locationMode},
+          deadline=${input.deadline},location_mode=${location.locationMode},
+          location_scope=${location.locationScope},
           location_details=${input.locationDetails},staff_contact_user_id=${input.staffContactUserId},
           staff_contact_name=(SELECT COALESCE(NULLIF(trim(name),''),'Akun staf ' || substr(id,1,8))
             FROM user WHERE id=${input.staffContactUserId}),

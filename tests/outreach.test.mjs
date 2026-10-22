@@ -229,8 +229,9 @@ test("one reminder is permitted after seven days; expiry and short deadlines nev
     (await (await call(a, `/api/outreach/requests/${requestId}`)).json()).request.status,
     "expired"
   );
+  const today = new Date().toISOString().slice(0, 10);
   const tomorrow = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
-  const short = await approvedNeed(f, { deadline: tomorrow });
+  const short = await approvedNeed(f, { timing: `${today}|${tomorrow}` });
   const shortSent = await send(f, short, await member("short-member"));
   assert.equal(shortSent.status, 200);
   const shortId = (await shortSent.json()).requestId;

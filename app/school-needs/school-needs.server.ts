@@ -8,6 +8,7 @@ import {
   schoolNeedCursor,
   schoolNeedInput,
 } from "../http/validation";
+import { parseTiming } from "./payload";
 import type { LocationMode, NeedCategory, ParticipationTerm } from "./model";
 
 const submitterRoles = ["staff", "student", "directory-coordinator"] as const;
@@ -121,7 +122,6 @@ type ParsedNeed = {
   requestedHelp: string;
   timeCommitment: string;
   timing: string;
-  deadline: string | null;
   locationMode: LocationMode;
   locationDetails: string;
   staffContactUserId: string;
@@ -145,6 +145,7 @@ export async function submitSchoolNeed(request: Request, env: Env, input: unknow
   const { expectedVersion: _expectedVersion, ...need } = body;
   const rows = await schoolNeedsRepository(env.DB).submit({
     ...need,
+    deadline: parseTiming(need.timing)?.until ?? null,
     id: crypto.randomUUID(),
     actorId: access.account.id,
     occurredAt: new Date().toISOString(),
@@ -174,6 +175,7 @@ export async function editSchoolNeed(request: Request, env: Env, needId: string,
   const { expectedVersion, ...need } = body;
   const rows = await repository.edit({
     ...need,
+    deadline: parseTiming(need.timing)?.until ?? null,
     id: needId,
     actorId: access.account.id,
     expectedVersion,

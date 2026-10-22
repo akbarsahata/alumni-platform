@@ -946,3 +946,24 @@ main .profile-location-select input:not([type="hidden"]) {
     gap: 2rem;
   }
 }
+
+/* Clear per-field validation feedback without the full alert panel. */
+main .field-error {
+  display: block;
+  margin-top: 0.3rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--red);
+  font-size: 0.75rem;
+  line-height: 1.4;
+  font-weight: 500;
+}
+main :is(input, select, textarea)[aria-invalid="true"] {
+  border-color: var(--red);
+  background-color: #fff7f6;
+}
+main :is(input, select, textarea)[aria-invalid="true"]:focus {
+  outline-color: #a9222a55;
+  border-color: var(--red);
+}

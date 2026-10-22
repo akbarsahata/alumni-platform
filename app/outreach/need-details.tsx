@@ -1,3 +1,6 @@
+import { locationModeLabels, type LocationMode } from "../school-needs/model";
+import { formatTimeCommitment, formatTimingRange } from "../school-needs/payload";
+
 type NeedDetailsProps = {
   need: {
     purpose: string;
@@ -5,7 +8,7 @@ type NeedDetailsProps = {
     timeCommitment: string;
     timing: string | null;
     deadline: string | null;
-    locationMode: string;
+    locationMode: LocationMode;
     locationDetails: string;
     participationTerms: string;
     paidDetails: string;
@@ -18,16 +21,11 @@ export function NeedDetails({ need }: NeedDetailsProps) {
       {[
         ["Tujuan sekolah", need.purpose],
         ["Keahlian atau bantuan", need.requestedHelp],
-        ["Komitmen waktu", need.timeCommitment],
-        ["Waktu dan batas waktu", [need.timing, need.deadline].filter(Boolean).join(" · ")],
+        ["Komitmen waktu", formatTimeCommitment(need.timeCommitment)],
+        ["Waktu pelaksanaan", formatTimingRange(need.timing, need.deadline)],
         [
           "Lokasi",
-          [
-            need.locationMode === "remote" ? "Jarak jauh" : "Di lokasi sekolah",
-            need.locationDetails,
-          ]
-            .filter(Boolean)
-            .join(" · "),
+          [locationModeLabels[need.locationMode], need.locationDetails].filter(Boolean).join(" · "),
         ],
         [
           "Ketentuan partisipasi",

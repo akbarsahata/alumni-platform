@@ -19,6 +19,7 @@ import type {
   OutreachAuditCursor,
   OutreachStatus,
 } from "../outreach/model";
+import type { LocationMode } from "../school-needs/model";
 
 const needColumns = {
   id: schoolNeed.id,
@@ -30,7 +31,9 @@ const needColumns = {
   timeCommitment: schoolNeed.timeCommitment,
   timing: schoolNeed.timing,
   deadline: schoolNeed.deadline,
-  locationMode: schoolNeed.locationMode,
+  locationMode: sql<LocationMode>`CASE WHEN ${schoolNeed.locationMode}='on-site'
+    AND ${schoolNeed.locationScope}='outside' THEN 'off-site'
+    ELSE ${schoolNeed.locationMode} END`,
   locationDetails: schoolNeed.locationDetails,
   staffContactUserId: schoolNeed.staffContactUserId,
   staffContactName: schoolNeed.staffContactName,

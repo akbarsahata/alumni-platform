@@ -10,9 +10,8 @@ const details = {
   title: "Pendampingan robotika",
   purpose: "Mendampingi siswa menyiapkan klub robotika sekolah.",
   requestedHelp: "Keahlian robotika dan mentoring siswa.",
-  timeCommitment: "Dua jam setiap pekan selama satu bulan.",
-  timing: "Mulai bulan depan",
-  deadline: null,
+  timeCommitment: "2|jam|per-minggu",
+  timing: "2026-11-01|2026-11-30",
   locationMode: "remote",
   locationDetails: "",
   staffContactUserId: "",
@@ -88,13 +87,23 @@ test("school roles submit complete needs without alumni profiles and private pro
     { purpose: undefined },
     { requestedHelp: "" },
     { timeCommitment: undefined },
-    { timing: "", deadline: null },
+    { timeCommitment: "Dua jam" },
+    { timeCommitment: "0|jam" },
+    { timeCommitment: "2|menit" },
+    { timing: undefined },
+    { timing: "" },
+    { timing: "Mulai bulan depan" },
+    { timing: "2026-11-30|2026-11-01" },
+    { timing: "2026-02-30" },
+    { deadline: "2026-12-01" },
+    { initiativeLink: "bukan tautan" },
+    { initiativeLink: "ftp://school.example/berkas" },
     { locationMode: undefined },
     { locationMode: "on-site", locationDetails: "" },
+    { locationMode: "off-site", locationDetails: "" },
     { staffContactUserId: undefined },
     { participationTerms: undefined },
     { participationTerms: "paid", paidDetails: "" },
-    { deadline: "2026-02-30" },
   ]) {
     assert.equal((await call(student, endpoint, { ...valid, ...invalid })).status, 400);
   }
@@ -108,7 +117,7 @@ test("school roles submit complete needs without alumni profiles and private pro
 
   const response = await submit(student, staff, {
     category: "school-activity",
-    initiativeLink: "https://school.example/initiative",
+    initiativeLink: "school.example/initiative",
   });
   const result = await response.text();
   assert.equal(response.status, 200, result);
@@ -149,6 +158,10 @@ test("school roles submit complete needs without alumni profiles and private pro
     ownNeed.need.staffContactName,
     own.staffContacts.find((contact) => contact.id === staff.id).name
   );
+  assert.equal(ownNeed.need.timeCommitment, "2|jam|per-minggu");
+  assert.equal(ownNeed.need.timing, "2026-11-01|2026-11-30");
+  assert.equal(ownNeed.need.deadline, "2026-11-30");
+  assert.equal(ownNeed.need.initiativeLink, "https://school.example/initiative");
   assert.doesNotMatch(JSON.stringify(ownNeed), new RegExp(staff.email));
   assert.equal((await call(unrelatedStudent, endpoint)).status, 200);
   assert.equal((await call(unrelatedStudent, `/api/school-needs/${needId}`)).status, 404);
@@ -325,13 +338,15 @@ test("staff and directory coordinators may submit needs; coordinator-created nee
   const coordinatorSubmission = await submit(coordinator, staffContact, {
     category: "school-activity",
     title: "Kebutuhan yang dibuat koordinator",
-    timing: "",
-    deadline: "2026-12-01",
-    locationMode: "on-site",
-    locationDetails: "Laboratorium sekolah",
+    timing: "2026-12-01",
+    locationMode: "off-site",
+    locationDetails: "Balai Kota Palembang",
   });
   assert.equal(coordinatorSubmission.status, 200);
   const { needId } = await coordinatorSubmission.json();
+  const coordinatorNeed = await (await call(coordinator, `${endpoint}/${needId}`)).json();
+  assert.equal(coordinatorNeed.need.locationMode, "off-site");
+  assert.equal(coordinatorNeed.need.locationDetails, "Balai Kota Palembang");
   assert.equal(
     (await call(coordinator, `${endpoint}/${needId}/approve`, { expectedVersion: 1 })).status,
     409

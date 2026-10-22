@@ -24,9 +24,14 @@ extend the same workflow; see [the outcome specification](outreach-outcomes-spec
   and each member receives at most three new requests in a rolling 30-day period
   across all coordinators and replacement needs. Cancelled, declined and expired
   requests still count within that period. Conditional D1 writes serialize races.
-- A request expires after 14 days or at the end of its opportunity deadline date
-  (23:59:59.999 UTC), whichever comes first. All displayed timestamps are UTC.
-  Delivery retries and reminders retain the original expiry.
+- A request expires after 14 days or at the end of the need's implementation end
+  date (the optional `until` in the Waktu pelaksanaan date range, 23:59:59.999 UTC),
+  whichever comes first. Stored timestamps and expiry calculations use UTC. The
+  school-need detail page displays closure, revision and approval times in the
+  browser's local timezone with a timezone label and relative difference; remaining
+  timestamp surfaces are tracked in
+  [#31](https://github.com/akbarsahata/alumni-platform/issues/31). Delivery retries
+  and reminders retain the original expiry.
 - Sent need details are immutable. A coordinator can close a need, cancelling
   unanswered requests while retaining completed responses. Material changes require
   a new need, fresh independent approvals and fresh responses. Contact limits still

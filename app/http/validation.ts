@@ -4,6 +4,7 @@ import { z } from "zod";
 import { houses } from "../membership/model";
 import { roles } from "../authorization/roles";
 import { locationModes, needCategories, participationTerms } from "../school-needs/model";
+import { normalizeInitiativeLink, parseTimeCommitment, parseTiming } from "../school-needs/payload";
 
 export function parseInput<T>(schema: z.ZodType<T>, input: unknown, message: string): T {
   const result = schema.safeParse(input);
@@ -135,20 +136,16 @@ export const schoolNeedInput = z
     title: requiredText(200),
     purpose: requiredText(2000),
     requestedHelp: requiredText(2000),
-    timeCommitment: requiredText(500),
-    timing: z.string().trim().max(500).default(""),
-    deadline: z
-      .union([z.string(), z.null()])
-      .nullable()
-      .default(null)
-      .transform((value) => (value ? value : null))
-      .refine(
-        (value) =>
-          value === null ||
-          (/^\d{4}-\d{2}-\d{2}$/.test(value) &&
-            !Number.isNaN(Date.parse(`${value}T00:00:00.000Z`)) &&
-            new Date(`${value}T00:00:00.000Z`).toISOString().slice(0, 10) === value)
-      ),
+    timeCommitment: z
+      .string()
+      .trim()
+      .max(500)
+      .refine((value) => parseTimeCommitment(value) !== null),
+    timing: z
+      .string()
+      .trim()
+      .max(500)
+      .refine((value) => parseTiming(value) !== null),
     locationMode: z.enum(locationModes),
     locationDetails: z.string().trim().max(500).default(""),
     staffContactUserId: z.string().min(1).max(200),
@@ -159,14 +156,13 @@ export const schoolNeedInput = z
       .trim()
       .max(500)
       .default("")
-      .refine((value) => !value || /^https?:\/\/\S+$/i.test(value)),
+      .transform((value) => normalizeInitiativeLink(value))
+      .refine((result) => result.valid)
+      .transform((result) => result.value),
     expectedVersion: integer(1, Number.MAX_SAFE_INTEGER - 1).optional(),
   })
   .strict()
-  .refine((value) => value.timing.length > 0 || value.deadline !== null, {
-    path: ["timing"],
-  })
-  .refine((value) => value.locationMode !== "on-site" || value.locationDetails.length > 0, {
+  .refine((value) => value.locationMode === "remote" || value.locationDetails.length > 0, {
     path: ["locationDetails"],
   })
   .refine((value) => value.participationTerms !== "paid" || value.paidDetails.length > 0, {
