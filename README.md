@@ -90,8 +90,8 @@ npm test
 ```
 
 Keep port 5173 free before `npm test`. The harness runs real Worker/D1/KV and Chromium journeys with
-synthetic accounts and disposable state, preserving normal development data. Tests take about five
-minutes because OTP expiry and rate-limit resets use the real clock. See
+synthetic accounts and disposable state, preserving normal development data. CI runs four isolated integration contexts in parallel after static checks. OTP expiry uses
+disposable database aging, as do rate-limit reset checks. See
 [verification commands and coverage](docs/local-development.md#verification) for focused runs.
 
 Prettier targets 100 columns with two spaces, double quotes, and semicolons. Use `npm run format` to

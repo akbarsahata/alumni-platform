@@ -1,3 +1,35 @@
+# Parallel CI integration contexts — 2026-10-23
+
+Work is isolated on `codex/parallel-ci-tests` in the managed `parallel-ci-tests`
+worktree, rebased onto `origin/master` at `b01fbfa` after the source PR merged.
+The Tests workflow first
+runs static checks/build/helper tests, then four parallel jobs for authentication,
+membership, directory/school needs and outreach. Each context keeps its HTTP
+fixture producers and Chromium consumers on one disposable Worker/D1/KV instance.
+Directory and outreach repeat the roles bootstrap suite before their own tests.
+The final `tests` gate retains the existing required-check name and fails for
+failed, cancelled or skipped prerequisites. Matrix failures do not cancel siblings.
+
+`npm test -- --context <auth|membership|directory|outreach>` selects a context;
+plain and file-focused runs retain their previous behavior. The harness checks
+complete, nonduplicate test-file assignment and prints command timings. The older
+five-minute expiry-wait description was stale: current tests already age only a
+disposable verification row while asserting the installed lifetime. Rate-limit
+reset checks similarly age disposable persisted limiter rows.
+
+All four context commands pass locally: 108 distinct HTTP tests, six helper tests
+and 22 Chromium journeys; helper and roles setup repeats across context jobs.
+Typecheck, build, lint, formatting and diff checks pass. An initial representative
+browser timeout passed on a clean rerun; the initial concurrent typegen/dev run
+also collided on generated route types, so final typecheck/build ran after tests.
+No product code or test assertions changed. Command timing totals (excluding
+Worker readiness) were approximately 9s auth, 35s membership, 35s directory and
+67s outreach on this machine; these are local diagnostics, not hosted speedup
+measurements. The existing sequential GitHub run #59 completed in 5m 21s;
+hosted results for the new parallel workflow remain pending. Publishing this branch
+and opening a PR against `master` are authorized; no branch-rule change or deployment
+is included.
+
 # School-need form refinements — 2026-10-23
 
 The `/school-needs` create and edit forms now collect structured time and location
