@@ -25,10 +25,6 @@ test("primary corrects a representative name and the saved identity reaches scho
     await expect(primary.getByRole("row").filter({ hasText: f.staff.email })).toContainText(
       "Ibu Sari Browser Baru"
     );
-    await primary.screenshot({
-      path: "test-results/representative-names-desktop.png",
-      fullPage: true,
-    });
 
     const staff = await useAccount(staffContext, f.staff);
     await gotoReady(staff, "/school-needs");
@@ -42,10 +38,6 @@ test("primary corrects a representative name and the saved identity reaches scho
     await gotoReady(member, `/outreach/requests/${f.requestId}`);
     let consent = member.getByRole("region", { name: "Persetujuan berbagi email" });
     await expect(consent).toContainText("Ibu Sari Browser Baru");
-    await member.screenshot({
-      path: "test-results/representative-names-mobile.png",
-      fullPage: true,
-    });
     expect(await member.evaluate("document.documentElement.scrollWidth <= window.innerWidth")).toBe(
       true
     );

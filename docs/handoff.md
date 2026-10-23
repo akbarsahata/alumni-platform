@@ -30,6 +30,14 @@ hosted results for the new parallel workflow remain pending. Publishing this bra
 and opening a PR against `master` are authorized; no branch-rule change or deployment
 is included.
 
+Follow-up for PR #33: the first hosted directory job passed every HTTP test but
+hit the representative-name browser timeout. A stalled-font probe reproduced the
+same 30-second timeout and masked context-close error: the diagnostic screenshot
+waited on `document.fonts.ready`. Removing the two optional screenshots passed the
+same probe in 2.3s. The probe and debug markers were removed; all workflow, identity,
+mail and responsive-width assertions remain. Hosted logs alone do not prove the
+font wait caused that specific failure, but the reproduced dependency is removed.
+
 # School-need form refinements — 2026-10-23
 
 The `/school-needs` create and edit forms now collect structured time and location
