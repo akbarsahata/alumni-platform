@@ -16,6 +16,9 @@ test("primary corrects a representative name and the saved identity reaches scho
   const staffContext = await browser.newContext();
   const memberContext = await browser.newContext();
   try {
+    // Regression: an unavailable font host must not stall the real account journey.
+    // useAccount installs the local-only font policy after this fallback route.
+    await primaryContext.route("https://fonts.googleapis.com/**", () => {});
     const primary = await useAccount(primaryContext, f.primary);
     await gotoReady(primary, "/admin/roles");
     await primary.getByLabel("Akun perwakilan").selectOption(f.staff.id);
@@ -79,8 +82,6 @@ test("primary corrects a representative name and the saved identity reaches scho
     expect(mail.text).toContain("Ibu Sari Browser Terbaru");
     expect(mail.text).toContain(f.recipient.email);
   } finally {
-    await primaryContext.close();
-    await staffContext.close();
-    await memberContext.close();
+    await Promise.allSettled([primaryContext.close(), staffContext.close(), memberContext.close()]);
   }
 });

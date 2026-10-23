@@ -119,8 +119,17 @@ representative-name journey keeps workflow, captured-mail and mobile-width
 assertions but no longer takes its two optional screenshots. A deliberately
 stalled font reproduced its 30-second timeout, while the same probe passed in
 2.3s after removing captures. Temporary fault injection was removed. Hosted logs
-alone did not identify the exact original blocking step. Avoid making functional
-acceptance depend on optional screenshots or increasing timeouts without diagnosis.
+alone did not identify the exact original blocking step. That removal alone did not resolve the subsequent hosted directory timeout.
+A second probe stalled the Google Fonts stylesheet and reproduced a timeout in
+`page.goto` even without screenshots. The shared `useAccount` browser helper now
+aborts requests to `fonts.googleapis.com` and `fonts.gstatic.com` once per context,
+keeping these functional journeys independent of external font availability. The
+representative-name journey retains an unavailable-font-host regression case;
+its assertions still exercise the real Worker and local application assets.
+Directory/outreach cleanup preserves original failures instead of replacing them
+with context-close errors. No retries or longer test timeout were introduced.
+Avoid making functional acceptance depend on optional screenshots or increasing
+timeouts without diagnosis.
 
 Current local/hosted delivery evidence belongs in [the handoff](handoff.md), not
 in this operational contract.

@@ -1,6 +1,15 @@
 import type { BrowserContext, Page } from "@playwright/test";
 
+const localContexts = new WeakSet<BrowserContext>();
+
 export async function useAccount(context: BrowserContext, account: { cookie: string }) {
+  if (!localContexts.has(context)) {
+    // Functional journeys use local UI/assets; remote fonts must not block navigation or capture.
+    await context.route(/^https:\/\/fonts\.(?:googleapis|gstatic)\.com\//, (route) =>
+      route.abort()
+    );
+    localContexts.add(context);
+  }
   await context.clearCookies();
   const [name, ...value] = account.cookie.split("=");
   await context.addCookies([

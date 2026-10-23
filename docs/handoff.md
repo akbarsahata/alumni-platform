@@ -47,12 +47,17 @@ consent, captured-mail and mobile-width assertions remain; final local directory
 validation passes every HTTP check and five Chromium journeys. Hosted logs alone
 do not prove that font loading caused the original failure.
 
-At this documentation update, [run #62 for 107f454](https://github.com/akbarsahata/alumni-platform/actions/runs/39879576352)
-is in progress: static checks, auth and membership succeeded; directory and
-outreach are still running and the final gate has not completed. Do not describe
-PR #33 as hosted-green or claim a measured speedup until that gate succeeds.
-The next documentation commit changes no runtime/test behavior; its own PR run
-will provide separate hosted evidence.
+Follow-up after `daa79e1`: [run #62](https://github.com/akbarsahata/alumni-platform/actions/runs/39879576352)
+failed both directory and outreach browser journeys after their HTTP suites passed.
+The screenshot-only change was insufficient. A stalled Google Fonts stylesheet
+reproduced the representative timeout in `page.goto`; after preserving cleanup
+errors, the original wait was visible. The shared account helper now aborts remote
+Google Fonts requests once per browser context. The same unavailable-host probe
+passes in 2.0s, and remains as regression coverage in the representative journey.
+Directory/outreach cleanup uses settled promises to preserve the primary error.
+Local full directory/outreach context validation passes every HTTP suite,
+five directory Chromium journeys and seven outreach Chromium journeys. Hosted validation of this correction is still required; no longer timeout
+or automatic retry was introduced. PR #33 is not yet confirmed hosted-green.
 
 # School-need form refinements — 2026-10-23
 
