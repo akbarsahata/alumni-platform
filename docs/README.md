@@ -1,5 +1,8 @@
 # Project documents
 
+- [CI testing and parallel integration contexts](ci-testing.md): stage graph, exact context ownership, fixture isolation, local commands, required gate and timing/diagnostic limits.
+- [Local development](local-development.md): setup, mailbox, verification and CI operations.
+
 - [Remote D1 seeding](seeding.md): branch-selected GitHub Actions, disabled write flag,
   environment secrets and administrator appointment prerequisites.
 

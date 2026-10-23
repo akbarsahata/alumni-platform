@@ -8,6 +8,21 @@ own application persistence, preserving conditional writes and atomic SQLite tri
 See [backend-architecture.md](backend-architecture.md) for module ownership and verification.
 The proposal below describes broader pilot infrastructure and historical selection context.
 
+## Verification architecture
+
+CI runs static checks/build/helper tests, then four independent integration jobs
+for auth, membership, directory/school needs and outreach, then the stable `tests`
+required gate. Each integration job owns disposable Worker/D1/KV state and keeps
+HTTP fixture producers with their Chromium consumers. Parallelism is across jobs;
+HTTP files and browser journeys remain ordered within their context. No product
+bindings, production data or deployed services are shared by these jobs.
+
+The production build is validated separately; integration starts its own local
+development Worker. This preserves the real Better Auth/HTTP/captured-mail seam
+without repository mocks or a state-transfer boundary between HTTP and browser
+checks. See [CI testing](ci-testing.md) for context ownership, bootstrap dependencies,
+complete test-file assignment, gate semantics and timing tradeoffs.
+
 ## Stack proposal
 
 The user selected Cloudflare and Resend. Specific libraries below are recommendations pending ticket 0 validation, not installed or verified dependencies.

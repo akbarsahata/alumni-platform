@@ -1,42 +1,58 @@
 # Parallel CI integration contexts — 2026-10-23
 
-Work is isolated on `codex/parallel-ci-tests` in the managed `parallel-ci-tests`
-worktree, rebased onto `origin/master` at `b01fbfa` after the source PR merged.
-The Tests workflow first
-runs static checks/build/helper tests, then four parallel jobs for authentication,
-membership, directory/school needs and outreach. Each context keeps its HTTP
-fixture producers and Chromium consumers on one disposable Worker/D1/KV instance.
-Directory and outreach repeat the roles bootstrap suite before their own tests.
-The final `tests` gate retains the existing required-check name and fails for
-failed, cancelled or skipped prerequisites. Matrix failures do not cancel siblings.
+Implementation is pushed on `codex/parallel-ci-tests` in managed worktree
+`/Users/akbar/.codex/worktrees/parallel-ci-tests/alumni-platform`, rebased onto
+`origin/master` at `b01fbfa` after source PR #32 merged. Open delivery PR:
+[#33](https://github.com/akbarsahata/alumni-platform/pull/33), targeting `master`.
+Implementation commit: `bdea30a`; diagnostic screenshot fix: `107f454`.
+No deployment, remote migration, live email or repository-rule change occurred.
 
-`npm test -- --context <auth|membership|directory|outreach>` selects a context;
-plain and file-focused runs retain their previous behavior. The harness checks
-complete, nonduplicate test-file assignment and prints command timings. The older
-five-minute expiry-wait description was stale: current tests already age only a
-disposable verification row while asserting the installed lifetime. Rate-limit
-reset checks similarly age disposable persisted limiter rows.
+## Current design and documentation
 
-All four context commands pass locally: 108 distinct HTTP tests, six helper tests
-and 22 Chromium journeys; helper and roles setup repeats across context jobs.
-Typecheck, build, lint, formatting and diff checks pass. An initial representative
-browser timeout passed on a clean rerun; the initial concurrent typegen/dev run
-also collided on generated route types, so final typecheck/build ran after tests.
-No product code or test assertions changed. Command timing totals (excluding
-Worker readiness) were approximately 9s auth, 35s membership, 35s directory and
-67s outreach on this machine; these are local diagnostics, not hosted speedup
-measurements. The existing sequential GitHub run #59 completed in 5m 21s;
-hosted results for the new parallel workflow remain pending. Publishing this branch
-and opening a PR against `master` are authorized; no branch-rule change or deployment
-is included.
+[CI testing](ci-testing.md) is the operational reference for the stage graph,
+exact context ownership, fixture/bootstrap dependencies, commands, required gate,
+test assignment and diagnostics. [Architecture](architecture.md#verification-architecture)
+and [backend architecture](backend-architecture.md#verification-and-references)
+describe the verification boundary; [local development](local-development.md#verification)
+contains setup and focused commands. Older handoff sections below are historical;
+current OTP checks age disposable verification/limiter rows instead of sleeping.
 
-Follow-up for PR #33: the first hosted directory job passed every HTTP test but
-hit the representative-name browser timeout. A stalled-font probe reproduced the
-same 30-second timeout and masked context-close error: the diagnostic screenshot
-waited on `document.fonts.ready`. Removing the two optional screenshots passed the
-same probe in 2.3s. The probe and debug markers were removed; all workflow, identity,
-mail and responsive-width assertions remain. Hosted logs alone do not prove the
-font wait caused that specific failure, but the reproduced dependency is removed.
+The Tests workflow runs static checks/build/helpers, then four parallel context
+jobs (`auth`, `membership`, `directory`, `outreach`), then the stable `tests` gate.
+Each context owns its Worker/D1/KV, runs HTTP producers before Chromium consumers,
+and keeps one browser worker. Directory/outreach repeat roles bootstrap for
+`accounts.json`; helpers also repeat. File assignment fails closed for missing,
+stale or duplicate entries. The final gate rejects unsuccessful/skipped prerequisites;
+`fail-fast: false` preserves sibling results. Plain/full and file-focused commands
+remain supported. Parallelism requires separate runners, not competing local
+Workers on port 5173. Run typecheck/build apart from a running test Worker to
+avoid shared generated-route-type races.
+
+## Verification and hosted boundary
+
+All four context commands passed locally: 108 distinct HTTP tests, six helper
+tests and 22 Chromium journeys, with repeated helper/bootstrap execution excluded
+from distinct counts. Typecheck, production build, lint, formatting and diff checks
+passed. Command totals excluding Worker readiness were approximately 9s auth,
+35s membership, 35s directory and 67s outreach; these local numbers are not hosted
+speedup evidence. Sequential baseline [run #59](https://github.com/akbarsahata/alumni-platform/actions/runs/39877810992)
+completed in 5m 21s, including about 4m 14s of HTTP/browser execution.
+
+The [first parallel run](https://github.com/akbarsahata/alumni-platform/actions/runs/39878646139)
+passed directory HTTP checks but hit its representative-name browser timeout.
+A deliberately stalled font reproduced the 30-second timeout and masked cleanup
+error: optional screenshots waited for fonts. Removing those two captures passed
+the identical probe in 2.3s. Temporary instrumentation was removed. All identity,
+consent, captured-mail and mobile-width assertions remain; final local directory
+validation passes every HTTP check and five Chromium journeys. Hosted logs alone
+do not prove that font loading caused the original failure.
+
+At this documentation update, [run #62 for 107f454](https://github.com/akbarsahata/alumni-platform/actions/runs/39879576352)
+is in progress: static checks, auth and membership succeeded; directory and
+outreach are still running and the final gate has not completed. Do not describe
+PR #33 as hosted-green or claim a measured speedup until that gate succeeds.
+The next documentation commit changes no runtime/test behavior; its own PR run
+will provide separate hosted evidence.
 
 # School-need form refinements — 2026-10-23
 

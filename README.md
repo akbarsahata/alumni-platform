@@ -104,7 +104,8 @@ files, lints, and typechecks. The full test suite runs in GitHub Actions. See
 The [Tests workflow](.github/workflows/tests.yml) runs on pushes to `master`, pull requests, and merge queue groups. It
 uses Ubuntu, Node 24, and Chromium to check formatting, lint, types, build, and the full test suite
 without live credentials. The badge above shows the latest `master` push result. See
-[CI details](docs/local-development.md#github-actions).
+[CI details](docs/local-development.md#github-actions) and
+[context ownership and test commands](docs/ci-testing.md).
 
 ## Stack and code map
 
@@ -134,6 +135,7 @@ current product workflows.
 | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
 | [Pilot specification](docs/pilot.md)                              | Audience, workflows, operating defaults, evaluation, and exclusions.                      |
 | [Architecture and data model](docs/architecture.md)               | Design direction, authorization, storage, email reliability, and recovery.                |
+| [CI testing](docs/ci-testing.md)                                  | Parallel stages, context ownership, fixture dependencies and the required gate.           |
 | [Local development](docs/local-development.md)                    | Setup, mailbox, testing, formatting, CI, and deployment boundaries.                       |
 | [Administrator bootstrap](docs/administrator-bootstrap.md)        | Private appointments, role isolation, and audit procedure.                                |
 | [Membership manual review](docs/membership-review.md)             | Application/status screens, independent checks, decision history, and local verification. |
