@@ -1,3 +1,94 @@
+# School-need form refinements — 2026-10-23
+
+The `/school-needs` create and edit forms now collect structured time and location
+data while keeping compact, parseable backend payloads. Submission and action
+feedback now uses toasts plus per-field client errors. Workflow timestamps on the
+school-need detail page now render in the browser's timezone with a Bahasa Indonesia
+relative description. The follow-up notification gap requested after this refinement
+was filed as [#30](https://github.com/akbarsahata/alumni-platform/issues/30) after
+checking the pilot and outreach specifications for conflicts and duplicates. The
+system-wide timestamp rollout is tracked in
+[#31](https://github.com/akbarsahata/alumni-platform/issues/31). Ordinary local D1 was
+migrated; no deployment or live email occurred.
+
+## Behavior
+
+- **Perkiraan komitmen waktu** is three controls: a positive whole-number amount,
+  unit (`jam` or `hari`), and an optional frequency (`per hari`, `per minggu`, or
+  `per bulan`). The backend payload is
+  `<amount>|<unit>[|<frequency>]`, for example `2|jam|per-minggu`. A missing
+  frequency omits the third segment. Detail and outreach views render the payload as
+  readable Indonesian, for example `2 jam per minggu`.
+- **Waktu pelaksanaan** uses native date inputs for a required start and optional
+  end. The backend payload is `YYYY-MM-DD` or `YYYY-MM-DD|YYYY-MM-DD`. The end date
+  is also persisted as the need deadline used by existing outreach expiry, so no
+  separate **Batas waktu** input remains. The API response still exposes the derived
+  `deadline`; API input no longer accepts a standalone `deadline` field.
+- **Tautan inisiatif (opsional)** normalizes scheme-less values on blur, paste and
+  Enter (for example `school.example/initiative` becomes
+  `https://school.example/initiative`), validates HTTP(S) URLs, and shows an inline
+  error. The shared validation also normalizes/validates API JSON callers.
+- **Lokasi kegiatan** adds **Di lokasi di luar sekolah**. Both on-site modes require
+  an address; remote remains optional. Choosing **Di lokasi sekolah** prefills
+  `SMAN Sumsel, Palembang`, which remains editable. Choosing the external mode clears
+  that school prefill and requires a manually entered location.
+- The create page and need-detail page now show Sonner success/error toasts for
+  submission, edit, validation and approval actions. The existing inline alerts
+  remain for no-JS and accessible feedback.
+- Workflow timestamps on the need-detail page (closure, revision creation and
+  approval) use `app/components/local-timestamp.tsx`. It formats with `date-fns` and
+  the Indonesian (`id`) locale in the browser's local timezone, adds the short
+  timezone label, and appends a relative description such as `(2 jam yang lalu)`.
+  The server/first client render uses a stable UTC fallback; the relative text
+  refreshes every minute. Date-only Waktu pelaksanaan values are unchanged.
+- Both forms run the same client validation on submit. Invalid controls receive
+  inline messages, `aria-invalid`, and a red border; the first invalid control is
+  focused, and errors clear as the corresponding field changes. Validation covers
+  required text and lengths, positive whole-number time commitments, date order,
+  required locations, paid-detail requirements, and HTTP(S) initiative links. The
+  server schema remains authoritative.
+
+## Persistence and verification
+
+- Migration `0023_school_need_location_scope.sql` additively stores
+  `location_scope` (`school` or `outside`) on `school_need` and
+  `school_need_revision` and recreates the two history triggers. Stored
+  `location_mode` remains `remote`/`on-site`; `off-site` is projected as
+  `on-site` + `outside`. Existing rows default to `school`. The migration was applied
+  to ordinary local D1 with `npm run db:migrate`.
+- Focused `node scripts/test.mjs tests/school-needs.test.mjs tests/browser/school-needs.spec.ts`
+  passes all five HTTP journeys and the Chromium journey. The browser journey covers
+  the initial invalid submission with per-field errors and an error toast, error
+  clearing, the school-location prefill, clearing it for an external location, manual
+  external address entry, the formatted time commitment/date range, link
+  normalization, inline invalid-link feedback, the success toast, and the resulting
+  detail page. It runs with `id-ID` locale and `Asia/Jakarta` timezone and asserts the
+  `WIB` timezone label plus Indonesian relative time.
+- `npm run typecheck`, `npm run lint`, `npm run format:check`, and the final full
+  `npm test` pass. The full suite passes every HTTP suite and all 22 Chromium
+  journeys, including the real authentication expiry and rate-limit windows.
+- The ordinary localhost server remains available (`/login` 200, signed-out
+  `/school-needs` 401) after the migration.
+- PR #32 review fix: school-need required, length, enum and conditional rules now
+  live in `app/school-needs/schema.ts`. The API `schoolNeedInput` and the browser form
+  validator both consume the same schemas/predicates; the browser maps Zod issues to
+  the individual controls with Indonesian messages. This removes the duplicated
+  rule set and aligns the client with the server's `staffContactUserId` bound.
+- Issue [#30](https://github.com/akbarsahata/alumni-platform/issues/30) records the
+  requested change-notification enhancement with `enhancement` and `needs-triage`.
+  The candidate scope is in
+  [school-need-change-notifications.md](school-need-change-notifications.md). It
+  notes the pilot/outreach conflict: sent terms are immutable and material changes
+  require a replacement need with fresh responses and consent, so in-place mutation
+  should not be implemented without a specification change. The recommended
+  spec-compliant scope is notification on closure/replacement.
+- Issue [#31](https://github.com/akbarsahata/alumni-platform/issues/31) tracks the
+  system-wide timestamp rollout with `enhancement` and `ready-for-agent`. The shared
+  rules, date-only exception, inventory and acceptance criteria are in
+  [local-timestamp-display.md](local-timestamp-display.md).
+
+---
+
 # Private outreach clarification — 2026-10-21
 
 Issue [#18](https://github.com/akbarsahata/alumni-platform/issues/18) is implemented

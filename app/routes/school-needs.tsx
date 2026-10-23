@@ -1,8 +1,12 @@
 import { env } from "cloudflare:workers";
+import { useEffect } from "react";
 import { Form, Link, data, useNavigation, useSearchParams } from "react-router";
+import { Toaster, toast } from "sonner";
 import type { Route } from "./+types/school-needs";
 import { pageTitle } from "../content/page-title";
-import { needCategories, needCategoryLabels, needStatusLabels } from "../school-needs/model";
+import { needStatusLabels } from "../school-needs/model";
+import { SchoolNeedFormFields } from "../school-needs/form-fields";
+import { useSchoolNeedFormValidation } from "../school-needs/use-form-validation";
 import { schoolNeedFormInput } from "../school-needs/form-input";
 import { readSchoolNeeds, submitSchoolNeed } from "../school-needs/school-needs.server";
 
@@ -66,132 +70,76 @@ function NeedList({
 export default function SchoolNeeds({ loaderData, actionData }: Route.ComponentProps) {
   const busy = useNavigation().state !== "idle";
   const hasContacts = loaderData.staffContacts.length > 0;
+  const { errors, formProps } = useSchoolNeedFormValidation();
+  useEffect(() => {
+    if (actionData?.message)
+      toast.success(actionData.message, {
+        id: "school-need-feedback",
+        toasterId: "school-needs",
+      });
+    else if (actionData?.error)
+      toast.error(actionData.error, {
+        id: "school-need-feedback",
+        toasterId: "school-needs",
+      });
+  }, [actionData]);
   return (
-    <main className="mx-auto max-w-3xl space-y-8">
-      <h1 className="text-2xl font-semibold">Kebutuhan sekolah</h1>
-      <p>
-        Ajukan kegiatan sekolah atau pendampingan siswa. Kebutuhan harus divalidasi oleh staf yang
-        disebutkan dan disetujui koordinator direktori sebelum penjangkauan. Profil alumni tidak
-        diperlukan untuk mengajukan kebutuhan.
-      </p>
-      {actionData?.error && <p role="alert">{actionData.error}</p>}
-      {actionData?.message && <p role="status">{actionData.message}</p>}
-      <section aria-label="Ajukan kebutuhan sekolah" className="space-y-4">
-        <h2 className="text-xl font-semibold">Ajukan kebutuhan</h2>
-        {!hasContacts && (
-          <p role="status">Belum ada perwakilan staf sekolah terverifikasi yang dapat dipilih.</p>
-        )}
-        <Form method="post" className="space-y-4">
-          <label className="block">
-            Jenis kebutuhan
-            <select name="category" required defaultValue="">
-              <option value="" disabled>
-                Pilih jenis kebutuhan
-              </option>
-              {needCategories.map((category) => (
-                <option key={category} value={category}>
-                  {needCategoryLabels[category]}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="block">
-            Judul
-            <input name="title" required maxLength={200} />
-          </label>
-          <label className="block">
-            Tujuan sekolah
-            <textarea name="purpose" required maxLength={2000} rows={4} />
-          </label>
-          <label className="block">
-            Keahlian atau bantuan yang dibutuhkan
-            <textarea name="requestedHelp" required maxLength={2000} rows={4} />
-          </label>
-          <label className="block">
-            Perkiraan komitmen waktu
-            <input name="timeCommitment" required maxLength={500} />
-          </label>
-          <label className="block">
-            Waktu pelaksanaan
-            <input name="timing" maxLength={500} />
-          </label>
-          <label className="block">
-            Batas waktu (opsional jika waktu pelaksanaan diisi)
-            <input name="deadline" type="date" />
-          </label>
-          <label className="block">
-            Lokasi kegiatan
-            <select name="locationMode" required defaultValue="">
-              <option value="" disabled>
-                Pilih lokasi
-              </option>
-              <option value="remote">Jarak jauh</option>
-              <option value="on-site">Di lokasi sekolah</option>
-            </select>
-          </label>
-          <label className="block">
-            Alamat/lokasi (wajib untuk kegiatan di lokasi)
-            <input name="locationDetails" maxLength={500} />
-          </label>
-          <label className="block">
-            Perwakilan staf terverifikasi
-            <select name="staffContactUserId" required defaultValue="">
-              <option value="" disabled>
-                Pilih kontak staf
-              </option>
-              {loaderData.staffContacts.map((contact) => (
-                <option key={contact.id} value={contact.id}>
-                  {contact.name || `Akun staf ${contact.id.slice(0, 8)}`}
-                </option>
-              ))}
-            </select>
-          </label>
-          <p>Nama kontak diambil dari akun staf terverifikasi yang dipilih.</p>
-          <label className="block">
-            Ketentuan partisipasi
-            <select name="participationTerms" required defaultValue="">
-              <option value="" disabled>
-                Pilih ketentuan
-              </option>
-              <option value="voluntary">Sukarela</option>
-              <option value="paid">Berbayar</option>
-            </select>
-          </label>
-          <label className="block">
-            Rincian kompensasi (wajib jika berbayar)
-            <textarea name="paidDetails" maxLength={1000} rows={3} />
-          </label>
-          <label className="block">
-            Tautan inisiatif (opsional)
-            <input name="initiativeLink" type="url" maxLength={500} />
-          </label>
-          <button type="submit" disabled={busy || !hasContacts}>
-            {busy ? "Mengirim…" : "Kirim kebutuhan"}
-          </button>
-        </Form>
-      </section>
-      <NeedList
-        title="Kebutuhan yang saya ajukan"
-        needs={loaderData.ownNeeds}
-        nextCursor={loaderData.ownNeedsNextCursor}
-        cursorParam="ownAfter"
+    <>
+      <Toaster
+        id="school-needs"
+        position="top-center"
+        offset={{ top: "80px" }}
+        mobileOffset={{ top: "128px" }}
+        richColors
+        closeButton
+        duration={6000}
+        containerAriaLabel="Pemberitahuan kebutuhan sekolah"
+        toastOptions={{ closeButtonAriaLabel: "Tutup pemberitahuan" }}
       />
-      {loaderData.staffQueue.length > 0 && (
+      <main className="mx-auto max-w-3xl space-y-8">
+        <h1 className="text-2xl font-semibold">Kebutuhan sekolah</h1>
+        <p>
+          Ajukan kegiatan sekolah atau pendampingan siswa. Kebutuhan harus divalidasi oleh staf yang
+          disebutkan dan disetujui koordinator direktori sebelum penjangkauan. Profil alumni tidak
+          diperlukan untuk mengajukan kebutuhan.
+        </p>
+        {actionData?.error && <p role="alert">{actionData.error}</p>}
+        {actionData?.message && <p role="status">{actionData.message}</p>}
+        <section aria-label="Ajukan kebutuhan sekolah" className="space-y-4">
+          <h2 className="text-xl font-semibold">Ajukan kebutuhan</h2>
+          {!hasContacts && (
+            <p role="status">Belum ada perwakilan staf sekolah terverifikasi yang dapat dipilih.</p>
+          )}
+          <Form method="post" className="space-y-4" {...formProps}>
+            <SchoolNeedFormFields staffContacts={loaderData.staffContacts} errors={errors} />
+            <button type="submit" disabled={busy || !hasContacts}>
+              {busy ? "Mengirim…" : "Kirim kebutuhan"}
+            </button>
+          </Form>
+        </section>
         <NeedList
-          title="Menunggu validasi staf Anda"
-          needs={loaderData.staffQueue}
-          nextCursor={loaderData.staffQueueNextCursor}
-          cursorParam="staffAfter"
+          title="Kebutuhan yang saya ajukan"
+          needs={loaderData.ownNeeds}
+          nextCursor={loaderData.ownNeedsNextCursor}
+          cursorParam="ownAfter"
         />
-      )}
-      {loaderData.coordinatorQueue.length > 0 && (
-        <NeedList
-          title="Menunggu persetujuan koordinator direktori"
-          needs={loaderData.coordinatorQueue}
-          nextCursor={loaderData.coordinatorQueueNextCursor}
-          cursorParam="coordinatorAfter"
-        />
-      )}
-    </main>
+        {loaderData.staffQueue.length > 0 && (
+          <NeedList
+            title="Menunggu validasi staf Anda"
+            needs={loaderData.staffQueue}
+            nextCursor={loaderData.staffQueueNextCursor}
+            cursorParam="staffAfter"
+          />
+        )}
+        {loaderData.coordinatorQueue.length > 0 && (
+          <NeedList
+            title="Menunggu persetujuan koordinator direktori"
+            needs={loaderData.coordinatorQueue}
+            nextCursor={loaderData.coordinatorQueueNextCursor}
+            cursorParam="coordinatorAfter"
+          />
+        )}
+      </main>
+    </>
   );
 }

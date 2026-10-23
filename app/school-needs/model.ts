@@ -1,5 +1,5 @@
 export const needCategories = ["school-activity", "student-mentoring"] as const;
-export const locationModes = ["remote", "on-site"] as const;
+export const locationModes = ["remote", "on-site", "off-site"] as const;
 export const participationTerms = ["voluntary", "paid"] as const;
 
 export type NeedCategory = (typeof needCategories)[number];
@@ -7,9 +7,17 @@ export type LocationMode = (typeof locationModes)[number];
 export type ParticipationTerm = (typeof participationTerms)[number];
 export type NeedStatus = "awaiting-staff" | "awaiting-coordinator" | "approved";
 
+export const schoolLocation = "SMAN Sumsel, Palembang";
+
 export const needCategoryLabels: Record<NeedCategory, string> = {
   "school-activity": "Kegiatan sekolah",
   "student-mentoring": "Pendampingan siswa",
+};
+
+export const locationModeLabels: Record<LocationMode, string> = {
+  remote: "Jarak jauh",
+  "on-site": "Di lokasi sekolah",
+  "off-site": "Di lokasi di luar sekolah",
 };
 
 export const needStatusLabels: Record<NeedStatus, string> = {

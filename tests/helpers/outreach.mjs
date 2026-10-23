@@ -17,8 +17,8 @@ export const needInput = {
   title: "Pendampingan robotika",
   purpose: "Mendampingi siswa merancang robot",
   requestedHelp: "Mentor teknologi",
-  timeCommitment: "Dua jam",
-  timing: "Sesuai kesepakatan",
+  timeCommitment: "2|jam|per-minggu",
+  timing: "2026-11-01",
   locationMode: "remote",
   participationTerms: "voluntary",
 };
