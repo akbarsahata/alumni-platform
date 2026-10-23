@@ -69,6 +69,11 @@ migrated; no deployment or live email occurred.
   journeys, including the real authentication expiry and rate-limit windows.
 - The ordinary localhost server remains available (`/login` 200, signed-out
   `/school-needs` 401) after the migration.
+- PR #32 review fix: school-need required, length, enum and conditional rules now
+  live in `app/school-needs/schema.ts`. The API `schoolNeedInput` and the browser form
+  validator both consume the same schemas/predicates; the browser maps Zod issues to
+  the individual controls with Indonesian messages. This removes the duplicated
+  rule set and aligns the client with the server's `staffContactUserId` bound.
 - Issue [#30](https://github.com/akbarsahata/alumni-platform/issues/30) records the
   requested change-notification enhancement with `enhancement` and `needs-triage`.
   The candidate scope is in

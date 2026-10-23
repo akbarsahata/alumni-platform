@@ -26,7 +26,13 @@ export type TimingRange = {
   until: string | null;
 };
 
-const timeCommitmentPattern = /^([1-9]\d{0,3})\|(jam|hari)(?:\|(per-hari|per-minggu|per-bulan))?$/;
+const amountPatternSource = "[1-9]\\d{0,3}";
+export const timeCommitmentAmountPattern = new RegExp(`^${amountPatternSource}$`);
+const unitPatternSource = timeCommitmentUnits.join("|");
+const frequencyPatternSource = timeCommitmentFrequencies.join("|");
+const timeCommitmentPattern = new RegExp(
+  `^(${amountPatternSource})\\|(${unitPatternSource})(?:\\|(${frequencyPatternSource}))?$`
+);
 const timingPattern = /^(\d{4}-\d{2}-\d{2})(?:\|(\d{4}-\d{2}-\d{2}))?$/;
 const monthNames = [
   "Januari",

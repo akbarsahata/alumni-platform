@@ -3,8 +3,7 @@ import { outcomeStates } from "../outreach/model";
 import { z } from "zod";
 import { houses } from "../membership/model";
 import { roles } from "../authorization/roles";
-import { locationModes, needCategories, participationTerms } from "../school-needs/model";
-import { normalizeInitiativeLink, parseTimeCommitment, parseTiming } from "../school-needs/payload";
+import { schoolNeedApiFields, schoolNeedConditionalIssues } from "../school-needs/schema";
 
 export function parseInput<T>(schema: z.ZodType<T>, input: unknown, message: string): T {
   const result = schema.safeParse(input);
@@ -132,41 +131,13 @@ export const representativeNameInput = z
   .strict();
 export const schoolNeedInput = z
   .object({
-    category: z.enum(needCategories),
-    title: requiredText(200),
-    purpose: requiredText(2000),
-    requestedHelp: requiredText(2000),
-    timeCommitment: z
-      .string()
-      .trim()
-      .max(500)
-      .refine((value) => parseTimeCommitment(value) !== null),
-    timing: z
-      .string()
-      .trim()
-      .max(500)
-      .refine((value) => parseTiming(value) !== null),
-    locationMode: z.enum(locationModes),
-    locationDetails: z.string().trim().max(500).default(""),
-    staffContactUserId: z.string().min(1).max(200),
-    participationTerms: z.enum(participationTerms),
-    paidDetails: z.string().trim().max(1000).default(""),
-    initiativeLink: z
-      .string()
-      .trim()
-      .max(500)
-      .default("")
-      .transform((value) => normalizeInitiativeLink(value))
-      .refine((result) => result.valid)
-      .transform((result) => result.value),
+    ...schoolNeedApiFields,
     expectedVersion: integer(1, Number.MAX_SAFE_INTEGER - 1).optional(),
   })
   .strict()
-  .refine((value) => value.locationMode === "remote" || value.locationDetails.length > 0, {
-    path: ["locationDetails"],
-  })
-  .refine((value) => value.participationTerms !== "paid" || value.paidDetails.length > 0, {
-    path: ["paidDetails"],
+  .superRefine((value, ctx) => {
+    for (const issue of schoolNeedConditionalIssues(value))
+      ctx.addIssue({ code: "custom", path: [issue.path], message: issue.message });
   });
 export const schoolNeedApprovalInput = z
   .object({
