@@ -56,8 +56,8 @@ const contexts = {
     ],
   },
   outreach: {
-    http: ["outreach", "introductions", "outcomes", "clarification"],
-    browser: ["outreach", "introductions", "outcomes", "clarification"],
+    http: ["outreach", "introductions", "outcomes", "clarification", "deletion"],
+    browser: ["outreach", "introductions", "outcomes", "clarification", "deletion"],
   },
 };
 const context = contextIndex === -1 ? undefined : contexts[process.argv[contextIndex + 1]];
@@ -183,6 +183,7 @@ try {
       await run(process.execPath, ["--test", "tests/introductions.test.mjs"]);
       await run(process.execPath, ["--test", "tests/outcomes.test.mjs"]);
       await run(process.execPath, ["--test", "tests/clarification.test.mjs"]);
+      await run(process.execPath, ["--test", "tests/deletion.test.mjs"]);
     }
     const results = await Promise.allSettled(
       process.argv[2]

@@ -3,7 +3,7 @@ import { Toaster, toast } from "sonner";
 import { LocationSelect } from "../profiles/location-select";
 import { cityOptions, countryOptions } from "../profiles/locations";
 import { env } from "cloudflare:workers";
-import { Form, data, useNavigation } from "react-router";
+import { Form, Link, data, useNavigation } from "react-router";
 import type { Route } from "./+types/profile";
 import { readProfile, saveProfile } from "../profiles/profiles.server";
 import { helpTypes, helpLabels, availabilityChoices, availabilityLabels } from "../profiles/model";
@@ -55,7 +55,9 @@ const reasons: Record<string, string> = {
   incomplete: "Pilihan profil belum lengkap.",
 };
 export default function Profile({ loaderData, actionData }: Route.ComponentProps) {
-  const { profile, identity, eligibility, membershipStatus, tags } = loaderData;
+  const { profile, identity, eligibility, membershipStatus, tags, deletion } = loaderData;
+  const deletionActive = deletion?.status === "active";
+  const deletionCompleted = deletion?.status === "completed";
   const busy = useNavigation().state !== "idle";
   useEffect(() => {
     if (actionData?.message)
@@ -78,6 +80,48 @@ export default function Profile({ loaderData, actionData }: Route.ComponentProps
       />
       <main className="profile-page">
         <h1 className="text-2xl font-semibold">Profil & Keahlian</h1>
+        <p>
+          <Link className="underline" to="/profile/deletion">
+            Privasi &amp; penghapusan
+          </Link>
+        </p>
+
+        {deletionActive && (
+          <section
+            aria-label="Status penghapusan profil"
+            className="rounded border border-red-300 p-4 space-y-2"
+          >
+            <h2 className="text-xl font-semibold">Permintaan penghapusan profil sedang diproses</h2>
+            <p>
+              Profil Anda langsung disembunyikan dari pencarian dan penjangkauan. Permintaan bantuan
+              yang belum dijawab, pengingat, dan perkenalan yang belum dikirim telah dibatalkan.
+            </p>
+            <p>
+              Batas target penyelesaian: {deletion.dueAt} (UTC). Akun, keanggotaan, dan catatan
+              keuangan tidak dihapus oleh permintaan ini. Email yang sudah dibagikan tidak dapat
+              ditarik kembali.
+            </p>
+            <p>
+              <Link className="underline" to="/profile/deletion">
+                Lihat status dan langkah penghapusan
+              </Link>
+            </p>
+          </section>
+        )}
+        {deletionCompleted && (
+          <section aria-label="Penghapusan profil selesai" className="rounded border p-4 space-y-2">
+            <h2 className="text-xl font-semibold">Penghapusan profil sebelumnya telah selesai</h2>
+            <p>
+              Profil dan teks klarifikasi privat pada permintaan tersebut telah dihapus. Akun dan
+              keanggotaan tetap berlaku. Anda dapat membuat profil baru bila ingin ikut lagi.
+            </p>
+            <p>
+              <Link className="underline" to="/profile/deletion">
+                Lihat riwayat permintaan penghapusan
+              </Link>
+            </p>
+          </section>
+        )}
 
         <details className="profile-privacy">
           <summary>Profil privat · Email hanya dibagikan dengan persetujuan</summary>{" "}
@@ -127,7 +171,7 @@ export default function Profile({ loaderData, actionData }: Route.ComponentProps
             </p>
           </details>
 
-          {membershipStatus === "approved" && profile.confirmedAt && (
+          {membershipStatus === "approved" && profile.confirmedAt && !deletionActive && (
             <Form method="post">
               <input type="hidden" name="intent" value="confirm" />
               <Button disabled={busy}>Konfirmasi profil masih benar</Button>
@@ -140,7 +184,7 @@ export default function Profile({ loaderData, actionData }: Route.ComponentProps
           </noscript>
         )}
         {actionData?.error && <p role="alert">{actionData.error}</p>}
-        {membershipStatus === "approved" ? (
+        {membershipStatus === "approved" && !deletionActive ? (
           <>
             <Form
               id="profile-form"
@@ -269,6 +313,8 @@ export default function Profile({ loaderData, actionData }: Route.ComponentProps
               </Button>
             </div>
           </>
+        ) : deletionActive ? (
+          <p>Formulir profil dinonaktifkan selama permintaan penghapusan diproses.</p>
         ) : (
           <p>Anda dapat melihat profil sendiri. Perbarui setelah keanggotaan dipulihkan.</p>
         )}

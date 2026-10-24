@@ -38,9 +38,14 @@ outcome history, member confirmation/correction, aggregate outcomes, and verifie
 closure behavior. Issue **#18 is implemented locally** on
 `feat/private-outreach-clarification`, with a private per-request clarification
 thread, captured-email notifications, minimal audit, and read-only thread history
-after the request ends. The next local implementation frontier is **#20**. Issues
-#17–#20 remain open on GitHub. The table above retains the declared prerequisite
-relationships even when those prerequisites are complete locally.
+after the request ends. Issue **#20 is implemented locally** on
+`feat/profile-deletion-retention`: member deletion requests, immediate hiding and
+cancellation, primary-only manual processing, append-only evidence, and the
+manual 90-day/12-month retention boundary. Its technical specification and
+runbook are [Profile deletion and manual retention](profile-deletion-retention-spec.md)
+and [the operator runbook](deletion-retention.md). Issues #17–#20 remain open on
+GitHub. The table above retains the declared prerequisite relationships even when
+those prerequisites are complete locally.
 
 See [outreach.md](outreach.md) for the request/response operating procedure and
 [handoff.md](handoff.md) for verification and local/remote delivery boundaries.

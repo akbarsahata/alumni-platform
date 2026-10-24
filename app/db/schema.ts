@@ -371,3 +371,58 @@ export const localIntroductionMail = sqliteTable("local_introduction_mail", {
   capturedAt: integer("captured_at").notNull(),
   expiresAt: integer("expires_at").notNull(),
 });
+
+export const profileDeletionRequest = sqliteTable("profile_deletion_request", {
+  id: text("id").primaryKey(),
+  memberUserId: text("member_user_id").notNull(),
+  requestedAt: text("requested_at").notNull(),
+  dueAt: text("due_at").notNull(),
+  status: text("status", { enum: ["active", "completed"] }).notNull(),
+  profileRemovedAt: text("profile_removed_at"),
+  profileRemovedBy: text("profile_removed_by"),
+  profileRemovalCount: integer("profile_removal_count"),
+  clarificationRemovedAt: text("clarification_removed_at"),
+  clarificationRemovedBy: text("clarification_removed_by"),
+  clarificationRemovalCount: integer("clarification_removal_count"),
+  completedAt: text("completed_at"),
+  completedBy: text("completed_by"),
+  completionNote: text("completion_note"),
+});
+export const profileDeletionEvent = sqliteTable("profile_deletion_event", {
+  id: text("id").primaryKey(),
+  requestId: text("request_id").notNull(),
+  actorUserId: text("actor_user_id").notNull(),
+  action: text("action", {
+    enum: ["requested", "profile-removed", "clarification-removed", "completed"],
+  }).notNull(),
+  count: integer("count"),
+  note: text("note"),
+  occurredAt: text("occurred_at").notNull(),
+});
+export const retentionExecution = sqliteTable("retention_execution", {
+  id: text("id").primaryKey(),
+  actorUserId: text("actor_user_id").notNull(),
+  scope: text("scope", {
+    enum: ["clarification-text", "outreach-records", "profile-deletion-evidence"],
+  }).notNull(),
+  targetId: text("target_id").notNull(),
+  reason: text("reason").notNull(),
+  executedAt: text("executed_at").notNull(),
+  completedAt: text("completed_at"),
+});
+export const schoolNeedRetentionSnapshot = sqliteTable("school_need_retention_snapshot", {
+  id: text("id").primaryKey(),
+  needId: text("need_id").notNull(),
+  category: text("category").notNull(),
+  requestCount: integer("request_count").notNull(),
+  pendingCount: integer("pending_count").notNull(),
+  interestedCount: integer("interested_count").notNull(),
+  declinedCount: integer("declined_count").notNull(),
+  cancelledCount: integer("cancelled_count").notNull(),
+  introducedCount: integer("introduced_count").notNull(),
+  helpConfirmedCount: integer("help_confirmed_count").notNull(),
+  completedCount: integer("completed_count").notNull(),
+  didNotProceedCount: integer("did_not_proceed_count").notNull(),
+  sharedCount: integer("shared_count").notNull(),
+  capturedAt: text("captured_at").notNull(),
+});

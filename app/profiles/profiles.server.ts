@@ -4,6 +4,7 @@ import { readLocationValues, validLocationValues } from "./locations";
 import { encodeLocationList } from "./location-list";
 import { getAccess } from "../authorization/permissions.server";
 import { profileRepository } from "../db/profile.repository.server";
+import { profileDeletionRepository } from "../db/profile-deletion.repository.server";
 import { parseInput, profileInput } from "../http/validation";
 import { z } from "zod";
 import { emptyProfile } from "./model";
@@ -14,6 +15,7 @@ export async function readProfile(request: Request, env: Env) {
     throw new Response("Profil tersedia setelah keanggotaan disetujui.", { status: 403 });
   const own = await profileRepository(env.DB).own(access.account.id);
   const stored = own.profile;
+  const deletionRow = await profileDeletionRepository(env.DB).latestForMember(access.account.id);
   const profile = stored
     ? {
         displayName: stored.displayName,
@@ -31,7 +33,9 @@ export async function readProfile(request: Request, env: Env) {
   const reason = profileEligibilityReason({
     ...profile,
     membershipStatus: access.membership.status,
-    deletionRequestedAt: stored?.deletionRequestedAt,
+    deletionRequestedAt:
+      stored?.deletionRequestedAt ??
+      (deletionRow?.status === "active" ? deletionRow.requestedAt : null),
   });
   return {
     profile,
@@ -39,6 +43,16 @@ export async function readProfile(request: Request, env: Env) {
     identity: { ...own.identity, house: access.membership.house },
     membershipStatus: access.membership.status,
     eligibility: { eligible: reason === null, reason },
+    deletion: deletionRow
+      ? {
+          id: deletionRow.id,
+          status: deletionRow.status,
+          requestedAt: deletionRow.requestedAt,
+          dueAt: deletionRow.dueAt,
+          completedAt: deletionRow.completedAt,
+          profileExists: !!stored,
+        }
+      : null,
   };
 }
 export async function saveProfile(request: Request, env: Env, input: unknown, confirm = false) {

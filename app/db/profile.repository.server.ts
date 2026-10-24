@@ -56,6 +56,7 @@ export function profileRepository(binding: D1Database) {
         INSERT INTO expertise_profile (user_id, display_name, introduction, city, country, availability_note, expertise_tags, help_types, availability, participation, confirmed_at, location_format)
         SELECT ${userId}, ${profile.displayName}, ${profile.introduction}, ${profile.city}, ${profile.country}, ${profile.availabilityNote}, ${JSON.stringify(profile.expertiseTags)}, ${JSON.stringify(profile.helpTypes)}, ${profile.availability}, ${profile.participation ? 1 : 0}, ${profile.confirmedAt}, ${profile.locationFormat}
         WHERE EXISTS (SELECT 1 FROM alumni_membership WHERE user_id = ${userId} AND status = 'approved')
+        AND NOT EXISTS (SELECT 1 FROM profile_deletion_request WHERE member_user_id = ${userId} AND status = 'active')
         AND NOT EXISTS (SELECT 1 FROM json_each(${JSON.stringify(profile.expertiseTags)}) selected
           WHERE NOT EXISTS (SELECT 1 FROM expertise_tag tag WHERE tag.id = selected.value
             AND (tag.retired = 0 OR EXISTS (SELECT 1 FROM expertise_profile previous, json_each(previous.expertise_tags) old
@@ -78,7 +79,8 @@ export function profileRepository(binding: D1Database) {
                 .where(
                   and(eq(alumniMembership.userId, userId), eq(alumniMembership.status, "approved"))
                 )
-            )
+            ),
+            sql`NOT EXISTS (SELECT 1 FROM profile_deletion_request WHERE member_user_id = ${userId} AND status = 'active')`
           )
         )
         .returning({ userId: expertiseProfile.userId });

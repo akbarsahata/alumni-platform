@@ -1,6 +1,7 @@
 import { outreachRoutes } from "../app/http/outreach.routes.server";
 import { directoryRoutes } from "../app/http/directory.routes.server";
 import { profileRoutes } from "../app/http/profile.routes.server";
+import { profileDeletionRoutes } from "../app/http/profile-deletion.routes.server";
 import { apiMethodPolicy } from "../app/http/methods.server";
 import { createRequestHandler } from "react-router";
 import { Hono } from "hono";
@@ -22,6 +23,7 @@ app.all("/api/auth/*", (c) => handleAuth(c.req.raw, c.env));
 app.route("/api", administrationRoutes);
 app.route("/api/membership", membershipRoutes);
 app.route("/api/profile", profileRoutes);
+app.route("/api", profileDeletionRoutes);
 app.route("/api/directory", directoryRoutes);
 app.route("/api/school-needs", schoolNeedsRoutes);
 app.route("/api/outreach", outreachRoutes);

@@ -54,6 +54,122 @@ deployment, remote database change or live email is included.
   was stopped so the isolated test runner could bind the port; it was not restarted.
   No ordinary local D1 data or environment file was changed.
 
+---
+
+# Profile deletion and manual retention — 2026-10-24
+
+Issue [#20](https://github.com/akbarsahata/alumni-platform/issues/20) is implemented
+on branch `feat/profile-deletion-retention`, following
+[the local specification](profile-deletion-retention-spec.md) and the
+[manual retention runbook](deletion-retention.md). No deployment, remote migration,
+live email or scheduled purge was added. Hosted verification runs on PR
+[#36](https://github.com/akbarsahata/alumni-platform/pull/36).
+
+## Behavior
+
+- Members use **Privasi & penghapusan** from `/profile` or `/profile/deletion`.
+  The request is confirmed in Bahasa Indonesia, hides the profile immediately,
+  records a UTC due date 30 calendar days later, and keeps the account,
+  membership, roles and financial records unchanged. Repeated/concurrent
+  submissions return the one active request without moving the due date.
+- The existing eligibility triggers cancel pending outreach requests, queued
+  request/reminder notifications, and pending/claimed introductions. Interested
+  or declined responses, shared introductions and outcomes remain historical.
+  Active requests can no longer consent to a new introduction or add
+  clarification.
+- Profile save and confirmation are rejected while a request is active, including
+  after the profile row has been removed. A completed lifecycle leaves the profile
+  row absent; the member may create a new profile and start a later lifecycle.
+  Once a new profile exists, `/profile/deletion` shows the request form again while
+  retaining the completed request as visible history.
+- The primary-only `/admin/profile-deletions` queue orders active requests by due
+  date and recent completions by completion time, marks overdue work, and shows
+  safe membership identity only. Its detail page has separate **Hapus konten
+  profil** and **Hapus teks klarifikasi privat** actions plus completion evidence.
+  Completion is blocked until both steps are done; repeated or racing actions
+  create no duplicate event. The screen grants no directory search, profile
+  browsing, outreach workspace, or clarification-text access.
+- Profile removal deletes exactly the profile row and records `0`/`1` rows.
+  Clarification removal deletes messages on requests where the member is the
+  recipient and records the count; messages the member wrote as a coordinator in
+  another member's thread remain. Completion stores a trimmed 1–1,000 character
+  evidence note.
+- `/admin/audit` was not widened. Deletion evidence is the append-only request
+  event history, with only actor IDs, action, count, UTC time, and completion
+  evidence. No general audit or deletion projection contains email, profile text,
+  clarification text, need details or outcome notes. Deletion workflow instants
+  use the shared browser-local `LocalTimestamp` component; the UTC instant remains
+  in its `dateTime` and `title` attributes.
+
+## Persistence and operator boundary
+
+- Migration `0024_profile_deletion_retention.sql` adds the request/event tables,
+  one-active-request index, manual `retention_execution` evidence table,
+  aggregate-only `school_need_retention_snapshot`, candidate/hold views, derived
+  projection guards and delete guards. The migration applied successfully to the
+  ordinary local D1 in this checkout with `npm run db:migrate`; existing local
+  data was preserved.
+- `retention_clarification_candidate` uses the earliest request end (declined or
+  cancelled response, expiry, or need closure). `retention_closed_need_candidate`
+  exposes closed needs past 12 months with aggregate counts.
+  `retention_profile_deletion_hold` exposes active deletion requests and the
+  12-month completed evidence holds.
+- Ordinary cleanup requires a matching `retention_execution` row, the applicable
+  retention period, and an aggregate snapshot before individual outreach records
+  are removed. Delete guards defer outcome/introduction/request removal during an
+  active or unexpired profile-deletion hold. The profile-deletion processing path
+  is the only non-retention exception, for the member's own clarification thread.
+- School-need reports read the latest retained aggregate snapshot once it exists,
+  so counts remain visible after the individual outreach rows are purged. The
+  snapshot contains no member identity, contact, content or individual timestamp.
+- The runbook covers export/backup, candidate review, aggregate snapshot,
+  execution evidence, deletion order, profile-deletion evidence removal, and
+  verification queries. No trigger may be disabled to bypass a guard.
+
+## Verification
+
+- Review follow-up: deletion request/detail/queue reads now use schema-typed
+  Drizzle projections instead of hand-typed raw SQL; `/profile/deletion` offers a
+  new request once a profile exists after completion; and the retention journey
+  verifies an authorized school-need report still shows the preserved aggregate
+  after outreach rows are purged.
+- Focused:
+  `node scripts/test.mjs tests/deletion.test.mjs tests/browser/deletion.spec.ts`
+  passes all five HTTP journeys and the Chromium deletion journey.
+- Outreach context:
+  `node scripts/test.mjs --context outreach` passes outreach, introductions,
+  outcomes, clarification and deletion HTTP suites plus all eight Chromium
+  journeys in that context.
+- Full `npm test` passes every HTTP/helper suite and all 23 Chromium journeys,
+  including the real OTP expiry/rate-limit windows and the new deletion journey.
+  A longer fixture set exposed recipient pagination in the existing outreach
+  browser journey; it now follows **Penerima berikutnya** by URL instead of
+  assuming the first candidate page.
+- `npm run typecheck`, `npm run build`, `npm run lint` and `npm run format:check`
+  pass.
+- The retention review uses disposable persisted records and the documented
+  operator SQL: it exercises 90-day clarification candidates, 12-month closed-need
+  aggregates, snapshot creation, execution evidence, premature-deletion rejection,
+  active evidence holds, the complete deletion order after aging, deletion-evidence
+  removal after its hold, and confirmation that aggregate snapshots remain.
+- Chromium evidence: `test-results/deletion-member-mobile.png` and
+  `test-results/deletion-admin-desktop.png` were visually inspected; the mobile
+  request/status layout has no horizontal overflow.
+- Because another local session occupied port 5173 during part of this work, the
+  final local suite runs used an isolated 5174 Worker. CI still uses the committed
+  5173 configuration. No test infrastructure or default port was changed.
+
+## Remaining boundaries
+
+No deployment, remote migration, live email, scheduler, automatic purge, account
+deletion, membership deletion, role revocation, financial deletion, bulk retention
+UI, or backup automation is included. Already-shared email remains in the
+recipient mailbox and restricted sharing evidence; the product only stops future
+sharing. Issue #20 remains open on GitHub until the delivery PR is reviewed and
+merged.
+
+---
+
 # Cold-cache CI hydration correction — 2026-10-24
 
 Continuation of PR [#33](https://github.com/akbarsahata/alumni-platform/pull/33).
