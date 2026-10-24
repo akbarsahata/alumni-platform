@@ -39,8 +39,9 @@ email send was added.
 - Full `npm test` passed the helper suites, every HTTP suite and all 23 Chromium
   journeys with no failures or skips. A repeat run after the final provider-only SQL
   simplification was blocked by an unrelated dev server on `127.0.0.1:5173` from another
-  worktree; that server was left running. Unit tests, typecheck, lint and build pass after
-  the final change.
+  worktree; that server was left running.
+- Hosted PR [#37](https://github.com/akbarsahata/alumni-platform/pull/37) checks pass:
+  static checks/build, all four integration contexts, and the stable `tests` gate.
 - The `markIntroductionShared` statement was separately syntax- and behavior-checked
   against a disposable SQLite schema, including the `captured`/`shared_at` constraint.
 - `npm run typecheck`, `npm run build`, `npm run lint` and `npm run format:check` pass.
