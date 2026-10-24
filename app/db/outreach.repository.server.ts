@@ -9,6 +9,7 @@ import {
   outreachAudit,
   outreachClarification,
   outreachIntroduction,
+  outreachIntroductionDelivery,
   outreachOutcome,
   outreachStaffRecipient,
   schoolNeedRetentionSnapshot,
@@ -65,6 +66,9 @@ const sharingColumns = {
   invalidatedAt: outreachIntroduction.invalidatedAt,
   invalidationReason: outreachIntroduction.invalidationReason,
   deliveryState: outreachIntroduction.deliveryState,
+  deliveryAttemptState: outreachIntroductionDelivery.state,
+  deliveryAttemptStartedAt: outreachIntroductionDelivery.startedAt,
+  deliveryAttemptLastAt: outreachIntroductionDelivery.lastAttemptAt,
   sharedAt: outreachIntroduction.sharedAt,
 };
 const clarificationColumns = {
@@ -123,6 +127,10 @@ export function outreachRepository(binding: D1Database) {
       .from(outreachIntroduction)
       .innerJoin(user, eq(user.id, outreachIntroduction.staffUserId))
       .innerJoin(outreachRequest, eq(outreachRequest.id, outreachIntroduction.requestId))
+      .leftJoin(
+        outreachIntroductionDelivery,
+        eq(outreachIntroductionDelivery.introductionId, outreachIntroduction.id)
+      )
       .where(requestAccess(requestId, actorId))
       .orderBy(desc(outreachIntroduction.consentedAt), desc(outreachIntroduction.id));
   const sharingForNeed = (needId: string) =>
@@ -130,6 +138,10 @@ export function outreachRepository(binding: D1Database) {
       .select(sharingColumns)
       .from(outreachIntroduction)
       .innerJoin(user, eq(user.id, outreachIntroduction.staffUserId))
+      .leftJoin(
+        outreachIntroductionDelivery,
+        eq(outreachIntroductionDelivery.introductionId, outreachIntroduction.id)
+      )
       .where(eq(outreachIntroduction.needId, needId))
       .orderBy(desc(outreachIntroduction.consentedAt), desc(outreachIntroduction.id));
   const clarificationForRequest = (requestId: string, actorId: string) =>
@@ -352,6 +364,9 @@ export function outreachRepository(binding: D1Database) {
         .limit(51);
     },
     async reconcile() {
+      await db.run(sql`UPDATE outreach_introduction_delivery SET state='ambiguous'
+        WHERE state='dispatching'
+          AND julianday(started_at)<=julianday('now','-24 hours')`);
       await db.run(sql`UPDATE outreach_request SET status='cancelled',updated_by=recipient_user_id,updated_at=strftime('%Y-%m-%dT%H:%M:%fZ','now')
      WHERE status='pending' AND NOT EXISTS(SELECT 1 FROM outreach_eligible_recipient WHERE user_id=recipient_user_id)`);
       await db.run(sql`UPDATE outreach_introduction SET invalidated_at=strftime('%Y-%m-%dT%H:%M:%fZ','now'),
@@ -360,6 +375,9 @@ export function outreachRepository(binding: D1Database) {
         delivery_state='cancelled'
      WHERE delivery_state IN('pending','claimed') AND shared_at IS NULL AND withdrawn_at IS NULL
        AND invalidated_at IS NULL
+       AND NOT EXISTS(SELECT 1 FROM outreach_introduction_delivery d
+         WHERE d.introduction_id=outreach_introduction.id
+           AND d.state IN('dispatching','accepted','ambiguous'))
        AND (member_user_id NOT IN (SELECT user_id FROM outreach_eligible_recipient)
          OR member_email!=(SELECT email FROM user WHERE id=member_user_id))`);
     },
@@ -615,6 +633,9 @@ export function outreachRepository(binding: D1Database) {
         WHERE request_id=${requestId} AND member_user_id=${memberId}
           AND delivery_state IN('pending','claimed') AND shared_at IS NULL
           AND withdrawn_at IS NULL AND invalidated_at IS NULL
+          AND NOT EXISTS(SELECT 1 FROM outreach_introduction_delivery d
+            WHERE d.introduction_id=outreach_introduction.id
+              AND d.state IN('dispatching','accepted','ambiguous'))
         RETURNING id`);
     },
     async activeIntroduction(requestId: string, memberId: string) {
@@ -630,14 +651,16 @@ export function outreachRepository(binding: D1Database) {
           ORDER BY consented_at DESC,id DESC LIMIT 1`)
       )[0];
     },
-    async claimIntroduction(
+    async beginIntroductionDelivery(
       requestId: string,
       now: string,
-      initiatingCoordinatorId: string | null
+      initiatingCoordinatorId: string | null,
+      provider: boolean
     ) {
-      return (
+      const claim = (
         await db.all<{ id: string }>(sql`
-          UPDATE outreach_introduction SET delivery_state='claimed',claimed_at=${now}
+          UPDATE outreach_introduction SET delivery_state='claimed',claimed_at=${now},
+            delivery_mode=${provider ? "provider" : "local"}
           WHERE id=(SELECT i.id FROM outreach_introduction i
             JOIN outreach_request r ON r.id=i.request_id
             JOIN outreach_staff_recipient sr ON sr.need_id=i.need_id
@@ -661,6 +684,115 @@ export function outreachRepository(binding: D1Database) {
             ORDER BY i.consented_at DESC,i.id DESC LIMIT 1)
           AND delivery_state='pending'
           RETURNING id`)
+      )[0];
+      if (claim)
+        return { id: claim.id, action: "send" as const, staffEmail: null, memberEmail: null };
+      if (!provider) return undefined;
+
+      const row = (
+        await db.all<{
+          id: string;
+          attemptState: "dispatching" | "accepted" | "failed" | "ambiguous";
+          staffEmail: string;
+          memberEmail: string;
+          startedAt: string;
+          providerMessageId: string | null;
+        }>(sql`
+          SELECT i.id,d.state AS attemptState,d.staff_email AS staffEmail,
+            d.member_email AS memberEmail,d.started_at AS startedAt,
+            d.provider_message_id AS providerMessageId
+          FROM outreach_introduction i
+          JOIN outreach_introduction_delivery d ON d.introduction_id=i.id
+          WHERE i.request_id=${requestId} AND i.delivery_state='claimed'
+            AND i.shared_at IS NULL AND i.withdrawn_at IS NULL AND i.invalidated_at IS NULL
+          ORDER BY i.consented_at DESC,i.id DESC LIMIT 1`)
+      )[0];
+      if (!row) return undefined;
+      if (row.attemptState === "accepted")
+        return {
+          id: row.id,
+          action: "evidence" as const,
+          staffEmail: row.staffEmail,
+          memberEmail: row.memberEmail,
+          providerMessageId: row.providerMessageId,
+        };
+      if (row.attemptState === "failed") return { id: row.id, action: "blocked" as const };
+      const retryable = (
+        await db.all<{ id: string }>(sql`
+          SELECT introduction_id AS id FROM outreach_introduction_delivery
+          WHERE introduction_id=${row.id}
+            AND julianday(started_at)>julianday('now','-24 hours')`)
+      )[0];
+      if (!retryable) return { id: row.id, action: "blocked" as const };
+      const retried = (
+        await db.all<{ id: string }>(sql`
+          UPDATE outreach_introduction SET claimed_at=${now},delivery_mode='provider'
+          WHERE id=${row.id} AND delivery_state='claimed'
+            AND shared_at IS NULL AND withdrawn_at IS NULL AND invalidated_at IS NULL
+          RETURNING id`)
+      )[0];
+      if (!retried) return undefined;
+      return {
+        id: row.id,
+        action: "send" as const,
+        staffEmail: row.staffEmail,
+        memberEmail: row.memberEmail,
+      };
+    },
+    async confirmIntroductionDelivery(
+      id: string,
+      staffEmail: string,
+      memberEmail: string,
+      initiatingCoordinatorId: string | null
+    ) {
+      return !!(
+        await db.all<{ id: string }>(sql`
+          SELECT i.id FROM outreach_introduction i
+          JOIN outreach_request r ON r.id=i.request_id
+          JOIN outreach_staff_recipient sr ON sr.need_id=i.need_id
+          JOIN user mu ON mu.id=i.member_user_id
+          JOIN user su ON su.id=i.staff_user_id
+          WHERE i.id=${id} AND i.delivery_state='claimed'
+            AND i.shared_at IS NULL AND i.withdrawn_at IS NULL AND i.invalidated_at IS NULL
+            AND r.status='interested' AND i.consented_at<=r.expires_at
+            AND i.member_email=mu.email AND i.member_email=${memberEmail}
+            AND i.staff_user_id=sr.user_id AND su.email=${staffEmail}
+            AND mu.email_verified=1 AND su.email_verified=1
+            AND EXISTS(SELECT 1 FROM outreach_eligible_recipient er
+              WHERE er.user_id=i.member_user_id)
+            AND EXISTS(SELECT 1 FROM role_assignment rr
+              WHERE rr.user_id=i.staff_user_id AND rr.role='staff')
+            AND (${initiatingCoordinatorId} IS NULL OR EXISTS(
+              SELECT 1 FROM role_assignment cr
+              WHERE cr.user_id=${initiatingCoordinatorId}
+                AND cr.role='directory-coordinator'))`)
+      )[0];
+    },
+    async markIntroductionAccepted(id: string, providerMessageId: string) {
+      return !!(
+        await db.all<{ id: string }>(sql`
+          UPDATE outreach_introduction_delivery SET state='accepted',
+            accepted_at=strftime('%Y-%m-%dT%H:%M:%fZ','now'),
+            provider_message_id=${providerMessageId}
+          WHERE introduction_id=${id} AND state IN('dispatching','ambiguous')
+          RETURNING introduction_id AS id`)
+      )[0];
+    },
+    async markIntroductionFailed(id: string) {
+      return !!(
+        await db.all<{ id: string }>(sql`
+          UPDATE outreach_introduction_delivery SET state='failed',
+            failed_at=strftime('%Y-%m-%dT%H:%M:%fZ','now')
+          WHERE introduction_id=${id} AND state='dispatching'
+          RETURNING introduction_id AS id`)
+      )[0];
+    },
+    async markIntroductionAmbiguous(id: string) {
+      return !!(
+        await db.all<{ id: string }>(sql`
+          UPDATE outreach_introduction_delivery SET state='ambiguous'
+          WHERE introduction_id=${id} AND state IN('dispatching','ambiguous')
+          RETURNING introduction_id AS id`)
       )[0];
     },
     async introductionDelivery(id: string) {
@@ -730,6 +862,18 @@ export function outreachRepository(binding: D1Database) {
             WHERE cr.user_id=${initiatingCoordinatorId}
               AND cr.role='directory-coordinator'))
         RETURNING recipient`);
+      return rows.length > 0;
+    },
+    async markIntroductionShared(id: string, staffEmail: string) {
+      const rows = await db.all<{ id: string }>(sql`
+        UPDATE outreach_introduction SET delivery_state='captured',
+          shared_at=strftime('%Y-%m-%dT%H:%M:%fZ','now')
+        WHERE id=${id} AND delivery_state='claimed'
+          AND shared_at IS NULL AND withdrawn_at IS NULL AND invalidated_at IS NULL
+          AND EXISTS(SELECT 1 FROM outreach_introduction_delivery d
+            WHERE d.introduction_id=outreach_introduction.id
+              AND d.state='accepted' AND d.staff_email=${staffEmail})
+        RETURNING id`);
       return rows.length > 0;
     },
     async releaseIntroduction(id: string) {

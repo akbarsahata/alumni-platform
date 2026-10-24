@@ -49,10 +49,31 @@ export function call(account, path, body, extra = {}) {
     redirect: "manual",
   });
 }
+export async function setMockEmailMode(mode) {
+  const response = await fetch(`${process.env.RESEND_MOCK_URL}/__control`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ mode }),
+  });
+  assert.equal(response.status, 204);
+}
+export async function resetMockEmail() {
+  const response = await fetch(`${process.env.RESEND_MOCK_URL}/__reset`, { method: "POST" });
+  assert.equal(response.status, 204);
+}
+export async function mockEmailRequests() {
+  return await (await fetch(`${process.env.RESEND_MOCK_URL}/__requests`)).json();
+}
+
 export async function capturedMail(email) {
-  return await (
+  const local = await (
     await fetch(`${base}/__local/mail?email=${encodeURIComponent(email)}`, {
       headers: { Authorization: `Bearer ${key}` },
     })
   ).json();
+  if (!process.env.RESEND_MOCK_URL) return local;
+  const mock = await (
+    await fetch(`${process.env.RESEND_MOCK_URL}/__messages?email=${encodeURIComponent(email)}`)
+  ).json();
+  return mock ?? local;
 }

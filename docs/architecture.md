@@ -68,7 +68,7 @@ R2 is private by default. Serve payment evidence only through authenticated, aut
 
 Use an outbox to separate committed workflow changes from email delivery. Persist a stable idempotency key, retry state and provider message ID; prevent ordinary retries from sending duplicate messages. Reconcile ambiguous delivery outcomes within the provider's documented idempotency guarantees. If webhooks are added, verify signatures and deduplicate events. Honor opt-outs for optional updates and suppress bounced destinations.
 
-Resend has a verified domain according to the user, but this workspace has no configured credential. Use a stub locally; no live messages during development. Store production credentials as Worker secrets. Distinguish transactional mail from digests and confirm the sender/reply-to addresses before deployment.
+`app/email/email.server.ts` captures mail in development and delivers through the Resend HTTP API when a Worker is configured for staging or production. The adapter uses a bounded timeout, sanitized errors, and `Idempotency-Key` values derived from stable outbox, request, invitation, introduction or email-change identifiers. Resend retains idempotency keys for 24 hours; synchronous sends still have no scheduled retry or provider webhook processing. Local tests use a mocked provider or captured mail and require no live credential. Store staging and production API keys as separate Worker secrets; confirm the verified sender and reply-to addresses before deployment. Consented introductions keep the atomic local D1 mailbox in development and mark sharing evidence conditionally after provider acceptance in staging/production.
 
 ## Environments and recovery
 

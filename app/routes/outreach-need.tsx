@@ -56,7 +56,12 @@ export async function action({ request, params }: Route.ActionArgs) {
         }
       : null;
   try {
-    let result: { notificationPending?: boolean; shared?: boolean; pending?: boolean } = {};
+    let result: {
+      notificationPending?: boolean;
+      shared?: boolean;
+      pending?: boolean;
+      attention?: boolean;
+    } = {};
     let message = "Status penjangkauan diperbarui.";
     if (intent === "send") {
       result = await sendOutreach(request, env, params.needId, {
@@ -86,9 +91,11 @@ export async function action({ request, params }: Route.ActionArgs) {
         result = await retryIntroduction(request, env, requestId, {});
         message = result.shared
           ? "Perkenalan terkirim."
-          : result.pending
-            ? "Perkenalan masih menunggu pengiriman."
-            : "Tidak ada persetujuan yang menunggu pengiriman.";
+          : result.attention
+            ? "Pengiriman perkenalan memerlukan pemeriksaan operator sebelum dicoba lagi."
+            : result.pending
+              ? "Perkenalan masih menunggu pengiriman."
+              : "Tidak ada persetujuan yang menunggu pengiriman.";
       } else if (intent === "record-outcome") {
         const outcome = await recordOutreachOutcome(request, env, requestId, {
           action: "record",
@@ -324,11 +331,23 @@ export default function OutreachNeed({ loaderData: d, actionData }: Route.Compon
                       Coba kirim notifikasi
                     </button>
                   )}
-                {active?.deliveryState === "pending" && (
-                  <button name="intent" value="deliver-introduction" disabled={busy}>
-                    Coba kirim perkenalan
-                  </button>
-                )}
+                {active &&
+                  (active.deliveryState === "pending" ||
+                    (active.deliveryAttemptState === "ambiguous" &&
+                      !!active.deliveryAttemptStartedAt &&
+                      Date.parse(active.deliveryAttemptStartedAt) + 86400000 > Date.now())) && (
+                    <button name="intent" value="deliver-introduction" disabled={busy}>
+                      Coba kirim perkenalan
+                    </button>
+                  )}
+                {active?.deliveryAttemptState === "ambiguous" &&
+                  !!active.deliveryAttemptStartedAt &&
+                  Date.parse(active.deliveryAttemptStartedAt) + 86400000 <= Date.now() && (
+                    <p>
+                      Pengiriman perkenalan melewati batas aman idempotensi dan menunggu pemeriksaan
+                      operator.
+                    </p>
+                  )}
               </Form>
             </article>
           );

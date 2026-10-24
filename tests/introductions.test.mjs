@@ -1,6 +1,12 @@
 import { test, after } from "node:test";
 import assert from "node:assert/strict";
-import { call, capturedMail } from "./helpers/accounts.mjs";
+import {
+  call,
+  capturedMail,
+  mockEmailRequests,
+  resetMockEmail,
+  setMockEmailMode,
+} from "./helpers/accounts.mjs";
 import {
   setup,
   member,
@@ -77,6 +83,12 @@ test("interest alone does not share email; consent is initially unchecked and se
   const afterConsent = await (await call(recipient, `/api/outreach/requests/${requestId}`)).json();
   assert.equal(afterConsent.sharing.length, 1);
   assert.ok(afterConsent.sharing[0].sharedAt);
+  const providerRequests = await mockEmailRequests();
+  const introductionRequest = providerRequests.filter((item) => item.to === f.staff.email).at(-1);
+  assert.equal(
+    introductionRequest.idempotencyKey,
+    `outreach-introduction:${afterConsent.sharing[0].id}`
+  );
   assert.equal(afterConsent.access.canConsent, false);
   assert.equal(afterConsent.access.canWithdraw, false);
 
@@ -155,13 +167,12 @@ test("repeated and concurrent consent share once; retries are idempotent", async
   );
 });
 
-test("failed sharing evidence rolls back mail capture before an ordinary retry", async () => {
+test("accepted provider delivery remains reconcilable when sharing evidence fails", async () => {
   const f = await setup();
   const recipient = await member("intro-capture-rollback");
   const needId = await approvedNeed(f);
   const { requestId } = await (await send(f, needId, recipient)).json();
   assert.equal((await respond(recipient, requestId)).status, 200);
-  const before = await capturedMail(f.staff.email);
   await fixtureSql(`CREATE TRIGGER fail_introduction_evidence BEFORE INSERT ON outreach_audit
     WHEN NEW.action='introduction-shared' AND NEW.need_id='${needId}' BEGIN
     SELECT RAISE(ABORT,'synthetic sharing evidence failure'); END`);
@@ -170,11 +181,13 @@ test("failed sharing evidence rolls back mail capture before an ordinary retry",
     assert.equal(response.status, 200);
     const result = await response.json();
     assert.equal(result.shared, false);
-    assert.equal(result.pending, true);
-    assert.deepEqual(await capturedMail(f.staff.email), before);
+    assert.equal(result.pending, false);
+    assert.equal(result.attention, true);
+    assert.match((await capturedMail(f.staff.email)).text, new RegExp(escape(recipient.email)));
     const detail = await (await call(recipient, `/api/outreach/requests/${requestId}`)).json();
     assert.equal(detail.sharing[0].sharedAt, null);
-    assert.equal(detail.sharing[0].deliveryState, "pending");
+    assert.equal(detail.sharing[0].deliveryState, "claimed");
+    assert.equal(detail.sharing[0].deliveryAttemptState, "accepted");
   } finally {
     await fixtureSql("DROP TRIGGER fail_introduction_evidence");
   }
@@ -208,7 +221,12 @@ test("coordinator revocation after claim prevents sharing and leaves the introdu
   try {
     const retry = await retryIntroduction(f.coordinator, requestId);
     assert.equal(retry.status, 200, await retry.clone().text());
-    assert.deepEqual(await retry.json(), { changed: true, shared: false, pending: true });
+    assert.deepEqual(await retry.json(), {
+      changed: true,
+      shared: false,
+      pending: true,
+      attention: false,
+    });
     assert.deepEqual(await capturedMail(f.staff.email), before);
     const detail = await (await call(recipient, `/api/outreach/requests/${requestId}`)).json();
     assert.equal(detail.sharing[0].deliveryState, "pending");
@@ -705,4 +723,117 @@ after(async () => {
     }),
     { mode: 0o600 }
   );
+});
+
+test("provider send serializes withdrawal and records the provider attempt", async () => {
+  await resetMockEmail();
+  const f = await setup();
+  const recipient = await member("intro-provider-withdraw-race");
+  const needId = await approvedNeed(f);
+  const { requestId } = await (await send(f, needId, recipient)).json();
+  assert.equal((await respond(recipient, requestId)).status, 200);
+  await setMockEmailMode("hold");
+  const consent = giveConsent(recipient, requestId);
+  for (let attempt = 0; attempt < 50; attempt++) {
+    if ((await mockEmailRequests()).length > 0) break;
+    await new Promise((resolve) => setTimeout(resolve, 20));
+  }
+  assert.equal((await mockEmailRequests()).length, 1);
+  const withdrawn = await withdrawConsent(recipient, requestId);
+  assert.equal(withdrawn.status, 409);
+  assert.match(await withdrawn.text(), /Pengiriman sedang berlangsung/i);
+  await setMockEmailMode("success");
+  const result = await (await consent).json();
+  assert.equal(result.shared, true);
+  const detail = await (await call(recipient, `/api/outreach/requests/${requestId}`)).json();
+  assert.ok(detail.sharing[0].sharedAt);
+  assert.equal(detail.sharing[0].withdrawnAt, null);
+  assert.equal(detail.sharing[0].deliveryAttemptState, "accepted");
+  assert.equal(detail.access.canWithdraw, false);
+  await resetMockEmail();
+});
+
+test("a definite provider failure releases a retryable introduction", async () => {
+  await resetMockEmail();
+  await setMockEmailMode("error");
+  const f = await setup();
+  const recipient = await member("intro-provider-definite");
+  const needId = await approvedNeed(f);
+  const { requestId } = await (await send(f, needId, recipient)).json();
+  assert.equal((await respond(recipient, requestId)).status, 200);
+  await queueIntroduction(requestId);
+  const retry = await retryIntroduction(f.coordinator, requestId);
+  assert.equal(retry.status, 200);
+  assert.deepEqual(await retry.json(), {
+    changed: true,
+    shared: false,
+    pending: true,
+    attention: false,
+  });
+  const detail = await (await call(recipient, `/api/outreach/requests/${requestId}`)).json();
+  assert.equal(detail.sharing[0].deliveryAttemptState, "failed");
+  assert.equal(detail.access.canWithdraw, true);
+  assert.equal((await withdrawConsent(recipient, requestId)).status, 200);
+  await setMockEmailMode("success");
+  await resetMockEmail();
+});
+
+test("ambiguous provider outcomes block withdrawal and blind retry after the idempotency window", async () => {
+  await resetMockEmail();
+  await setMockEmailMode("network");
+  const f = await setup();
+  const recipient = await member("intro-provider-ambiguous");
+  const needId = await approvedNeed(f);
+  const { requestId } = await (await send(f, needId, recipient)).json();
+  assert.equal((await respond(recipient, requestId)).status, 200);
+  await queueIntroduction(requestId);
+  const retry = await retryIntroduction(f.coordinator, requestId);
+  assert.equal(retry.status, 200);
+  const result = await retry.json();
+  assert.equal(result.shared, false);
+  assert.equal(result.pending, false);
+  assert.equal(result.attention, true);
+  assert.equal((await mockEmailRequests()).length, 1);
+  let detail = await (await call(recipient, `/api/outreach/requests/${requestId}`)).json();
+  assert.equal(detail.sharing[0].deliveryAttemptState, "ambiguous");
+  assert.equal(detail.access.canWithdraw, false);
+  assert.equal((await withdrawConsent(recipient, requestId)).status, 409);
+
+  await fixtureSql(`UPDATE outreach_introduction_delivery
+    SET started_at=strftime('%Y-%m-%dT%H:%M:%fZ','now','-25 hours')
+    WHERE introduction_id='${detail.sharing[0].id}'`);
+  const blocked = await retryIntroduction(f.coordinator, requestId);
+  assert.equal(blocked.status, 200);
+  const blockedResult = await blocked.json();
+  assert.equal(blockedResult.attention, true);
+  assert.equal((await mockEmailRequests()).length, 1);
+  detail = await (await call(recipient, `/api/outreach/requests/${requestId}`)).json();
+  assert.equal(detail.access.canWithdraw, false);
+  await setMockEmailMode("success");
+  await resetMockEmail();
+});
+
+test("staff replacement during a provider send does not erase accepted sharing evidence", async () => {
+  await resetMockEmail();
+  const f = await setup();
+  const recipient = await member("intro-provider-staff-change");
+  const needId = await approvedNeed(f);
+  const { requestId } = await (await send(f, needId, recipient)).json();
+  assert.equal((await respond(recipient, requestId)).status, 200);
+  const replacement = await staffAccount("intro-provider-staff-change-replacement", f.primary);
+  await setMockEmailMode("hold");
+  const consent = giveConsent(recipient, requestId);
+  for (let attempt = 0; attempt < 50; attempt++) {
+    if ((await mockEmailRequests()).length > 0) break;
+    await new Promise((resolve) => setTimeout(resolve, 20));
+  }
+  assert.equal((await mockEmailRequests()).length, 1);
+  assert.equal((await changeStaff(f.coordinator, needId, f.staff.id, replacement.id)).status, 200);
+  await setMockEmailMode("success");
+  assert.equal((await (await consent).json()).shared, true);
+  const detail = await (await call(recipient, `/api/outreach/requests/${requestId}`)).json();
+  assert.equal(detail.staffRecipient.userId, replacement.id);
+  assert.equal(detail.sharing.find((item) => item.sharedAt).staffUserId, f.staff.id);
+  assert.equal(detail.sharing.find((item) => item.sharedAt).deliveryAttemptState, "accepted");
+  await resetMockEmail();
 });

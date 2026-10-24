@@ -289,8 +289,22 @@ export const outreachIntroduction = sqliteTable("outreach_introduction", {
   deliveryState: text("delivery_state", {
     enum: ["pending", "claimed", "captured", "cancelled"],
   }).notNull(),
+  deliveryMode: text("delivery_mode", { enum: ["local", "provider"] }),
   claimedAt: text("claimed_at"),
   sharedAt: text("shared_at"),
+});
+export const outreachIntroductionDelivery = sqliteTable("outreach_introduction_delivery", {
+  introductionId: text("introduction_id").primaryKey(),
+  attempt: integer("attempt").notNull(),
+  idempotencyKey: text("idempotency_key").notNull(),
+  state: text("state", { enum: ["dispatching", "accepted", "failed", "ambiguous"] }).notNull(),
+  staffEmail: text("staff_email").notNull(),
+  memberEmail: text("member_email").notNull(),
+  startedAt: text("started_at").notNull(),
+  lastAttemptAt: text("last_attempt_at").notNull(),
+  acceptedAt: text("accepted_at"),
+  failedAt: text("failed_at"),
+  providerMessageId: text("provider_message_id"),
 });
 export const outreachOutcome = sqliteTable("outreach_outcome", {
   requestId: text("request_id").primaryKey(),

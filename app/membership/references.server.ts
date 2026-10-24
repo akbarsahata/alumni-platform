@@ -75,11 +75,15 @@ async function captureRequest(env: Env, userId: string, revision: number) {
   });
   if (!row) return;
   try {
-    await sendEmail(env, {
-      to: row.email,
-      subject: "Permintaan referensi alumni",
-      text: `Ada permintaan referensi alumni. Masuk dengan alamat email ini untuk melihat dan merespons. Permintaan berlaku tujuh hari.\n${new URL(`/references/${row.id}`, env.BETTER_AUTH_URL).href}`,
-    });
+    await sendEmail(
+      env,
+      {
+        to: row.email,
+        subject: "Permintaan referensi alumni",
+        text: `Ada permintaan referensi alumni. Masuk dengan alamat email ini untuk melihat dan merespons. Permintaan berlaku tujuh hari.\n${new URL(`/references/${row.id}`, env.BETTER_AUTH_URL).href}`,
+      },
+      { idempotencyKey: `reference-request:${row.id}` }
+    );
     await referenceRepository(env.DB).markCaptured({ id: row.id });
   } catch {
     /* Persisted request can be captured again on retry. Keep applicant response neutral. */

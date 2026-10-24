@@ -225,6 +225,15 @@ export default function OutreachRequest({ loaderData: d, actionData }: Route.Com
                   <button disabled={busy}>Tarik persetujuan</button>
                 </Form>
               )}
+              {!d.access.canWithdraw &&
+                ["dispatching", "accepted", "ambiguous"].includes(
+                  active.deliveryAttemptState ?? ""
+                ) && (
+                  <p role="status">
+                    Pengiriman sedang diproses atau menunggu pemeriksaan operator. Persetujuan tidak
+                    dapat ditarik setelah pengiriman dimulai.
+                  </p>
+                )}
               {!d.staffRecipient?.active && (
                 <p>
                   Perkenalan dijeda karena kontak staf tidak lagi memiliki peran staf terverifikasi.

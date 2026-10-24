@@ -1,3 +1,114 @@
+# PR #37 review fixes — 2026-10-25
+
+Addressed the three review findings on PR
+[#37](https://github.com/akbarsahata/alumni-platform/pull/37).
+
+## Delivery serialization
+
+- Migration `0025_introduction_delivery_attempts.sql` adds
+  `outreach_introduction_delivery`. It persists the stable idempotency key, attempt
+  count, recipient snapshot, first-attempt time, provider message ID and
+  `dispatching`, `accepted`, `failed` or `ambiguous` state.
+- A provider claim creates the attempt atomically through a D1 trigger. Withdrawal and
+  eligibility/staff-recipient invalidation now skip active provider attempts, so a
+  concurrent withdrawal cannot win after the irreversible send begins. Invalidation
+  resumes after a definite provider rejection.
+- Provider acceptance is recorded before `shared_at`. If the evidence write fails,
+  the accepted attempt remains and a coordinator retry reconciles evidence without
+  calling Resend again.
+- Timeout/transport outcomes are ambiguous. They remain blocked from withdrawal and
+  retry with the same Resend key for 24 hours. After the key window, retry is blocked
+  for operator reconciliation instead of blindly sending a duplicate.
+- Local development keeps the atomic D1 mailbox path. Tests now run the real provider
+  attempt/repository/D1 path against a loopback mock Resend server, including a held
+  send/withdrawal race, staff replacement during send, definite failure, ambiguous
+  outcome, 24-hour blocking and evidence reconciliation without resend.
+
+## Verification
+
+- `npm run test:unit` passes 16 helper tests, including sanitized adapter errors,
+  ambiguous timeout classification and introduction attempt orchestration.
+- Focused introductions pass 16 HTTP journeys and 3 Chromium journeys.
+- Full `npm test` passes all helper suites, every HTTP suite and all 23 Chromium
+  journeys.
+- `npm run typecheck`, `npm run build`, `npm run lint` and `npm run format:check` pass.
+- Migration `0025` applied successfully to ordinary local D1 with `npm run db:migrate`.
+- No live Resend request was made. Provider integration tests use only the loopback
+  mock server; no repository mocks replace the real D1 seam.
+
+## Remaining boundaries
+
+Deployment/provisioning and human live-send checks remain PR 2/3 work. Ambiguous
+provider outcomes after 24 hours require an operator to inspect the provider and
+resolve the attempt; there is no scheduled reconciliation UI or webhook processing
+yet. The mock provider URL override is test-only; deployed environments default to
+the Resend endpoint.
+
+---
+
+# Resend email delivery adapter — 2026-10-24
+
+PR 1 of the Cloudflare deployment work is implemented on branch
+`feat/resend-email-adapter` in worktree
+`/Users/akbar/projects/alumni-platform-resend-email`. This change adds the live email
+adapter and introduction-sharing evidence path only. No staging/production environment
+resources, deployment workflow, remote migration, administrator appointment or live
+email send was added.
+
+## Behavior
+
+- `app/email/resend.server.ts` posts to `https://api.resend.com/emails` with configured
+  `from` and `reply_to` values, a bounded 10-second timeout, sanitized errors and no
+  logging of recipients, bodies, OTPs or credentials.
+- `app/email/email.server.ts` selects local KV capture only for
+  `ENVIRONMENT=development` in a development build. Staging/production select Resend;
+  missing or unknown configuration fails closed. The local mailbox endpoint now also
+  requires `ENVIRONMENT=development`.
+- Retryable sends pass stable `Idempotency-Key` values for membership notifications,
+  reference requests, invitations, email changes, outreach requests/reminders and
+  introductions. Resend retains these keys for 24 hours.
+- Consented introductions keep the atomic local D1 mailbox for development. In
+  staging/production, provider acceptance is followed by a conditional
+  `markIntroductionShared` update with the same eligibility, consent, staff-role,
+  recipient-email and coordinator checks as local capture. A rejected or failed
+  sharing write leaves the introduction retryable and does not mark it shared.
+- Top-level Wrangler configuration now declares `ENVIRONMENT`, `EMAIL_FROM`,
+  `EMAIL_REPLY_TO`, and required `BETTER_AUTH_SECRET`, `LOCAL_MAIL_KEY` and
+  `RESEND_API_KEY` names. Staging/production sections and deploy commands remain the
+  next delivery slice.
+
+## Verification
+
+- `npm run test:unit` passes 17 helper tests: five mocked-provider adapter checks, six
+  introduction orchestration checks, and six existing location-list checks.
+- Focused introduction verification passes all 12 HTTP journeys and all three Chromium
+  journeys:
+  `node scripts/test.mjs tests/introductions.test.mjs tests/browser/introductions.spec.ts`.
+- Full `npm test` passed the helper suites, every HTTP suite and all 23 Chromium
+  journeys with no failures or skips. A repeat run after the final provider-only SQL
+  simplification was blocked by an unrelated dev server on `127.0.0.1:5173` from another
+  worktree; that server was left running.
+- Hosted PR [#37](https://github.com/akbarsahata/alumni-platform/pull/37) checks pass:
+  static checks/build, all four integration contexts, and the stable `tests` gate.
+- The `markIntroductionShared` statement was separately syntax- and behavior-checked
+  against a disposable SQLite schema, including the `captured`/`shared_at` constraint.
+- `npm run typecheck`, `npm run build`, `npm run lint` and `npm run format:check` pass.
+  The local build copies `.dev.vars` into ignored `build/server/.dev.vars`; that copy is
+  not committed and must be deleted before any deploy.
+- No live Resend request was made. The adapter tests use an injected fake `fetch`; local
+  integration tests still use captured mail.
+
+## Remaining boundaries
+
+No staging/production Wrangler environments, resource IDs, deploy script, CI deploy
+jobs, remote migrations, seed retargeting, remote bootstrap or operational runbook are
+included yet. Resend domain/SPF/DKIM/DMARC verification and real sends to two mailbox
+providers remain human deployment checks. Provider acceptance followed by a D1 sharing
+write failure is not atomic; the idempotency key prevents duplicate retries within the
+provider window, but scheduled retries and webhooks remain future work.
+
+---
+
 # Cloudflare deployment planning — 2026-10-24
 
 Created the agreed [Cloudflare deployment specification](deployment.md) for staging at

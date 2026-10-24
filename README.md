@@ -11,10 +11,11 @@ English.
 bootstrap, role management, membership applications/manual review, same-house references, reviewed
 house corrections, school invitations, profiles, expertise discovery, independently approved
 school needs, and bounded school outreach with private interest/decline responses, consented
-introductions, and append-only outcome tracking with need closure. Initiatives, finance, and
-broader engagement workflows remain planned. The latest entries in the
-[session handoff](docs/handoff.md) describe implementation and verification; earlier planning statuses
-are historical.
+introductions, and append-only outcome tracking with need closure. A Resend delivery adapter is
+implemented for configured staging/production Workers; local development and automated tests still
+use captured email. Initiatives, finance, and broader engagement workflows remain planned. The latest
+entries in the [session handoff](docs/handoff.md) describe implementation and verification; earlier
+planning statuses are historical.
 
 ## Quick start
 
@@ -111,8 +112,8 @@ without live credentials. The badge above shows the latest `master` push result.
 
 TypeScript, React 19, React Router 8 with server rendering, Cloudflare Workers/D1, Better Auth Email OTP,
 and Drizzle's D1 auth adapter. Vite, Wrangler, and Tailwind CSS support development/builds; local email
-capture uses KV; membership notifications have a D1 outbox. Private R2 storage, live Resend delivery,
-and scheduled outbox processing are planned.
+capture uses KV; membership notifications have a D1 outbox. Staging/production Workers can deliver
+through Resend when configured. Private R2 storage and scheduled outbox processing are planned.
 
 | Location                                                                                        | Responsibility                                                                     |
 | ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
@@ -120,7 +121,7 @@ and scheduled outbox processing are planned.
 | [Authentication](app/auth/)                                                                     | Email-code login, cookie sessions, restricted auth endpoints, and schema mappings. |
 | [Authorization](app/authorization/)                                                             | Current permissions, role management, and audit access.                            |
 | [Membership](app/membership/)                                                                   | Versioned applications, independent manual decisions, and notification capture.    |
-| [Email capture](app/email/email.server.ts)                                                      | Development-only email delivery and restricted mailbox access.                     |
+| [Email delivery](app/email/email.server.ts)                                                     | Development capture, Resend delivery, and restricted local mailbox access.         |
 | [Migrations](migrations/)                                                                       | Auth, rate limits, memberships, roles, bootstrap, and atomic audit triggers.       |
 | [Scripts](scripts/) / [tests](tests/)                                                           | Operator commands, integration harness, HTTP tests, and browser journeys.          |
 | [Worker bindings](wrangler.jsonc) / [Vite](vite.config.ts) / [Playwright](playwright.config.ts) | Runtime, build, and browser-test configuration.                                    |
@@ -161,11 +162,12 @@ Read [AGENTS.md](AGENTS.md) and the current specifications before implementing t
 [domain documentation conventions](docs/agents/domain.md). Reusable agent workflows live in
 [.agents/skills/](.agents/skills/).
 
-Development uses synthetic data and captured email. Production builds disable capture and have no
-live email adapter. Staging/production setup, domains, resource IDs, retention, recovery, and live
-Resend delivery remain follow-up work; the presence of a `deploy` script does not mean deployment is
-ready. Keep local secrets, state, build-local secrets, and test artifacts private. See
-[deployment boundaries](docs/local-development.md#build-and-deployment-boundary) and
+Development and automated tests use synthetic data and captured email. A built Worker with
+`ENVIRONMENT=development` still fails closed; staging/production use Resend only when the secret and
+sender configuration are present. Staging/production resource provisioning, deploy workflows,
+domains, retention, and recovery remain follow-up work; the presence of a `deploy` script does not
+mean deployment is ready. Keep local secrets, state, build-local secrets, and test artifacts private.
+See [deployment boundaries](docs/local-development.md#build-and-deployment-boundary) and
 [recovery planning](docs/architecture.md#environments-and-recovery).
 
 The [recovered overview](docs/recovered-readme.md) and
