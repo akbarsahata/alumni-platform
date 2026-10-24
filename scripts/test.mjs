@@ -86,6 +86,8 @@ await run(process.execPath, ["--test", "tests/location-list.test.mjs"]);
 
 await mkdir("test-results", { recursive: true });
 await mkdir(".wrangler", { recursive: true });
+// Wrangler CLI commands must not inherit the last deployment's flattened config.
+await rm(".wrangler/deploy", { recursive: true, force: true });
 process.env.ALUMNI_TEST_STATE = resolve(await mkdtemp(".wrangler/integration-state-"));
 process.env.ALUMNI_TEST_CONFIG = `${process.env.ALUMNI_TEST_STATE}/wrangler.jsonc`;
 process.env.ALUMNI_TEST_VARS = `${process.env.ALUMNI_TEST_STATE}/.dev.vars`;
@@ -97,7 +99,7 @@ await writeFile(
 );
 await writeFile(
   process.env.ALUMNI_TEST_VARS,
-  `BETTER_AUTH_SECRET=${randomBytes(32).toString("hex")}\nBETTER_AUTH_URL=http://127.0.0.1:5173\nLOCAL_MAIL_KEY=${randomBytes(32).toString("hex")}\n`,
+  `BETTER_AUTH_SECRET=${randomBytes(32).toString("hex")}\nBETTER_AUTH_URL=http://127.0.0.1:5173\nLOCAL_MAIL_KEY=${randomBytes(32).toString("hex")}\nRESEND_API_KEY=local-capture-only\n`,
   { mode: 0o600 }
 );
 await run("node_modules/.bin/wrangler", [
