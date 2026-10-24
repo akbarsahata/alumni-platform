@@ -50,7 +50,7 @@ Names below omit `tests/` and `.test.mjs` for HTTP, and `tests/browser/` and
 | `auth`       | auth, logout                                                                                              | login                                                                                                       |
 | `membership` | roles, membership, references, backend, corrections, account-bar, invitations, suspensions, email-changes | roles, membership, references, corrections, account-bar, invitations, suspensions, email-changes, hydration |
 | `directory`  | profiles, directory, school-needs, representative-names                                                   | profiles, directory, school-needs, representative-names, navigation-preview                                 |
-| `outreach`   | outreach, introductions, outcomes, clarification                                                          | outreach, introductions, outcomes, clarification                                                            |
+| `outreach`   | outreach, introductions, outcomes, clarification, deletion                                                | outreach, introductions, outcomes, clarification, deletion                                                  |
 
 `location-list.test.mjs` is the helper suite, run by the static job and by each
 runner invocation. Roles setup repeats in directory and outreach. These repeated

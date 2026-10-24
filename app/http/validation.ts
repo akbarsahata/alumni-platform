@@ -301,6 +301,11 @@ export const outreachOutcomeInput = z.discriminatedUnion("action", [
 export const outreachTakeoverInput = z
   .object({ expectedCoordinatorUserId: requiredText(200) })
   .strict();
+export const profileDeletionRequestInput = z.object({ confirm: z.literal(true) }).strict();
+export const profileDeletionActionInput = z.object({}).strict();
+export const profileDeletionCompleteInput = z
+  .object({ note: z.string().trim().min(1).max(1000) })
+  .strict();
 export const outreachPageCursor = z
   .string()
   .max(200)

@@ -104,6 +104,7 @@ export function SiteNavigation({
           { path: "/admin/roles", label: "Kelola peran", group: "Administrasi" },
           { path: "/admin/invitations", label: "Undangan sekolah", group: "Administrasi" },
           { path: "/admin/email-changes", label: "Perubahan email", group: "Administrasi" },
+          { path: "/admin/profile-deletions", label: "Penghapusan profil", group: "Administrasi" },
         ]
       : []),
     ...(access?.permissions.audit

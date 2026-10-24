@@ -6,13 +6,13 @@ The numbered sections below are the historical pilot roadmap, not the naming or 
 
 Local records show profiles (#13), directory discovery (#14), school needs and
 independent approval (#15), bounded outreach (#16), consented introductions (#17),
-and outcomes/need closure (#19) complete locally; #16 is closed on GitHub, and the
-other implementation code remains unpushed. The next local frontier is #18.
-Follow the [implementation index](profiles-expertise-outreach-issues.md) and
-[shared navigation decision](navigation-prototype.md): role-based grouped menus,
-guest login on `/`, no breadcrumbs, and a deferred actionable home dashboard.
-The latest working-tree and focused verification boundary is at the top of
-[handoff.md](handoff.md).
+outcomes/need closure (#19), and directory deletion/manual retention (#20)
+complete locally; #16 is closed on GitHub, and the other implementation code
+remains unpushed. Follow the [implementation index](profiles-expertise-outreach-issues.md)
+and [shared navigation decision](navigation-prototype.md): role-based grouped
+menus, guest login on `/`, no breadcrumbs, and a deferred actionable home
+dashboard. The latest working-tree and focused verification boundary is at the
+top of [handoff.md](handoff.md).
 
 ## 0 — Cloudflare foundation and authentication compatibility
 
