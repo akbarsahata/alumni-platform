@@ -1,4 +1,9 @@
-import { gotoReady } from "./app-ready";
+import {
+  expectLocalTimestamp,
+  expectNoRawTimestampText,
+  gotoReady,
+  localBrowserOptions,
+} from "./app-ready";
 import { test, expect } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 
@@ -13,8 +18,8 @@ test("administrator checks identity and the account holder verifies the new addr
     .split("\n")
     .find((line) => line.startsWith("LOCAL_MAIL_KEY="))!
     .slice("LOCAL_MAIL_KEY=".length);
-  const reviewerContext = await browser.newContext();
-  const memberContext = await browser.newContext();
+  const reviewerContext = await browser.newContext(localBrowserOptions);
+  const memberContext = await browser.newContext(localBrowserOptions);
   for (const context of [reviewerContext, memberContext]) {
     const subnet = crypto.randomUUID().replaceAll("-", "").slice(0, 8);
     await context.setExtraHTTPHeaders({
@@ -49,6 +54,8 @@ test("administrator checks identity and the account holder verifies the new addr
     await reviewer.getByLabel("Alasan perubahan (privat)").fill("Permintaan pemulihan akses akun.");
     await reviewer.getByRole("button", { name: "Kirim kode verifikasi" }).click();
     await expect(reviewer.getByRole("status")).toContainText(newEmail);
+    await expectLocalTimestamp(reviewer.getByRole("status").locator("time").first());
+    await expectNoRawTimestampText(reviewer);
     const link = await reviewer
       .getByRole("link", { name: "verifikasi perubahan email" })
       .getAttribute("href");
@@ -60,6 +67,8 @@ test("administrator checks identity and the account holder verifies the new addr
     const token = mail.text.match(/\b[a-f0-9]{64}\b/)[0];
     await gotoReady(member, link!);
     await expect(member.getByText(newEmail)).toBeVisible();
+    await expectLocalTimestamp(member.locator("main time").first());
+    await expectNoRawTimestampText(member);
     await member.getByLabel("Kode verifikasi email baru").fill(token);
     await member.getByRole("button", { name: "Verifikasi dan ubah email" }).click();
     await expect(member).toHaveURL(/\/login\?emailChanged=1$/);

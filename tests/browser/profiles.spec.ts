@@ -1,4 +1,10 @@
-import { gotoReady, reloadReady } from "./app-ready";
+import {
+  expectLocalTimestamp,
+  expectNoRawTimestampText,
+  gotoReady,
+  localBrowserOptions,
+  reloadReady,
+} from "./app-ready";
 import { test, expect } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 test("member edits, consents, pauses, opts out, and reconfirms a private profile in Bahasa Indonesia", async ({
@@ -7,7 +13,7 @@ test("member edits, consents, pauses, opts out, and reconfirms a private profile
   const { member } = JSON.parse(
     await readFile(`${process.env.ALUMNI_TEST_STATE}/profile-accounts.json`, "utf8")
   );
-  const context = await browser.newContext();
+  const context = await browser.newContext(localBrowserOptions);
   const [name, ...value] = member.cookie.split("=");
   await context.addCookies([
     { name, value: value.join("="), url: "http://127.0.0.1:5173", httpOnly: true, sameSite: "Lax" },
@@ -135,6 +141,10 @@ test("member edits, consents, pauses, opts out, and reconfirms a private profile
       .getByRole("button", { name: "Konfirmasi profil masih benar" })
       .click();
     await expect(notifications).toContainText("Profil dikonfirmasi");
+    await expectLocalTimestamp(
+      page.getByRole("region", { name: "Status relevansi profil" }).locator("time").first()
+    );
+    await expectNoRawTimestampText(page);
     await expect(notifications.locator("[data-sonner-toast]")).toHaveCSS("opacity", "1");
     const toastBox = await notifications.locator("[data-sonner-toast]").boundingBox();
     expect(toastBox?.y).toBeGreaterThan(64);

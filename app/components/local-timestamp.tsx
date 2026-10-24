@@ -9,9 +9,13 @@ function asDate(value: string) {
 
 function utcFallback(date: Date) {
   return new Intl.DateTimeFormat("id-ID", {
-    dateStyle: "medium",
-    timeStyle: "short",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
     timeZone: "UTC",
+    timeZoneName: "short",
   }).format(date);
 }
 
@@ -39,7 +43,8 @@ function formatLocal(date: Date, now: Date) {
  *
  * The server and first client render use a UTC fallback so hydration is stable;
  * after mounting, the component switches to the browser locale timezone and
- * refreshes the relative description every minute.
+ * refreshes the relative description every minute. The UTC instant stays available
+ * in the dateTime and title attributes.
  */
 export function LocalTimestamp({ value, className }: { value: string; className?: string }) {
   const [now, setNow] = useState<Date | null>(null);
@@ -53,8 +58,8 @@ export function LocalTimestamp({ value, className }: { value: string; className?
 
   if (!date) return <span className={className}>{value}</span>;
   return (
-    <time className={className} dateTime={value}>
-      {now ? formatLocal(date, now) : `${utcFallback(date)} UTC`}
+    <time className={className} dateTime={value} title={value}>
+      {now ? formatLocal(date, now) : utcFallback(date)}
     </time>
   );
 }

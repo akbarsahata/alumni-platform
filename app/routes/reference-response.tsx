@@ -4,6 +4,7 @@ import { pageTitle } from "../content/page-title";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
+import { LocalTimestamp } from "../components/local-timestamp";
 import { readReference, respondReference } from "../membership/references.server";
 import type { Route } from "./+types/reference-response";
 
@@ -48,7 +49,9 @@ export default function ReferenceResponse({ loaderData, actionData }: Route.Comp
       <p>Nama semasa sekolah: {loaderData.schoolName}</p>
       <p>Tahun kelulusan: {loaderData.graduationYear}</p>
       <p>House: {loaderData.house}</p>
-      <p>Berlaku sampai (UTC): {loaderData.expiresAt}</p>
+      <p>
+        Berlaku sampai: <LocalTimestamp value={loaderData.expiresAt} />
+      </p>
       <p>
         Referensi harus kenal pribadi dengan pemohon semasa sekolah. Tahun kelulusan boleh berbeda.
       </p>

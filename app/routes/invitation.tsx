@@ -6,6 +6,7 @@ import { readInvitation, acceptInvitation } from "../authorization/invitations.s
 import { roleLabels } from "../authorization/roles";
 import { pageTitle } from "../content/page-title";
 import { Button } from "../components/ui/button";
+import { LocalTimestamp } from "../components/local-timestamp";
 export function meta() {
   return [{ title: pageTitle("Undangan perwakilan sekolah") }];
 }
@@ -44,7 +45,9 @@ export default function Invitation({ loaderData, actionData }: Route.ComponentPr
         <>
           <p>Peran: {roleLabels[invitation.role]}</p>
           {invitation.representativeName && <p>Nama perwakilan: {invitation.representativeName}</p>}
-          <p>Berlaku hingga {invitation.expiresAt} (UTC).</p>
+          <p>
+            Berlaku hingga <LocalTimestamp value={invitation.expiresAt} />.
+          </p>
           {actionData?.error && <p role="alert">{actionData.error}</p>}
           {invitation.accepted ? (
             <p role="status">Undangan telah diterima. Peran sekolah telah diberikan.</p>

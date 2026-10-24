@@ -1,6 +1,12 @@
 import { test, expect } from "@playwright/test";
 import { readFile } from "node:fs/promises";
-import { gotoReady, reloadReady, useAccount } from "./app-ready";
+import {
+  expectLocalTimestamp,
+  gotoReady,
+  localBrowserOptions,
+  reloadReady,
+  useAccount,
+} from "./app-ready";
 
 async function fixture() {
   return JSON.parse(
@@ -23,8 +29,8 @@ test("stale consent is rejected; fresh unchecked consent shares without exposing
   browser,
 }) => {
   const f = await fixture();
-  const context = await browser.newContext();
-  const replacementContext = await browser.newContext();
+  const context = await browser.newContext(localBrowserOptions);
+  const replacementContext = await browser.newContext(localBrowserOptions);
   try {
     const member = await useAccount(context, f.consentMember);
     await member.setViewportSize({ width: 375, height: 812 });
@@ -57,6 +63,12 @@ test("stale consent is rejected; fresh unchecked consent shares without exposing
       member.getByText("Persetujuan tercatat. Perkenalan telah dikirim kepada kontak staf.")
     ).toBeVisible();
     await expect(consentSection.getByText(/Email Anda sudah dibagikan kepada/)).toBeVisible();
+    await expectLocalTimestamp(
+      consentSection
+        .locator("p")
+        .filter({ hasText: /Email Anda sudah dibagikan kepada/ })
+        .locator("time")
+    );
     await expect(
       member.getByText(/Email yang sudah dibagikan tidak dapat ditarik kembali/)
     ).toBeVisible();
@@ -68,6 +80,12 @@ test("stale consent is rejected; fresh unchecked consent shares without exposing
     const coordinator = await useAccount(context, f.coordinator);
     await gotoReady(coordinator, `/outreach/needs/${f.consentNeed}`);
     await expect(coordinator.getByText(/Perkenalan: terkirim kepada/)).toBeVisible();
+    await expectLocalTimestamp(
+      coordinator
+        .locator("p")
+        .filter({ hasText: /Perkenalan: terkirim kepada/ })
+        .locator("time")
+    );
     await expect(coordinator.locator("main")).not.toContainText(f.consentMember.email);
     await screenshotTop(coordinator, "test-results/introductions-consent-desktop.png");
 
@@ -84,7 +102,7 @@ test("coordinator replaces staff; member sees a fresh unchecked consent for the 
   browser,
 }) => {
   const f = await fixture();
-  const context = await browser.newContext();
+  const context = await browser.newContext(localBrowserOptions);
   try {
     const coordinator = await useAccount(context, f.coordinator);
     await gotoReady(coordinator, `/outreach/needs/${f.replacementNeed}`);
@@ -117,10 +135,22 @@ test("coordinator replaces staff; member sees a fresh unchecked consent for the 
       member.getByText("Persetujuan tercatat. Perkenalan telah dikirim kepada kontak staf.")
     ).toBeVisible();
     await expect(consentSection.getByText(/Email Anda sudah dibagikan kepada/)).toBeVisible();
+    await expectLocalTimestamp(
+      consentSection
+        .locator("p")
+        .filter({ hasText: /Email Anda sudah dibagikan kepada/ })
+        .locator("time")
+    );
 
     const coordinatorAgain = await useAccount(context, f.coordinator);
     await gotoReady(coordinatorAgain, `/outreach/needs/${f.replacementNeed}`);
     await expect(coordinatorAgain.getByText(/Perkenalan: terkirim kepada/)).toBeVisible();
+    await expectLocalTimestamp(
+      coordinatorAgain
+        .locator("p")
+        .filter({ hasText: /Perkenalan: terkirim kepada/ })
+        .locator("time")
+    );
     await expect(coordinatorAgain.locator("main")).not.toContainText(f.replacementMember.email);
   } finally {
     await context.close();
@@ -131,12 +161,13 @@ test("member withdraws a pending consent and sees the non-recall explanation", a
   browser,
 }) => {
   const f = await fixture();
-  const context = await browser.newContext();
+  const context = await browser.newContext(localBrowserOptions);
   try {
     const member = await useAccount(context, f.withdrawMember);
     await gotoReady(member, `/outreach/requests/${f.withdrawRequestId}`);
     const consentSection = member.getByRole("region", { name: "Persetujuan berbagi email" });
     await expect(consentSection).toContainText(/Persetujuan tercatat/);
+    await expectLocalTimestamp(consentSection.locator("time").first());
     await expect(
       consentSection.getByText(/Email yang sudah dibagikan tidak dapat ditarik kembali/)
     ).toBeVisible();

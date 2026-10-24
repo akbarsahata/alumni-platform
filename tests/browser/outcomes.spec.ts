@@ -1,6 +1,12 @@
 import { test, expect } from "@playwright/test";
 import { readFile } from "node:fs/promises";
-import { gotoReady, reloadReady, useAccount } from "./app-ready";
+import {
+  expectLocalTimestamp,
+  gotoReady,
+  localBrowserOptions,
+  reloadReady,
+  useAccount,
+} from "./app-ready";
 
 test("coordinator records and closes while the member confirms, corrects and the school sees aggregates", async ({
   browser,
@@ -8,13 +14,19 @@ test("coordinator records and closes while the member confirms, corrects and the
   const f = JSON.parse(
     await readFile(`${process.env.ALUMNI_TEST_STATE}/outcomes-accounts.json`, "utf8")
   );
-  const context = await browser.newContext();
-  const otherContext = await browser.newContext();
+  const context = await browser.newContext(localBrowserOptions);
+  const otherContext = await browser.newContext(localBrowserOptions);
   try {
     const coordinator = await useAccount(context, f.coordinator);
     await gotoReady(coordinator, `/outreach/needs/${f.needId}`);
     await expect(coordinator.getByRole("heading", { name: "Hasil bantuan" })).toBeVisible();
     await expect(coordinator.getByText(/Status saat ini: Sudah diperkenalkan/)).toBeVisible();
+    await expectLocalTimestamp(
+      coordinator
+        .locator("p")
+        .filter({ hasText: /Diperkenalkan:/ })
+        .locator("time")
+    );
 
     const other = await useAccount(otherContext, f.otherCoordinator);
     await gotoReady(other, `/outreach/needs/${f.needId}`);
@@ -50,12 +62,21 @@ test("coordinator records and closes while the member confirms, corrects and the
     ).toBeVisible();
     await reloadReady(coordinator);
     await expect(coordinator.getByText(/Kebutuhan ditutup pada/)).toBeVisible();
+    await expectLocalTimestamp(
+      coordinator
+        .locator("p")
+        .filter({ hasText: /Kebutuhan ditutup pada/ })
+        .locator("time")
+    );
 
     const member = await useAccount(context, f.recipient);
     await member.setViewportSize({ width: 390, height: 844 });
     await gotoReady(member, `/outreach/requests/${f.requestId}`);
     await expect(member.getByRole("heading", { name: "Hasil bantuan" })).toBeVisible();
     await expect(member.getByText(/Catatan terbaru: Bantuan selesai di sekolah/)).toBeVisible();
+    await expectLocalTimestamp(
+      member.getByRole("region", { name: "Hasil bantuan" }).locator("time").first()
+    );
     await member.getByRole("button", { name: "Konfirmasi hasil" }).click();
     await expect(
       member.getByRole("status").filter({ hasText: "Hasil bantuan dikonfirmasi." })
@@ -72,6 +93,13 @@ test("coordinator records and closes while the member confirms, corrects and the
     ).toBeVisible();
     await member.getByText("Riwayat hasil bantuan (4)").click();
     await expect(member.getByText("Dikonfirmasi alumni")).toBeVisible();
+    await expectLocalTimestamp(
+      member
+        .locator("p")
+        .filter({ hasText: /^Waktu:/ })
+        .first()
+        .locator("time")
+    );
     await member.screenshot({ path: "test-results/outcomes-mobile.png", fullPage: true });
     expect(await member.evaluate("document.documentElement.scrollWidth <= window.innerWidth")).toBe(
       true

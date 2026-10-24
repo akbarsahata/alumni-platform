@@ -1,6 +1,7 @@
 import { pageTitle } from "../content/page-title";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
+import { LocalTimestamp } from "../components/local-timestamp";
 import { env } from "cloudflare:workers";
 import { Form, Link, data, redirect, useNavigation } from "react-router";
 import type { Route } from "./+types/email-change";
@@ -35,7 +36,7 @@ export default function EmailChange({ loaderData, actionData }: Route.ComponentP
       </p>
       <p>
         Pemilik akun harus masuk menggunakan email lama saat memasukkan kode. Kode berlaku hingga{" "}
-        <time dateTime={loaderData.expiresAt}>{loaderData.expiresAt} UTC</time>.
+        <LocalTimestamp value={loaderData.expiresAt} />.
       </p>
       {actionData?.error && <p role="alert">{actionData.error}</p>}
       {loaderData.expired ? (

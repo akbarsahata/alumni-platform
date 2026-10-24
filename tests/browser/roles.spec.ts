@@ -1,6 +1,13 @@
-import { gotoReady } from "./app-ready";
+import {
+  expectLocalTimestamp,
+  expectNoRawTimestampText,
+  gotoReady,
+  localBrowserOptions,
+} from "./app-ready";
 import { test, expect } from "@playwright/test";
 import { readFile } from "node:fs/promises";
+
+test.use(localBrowserOptions);
 
 test("primary administrator grants and revokes roles in Bahasa Indonesia and inspects history", async ({
   page,
@@ -36,4 +43,6 @@ test("primary administrator grants and revokes roles in Bahasa Indonesia and ins
   await expect(page.getByRole("heading", { name: "Riwayat perubahan" })).toBeVisible();
   await expect(page.getByText("Masa tugas selesai pada uji lokal")).toBeVisible();
   await expect(page.getByText("Penunjukan koordinator keuangan untuk uji lokal")).toBeVisible();
+  await expectLocalTimestamp(page.locator("main time").first());
+  await expectNoRawTimestampText(page);
 });

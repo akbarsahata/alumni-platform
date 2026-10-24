@@ -1,6 +1,12 @@
 import { test, expect } from "@playwright/test";
 import { readFile } from "node:fs/promises";
-import { gotoReady, reloadReady, useAccount } from "./app-ready";
+import {
+  expectLocalTimestamp,
+  gotoReady,
+  localBrowserOptions,
+  reloadReady,
+  useAccount,
+} from "./app-ready";
 
 async function fixture() {
   return JSON.parse(
@@ -19,8 +25,8 @@ test("member asks privately and coordinator replies without exposing the thread 
   browser,
 }) => {
   const f = await fixture();
-  const context = await browser.newContext();
-  const coordinatorContext = await browser.newContext();
+  const context = await browser.newContext(localBrowserOptions);
+  const coordinatorContext = await browser.newContext(localBrowserOptions);
   try {
     const member = await useAccount(context, f.recipient);
     await member.setViewportSize({ width: 375, height: 812 });
@@ -36,6 +42,7 @@ test("member asks privately and coordinator replies without exposing the thread 
     await expect(member.getByLabel("Pesan klarifikasi")).toHaveValue("");
     await expect(memberThread).toContainText("Apakah kegiatan ini menyediakan transportasi?");
     await expect(memberThread).toContainText("Anda");
+    await expectLocalTimestamp(memberThread.locator("time").first());
     await screenshotTop(member, "test-results/clarification-mobile.png");
     expect(await member.evaluate("document.documentElement.scrollWidth <= window.innerWidth")).toBe(
       true
@@ -54,6 +61,7 @@ test("member asks privately and coordinator replies without exposing the thread 
     await expect(coordinator.getByText(/Pesan klarifikasi tersimpan/)).toBeVisible();
     await expect(coordinator.getByLabel("Pesan klarifikasi")).toHaveValue("");
     await expect(coordinatorThread).toContainText("Ya, transportasi disediakan dari sekolah.");
+    await expectLocalTimestamp(coordinatorThread.locator("time").first());
     await screenshotTop(coordinator, "test-results/clarification-desktop.png");
 
     await reloadReady(member);

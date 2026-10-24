@@ -15,6 +15,7 @@ import {
 } from "../membership/applications.server";
 import { houses, statusLabels } from "../membership/model";
 import { RevisionView } from "../membership/revision-view";
+import { LocalTimestamp } from "../components/local-timestamp";
 
 export function meta() {
   return [{ title: pageTitle("Tinjauan pengajuan") }];
@@ -239,7 +240,9 @@ export default function MembershipReview({ loaderData, actionData }: Route.Compo
             <article key={review.id}>
               <p>{review.resolvedBy ? "Tinjauan selesai" : "Menunggu tinjauan"}</p>
               <p>{review.explanation}</p>
-              <p>Waktu (UTC): {review.requestedAt}</p>
+              <p>
+                Waktu: <LocalTimestamp value={review.requestedAt} />
+              </p>
             </article>
           ))}
           <h3>Riwayat perubahan status privat</h3>
@@ -249,7 +252,9 @@ export default function MembershipReview({ loaderData, actionData }: Route.Compo
               <p>Pemeriksa: {decision.actorUserId}</p>
               <p>Alasan: {decision.reason}</p>
               <p>Pesan untuk anggota: {decision.applicantMessage}</p>
-              <p>Waktu (UTC): {decision.occurredAt}</p>
+              <p>
+                Waktu: <LocalTimestamp value={decision.occurredAt} />
+              </p>
             </article>
           ))}
         </section>
@@ -266,7 +271,9 @@ export default function MembershipReview({ loaderData, actionData }: Route.Compo
               <p>Alasan: {correction.reason}</p>
               <p>Sumber: {correction.checkSource}</p>
               <p>Catatan pemeriksaan baru: {correction.checkNote}</p>
-              <p>Waktu (UTC): {correction.occurredAt}</p>
+              <p>
+                Waktu: <LocalTimestamp value={correction.occurredAt} />
+              </p>
             </article>
           ))}
         </section>
@@ -281,7 +288,9 @@ export default function MembershipReview({ loaderData, actionData }: Route.Compo
             <p>
               Versi {reference.revision}: {reference.email}
             </p>
-            <p>Berlaku sampai (UTC): {reference.expiresAt}</p>
+            <p>
+              Berlaku sampai: <LocalTimestamp value={reference.expiresAt} />
+            </p>
             <p>
               Respons:{" "}
               {reference.outcome === "endorse"
@@ -297,7 +306,14 @@ export default function MembershipReview({ loaderData, actionData }: Route.Compo
                 <p>Akun referensi: {reference.actorUserId}</p>
                 <p>Kenal pribadi semasa sekolah: {reference.personallyKnown ? "Ya" : "Tidak"}</p>
                 <p>Komentar privat: {reference.comment}</p>
-                <p>Waktu respons (UTC): {reference.occurredAt}</p>
+                <p>
+                  Waktu respons:{" "}
+                  {reference.occurredAt ? (
+                    <LocalTimestamp value={reference.occurredAt} />
+                  ) : (
+                    "waktu yang tercatat"
+                  )}
+                </p>
               </>
             )}
           </article>
@@ -311,7 +327,9 @@ export default function MembershipReview({ loaderData, actionData }: Route.Compo
               Versi {decision.revision}: {statusLabels[decision.outcome]}
             </h3>
             <p>Pemeriksa (ID akun): {decision.actorUserId}</p>
-            <p>Waktu (UTC): {decision.occurredAt}</p>
+            <p>
+              Waktu: <LocalTimestamp value={decision.occurredAt} />
+            </p>
             <p>Alasan internal: {decision.reason}</p>
             {decision.checkSource && (
               <>

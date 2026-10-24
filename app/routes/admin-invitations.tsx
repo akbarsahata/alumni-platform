@@ -5,6 +5,7 @@ import { requirePrimary } from "../authorization/permissions.server";
 import { issueInvitation } from "../authorization/invitations.server";
 import { pageTitle } from "../content/page-title";
 import { Input } from "../components/ui/input";
+import { LocalTimestamp } from "../components/local-timestamp";
 import { Textarea } from "../components/ui/textarea";
 import { Button } from "../components/ui/button";
 export function meta() {
@@ -44,7 +45,7 @@ export default function Invitations({ actionData }: Route.ComponentProps) {
           {actionData.invitation.delivered
             ? "Undangan telah dikirim."
             : "Undangan tersimpan, tetapi email belum terkirim. Sampaikan tautan undangan atau terbitkan undangan baru."}{" "}
-          Berlaku hingga {actionData.invitation.expiresAt}.{" "}
+          Berlaku hingga <LocalTimestamp value={actionData.invitation.expiresAt} />.{" "}
           <Link to={`/invitations/${actionData.invitation.id}`}>Tautan undangan</Link>
         </p>
       )}

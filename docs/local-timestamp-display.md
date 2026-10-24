@@ -1,8 +1,8 @@
 # Local timestamp display
 
-Status: `LocalTimestamp` is implemented and applied to the school-need detail page.
-Applying it to every remaining timestamp is tracked in
-[#31](https://github.com/akbarsahata/alumni-platform/issues/31).
+Status: `LocalTimestamp` is applied to every workflow surface listed below.
+[#31](https://github.com/akbarsahata/alumni-platform/issues/31) delivered the
+system-wide rollout.
 
 ## Rules
 
@@ -19,25 +19,26 @@ Applying it to every remaining timestamp is tracked in
   mounting, the component switches to the browser timezone and refreshes the relative
   description every minute.
 - Invalid values remain visible as their original text rather than throwing.
-- When a line intentionally shows an exact UTC operational value, retain the raw UTC
-  value in an accessible `dateTime`/`title` attribute or adjacent text while using
-  `LocalTimestamp` for the readable display.
+- The accessible `dateTime` and `title` attributes retain the exact underlying UTC
+  instant for operators who need it.
 - Update explanatory copy that currently claims every displayed timestamp is UTC.
 
-## Surfaces to migrate
+## Migrated surfaces
 
-- `/admin/audit` and `/outreach` audit events.
-- `/admin/membership-review`, `/membership`, `/directory-profile` and
-  `/directory-tags` history/confirmation times.
-- `/outreach`, `/outreach/needs/:id`, `/outreach/requests/:id` and outcome summaries,
-  including expiry, consent and sharing times.
+- `/admin/audit` and `/admin/outreach-audit` audit events, including their
+  explanatory copy.
+- `/admin/membership-review`, `/membership`, `/profile`, `/directory/:userId` and
+  `/directory/tags` history/confirmation times.
+- `/outreach`, `/outreach/needs/:needId`, `/outreach/requests/:requestId` and the
+  shared outcome summary, including expiry, consent, sharing, closure and outcome
+  history times.
 - `/reference-response`, `/invitation`, `/admin/invitations`, `/email-change` and
   `/admin/email-changes` expiry notices.
-- Any future workflow page that renders a UTC instant.
+- `/school-needs/:needId` closure, revision and approval times.
 
-The school-need detail page is already migrated: closure time, revision creation
-times and approval times use `LocalTimestamp`. Date-only Waktu pelaksanaan values are
-unchanged.
+Date-only Waktu pelaksanaan values on the school-need and outreach pages remain
+unchanged. Server-side email bodies are not browser surfaces; they continue to state
+their UTC expiry explicitly.
 
 ## Acceptance
 

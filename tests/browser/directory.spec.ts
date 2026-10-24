@@ -1,4 +1,9 @@
-import { gotoReady } from "./app-ready";
+import {
+  expectLocalTimestamp,
+  expectNoRawTimestampText,
+  gotoReady,
+  localBrowserOptions,
+} from "./app-ready";
 import { test, expect } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 test("coordinator searches private alumni and maintains shared expertise in Bahasa Indonesia", async ({
@@ -7,7 +12,7 @@ test("coordinator searches private alumni and maintains shared expertise in Baha
   const { coordinator, primary, browserMember } = JSON.parse(
     await readFile(`${process.env.ALUMNI_TEST_STATE}/directory-accounts.json`, "utf8")
   );
-  const context = await browser.newContext();
+  const context = await browser.newContext(localBrowserOptions);
   const [name, ...value] = coordinator.cookie.split("=");
   await context.addCookies([{ name, value: value.join("="), url: "http://127.0.0.1:5173" }]);
   try {
@@ -37,6 +42,8 @@ test("coordinator searches private alumni and maintains shared expertise in Baha
     await expect(page.getByRole("heading", { name: "Profil alumni" })).toBeVisible();
     await expect(page.locator("main")).not.toContainText("Komodo");
     await expect(page.locator("main")).not.toContainText(browserMember.email);
+    await expectLocalTimestamp(page.locator("main time").first());
+    await expectNoRawTimestampText(page);
     await gotoReady(page, "/directory/tags");
     await page.getByLabel("Keahlian baru").fill("Astronomi browser");
     await page.getByRole("button", { name: "Tambah keahlian" }).click();
@@ -57,6 +64,8 @@ test("coordinator searches private alumni and maintains shared expertise in Baha
       page.getByRole("heading", { name: "Astronomi sekolah (dihentikan)" })
     ).toBeVisible();
     await expect(page.getByLabel("Riwayat keahlian")).toContainText("Dihentikan");
+    await expectLocalTimestamp(page.getByLabel("Riwayat keahlian").locator("time").first());
+    await expectNoRawTimestampText(page);
     const revoked = await context.request.post("http://127.0.0.1:5173/api/admin/roles", {
       headers: { Cookie: primary.cookie, Origin: "http://127.0.0.1:5173" },
       data: {

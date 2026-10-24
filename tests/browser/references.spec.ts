@@ -1,4 +1,10 @@
-import { gotoReady, reloadReady } from "./app-ready";
+import {
+  expectLocalTimestamp,
+  expectNoRawTimestampText,
+  gotoReady,
+  localBrowserOptions,
+  reloadReady,
+} from "./app-ready";
 import { test, expect } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 
@@ -15,9 +21,9 @@ test("applicant requests a reference and authenticated alumnus responds before p
     .find((line) => line.startsWith("LOCAL_MAIL_KEY="))!
     .slice("LOCAL_MAIL_KEY=".length);
   const contexts = await Promise.all([
-    browser.newContext(),
-    browser.newContext(),
-    browser.newContext(),
+    browser.newContext(localBrowserOptions),
+    browser.newContext(localBrowserOptions),
+    browser.newContext(localBrowserOptions),
   ]);
   for (const [index, account] of [
     fixture.applicant,
@@ -62,6 +68,8 @@ test("applicant requests a reference and authenticated alumnus responds before p
       reference.getByText("Nama semasa sekolah: Nama Pemohon Referensi Browser")
     ).toBeVisible();
     await expect(reference.getByText("Penjelasan privat pemohon browser.")).toHaveCount(0);
+    await expectLocalTimestamp(reference.locator("main time").first());
+    await expectNoRawTimestampText(reference);
     await reference.getByLabel("Respons", { exact: true }).selectOption("endorse");
     await reference
       .getByLabel("Komentar privat untuk pemeriksa")
@@ -81,6 +89,8 @@ test("applicant requests a reference and authenticated alumnus responds before p
     await expect(
       reviewer.getByText("Komentar privat: Komentar privat referensi browser.")
     ).toBeVisible();
+    await expectLocalTimestamp(reviewer.locator("main time").first());
+    await expectNoRawTimestampText(reviewer);
     await reviewer.getByLabel("Sumber pemeriksaan independen").selectOption("trusted-alumnus");
     await reviewer
       .getByLabel("Catatan pemeriksaan independen")

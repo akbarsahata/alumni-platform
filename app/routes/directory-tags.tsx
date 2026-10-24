@@ -5,6 +5,7 @@ import type { Route } from "./+types/directory-tags";
 import { readTaxonomy, readTaxonomyAudit, changeTaxonomy } from "../profiles/taxonomy.server";
 import { requireDirectory } from "../authorization/permissions.server";
 import { pageTitle } from "../content/page-title";
+import { LocalTimestamp } from "../components/local-timestamp";
 export function meta() {
   return [{ title: pageTitle("Kelola keahlian") }];
 }
@@ -123,10 +124,11 @@ export default function Tags({ loaderData, actionData }: Route.ComponentProps) {
       </div>
       <section className="taxonomy-history" aria-label="Riwayat keahlian">
         <h2>Riwayat keahlian</h2>
-        <p>100 perubahan terakhir; waktu UTC.</p>
+        <p>100 perubahan terakhir; waktu dalam zona waktu browser Anda.</p>
         {loaderData.events.map((event) => (
           <p key={event.id}>
-            {actionLabels[event.action]} · {event.actorUserId} · {event.occurredAt}
+            {actionLabels[event.action]} · {event.actorUserId} ·{" "}
+            <LocalTimestamp value={event.occurredAt} />
           </p>
         ))}
       </section>
