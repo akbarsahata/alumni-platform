@@ -4,6 +4,15 @@
   "compatibility_date": "2026-10-01",
   "compatibility_flags": ["nodejs_compat"],
   "main": "./workers/app.ts",
+  "vars": {
+    "BETTER_AUTH_URL": "http://localhost:5173",
+    "EMAIL_FROM": "iam@akbarsahata.id",
+    "EMAIL_REPLY_TO": "iam@akbarsahata.id",
+    "ENVIRONMENT": "development",
+  },
+  "secrets": {
+    "required": ["BETTER_AUTH_SECRET", "LOCAL_MAIL_KEY", "RESEND_API_KEY"],
+  },
   "d1_databases": [
     {
       "binding": "DB",

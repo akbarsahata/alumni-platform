@@ -17,6 +17,7 @@ import {
   outreachAuditCursor,
 } from "../http/validation";
 import { sendEmail } from "../email/email.server";
+import { deliverIntroductionAttempt } from "./introduction-delivery";
 import {
   formatOutreachAuditCursor,
   isClarificationOpenStatus,
@@ -56,14 +57,18 @@ export async function deliverOutreach(
       continue;
     }
     try {
-      await sendEmail(env, {
-        to: delivery.email,
-        subject:
-          claim.kind === "reminder"
-            ? "Pengingat permintaan bantuan sekolah"
-            : "Permintaan bantuan sekolah",
-        text: `${delivery.title}\nBatas respons: ${delivery.expiresAt}\nLihat rincian dan tanggapi: ${new URL(`/outreach/requests/${requestId}`, env.BETTER_AUTH_URL).href}\nMenyatakan minat tidak membagikan email Anda.`,
-      });
+      await sendEmail(
+        env,
+        {
+          to: delivery.email,
+          subject:
+            claim.kind === "reminder"
+              ? "Pengingat permintaan bantuan sekolah"
+              : "Permintaan bantuan sekolah",
+          text: `${delivery.title}\nBatas respons: ${delivery.expiresAt}\nLihat rincian dan tanggapi: ${new URL(`/outreach/requests/${requestId}`, env.BETTER_AUTH_URL).href}\nMenyatakan minat tidak membagikan email Anda.`,
+        },
+        { idempotencyKey: `outreach-notification:${claim.id}` }
+      );
       await repository.finishNotification(claim.id, "captured");
     } catch {
       await repository.finishNotification(claim.id, "pending");
@@ -270,31 +275,13 @@ async function deliverIntroduction(
   requestId: string,
   initiatingCoordinatorId: string | null
 ) {
-  const repository = outreachRepository(env.DB);
-  await repository.reconcile();
-  const now = new Date().toISOString();
-  const claim = await repository.claimIntroduction(requestId, now, initiatingCoordinatorId);
-  if (!claim) return { shared: false, pending: await repository.hasPendingIntroduction(requestId) };
-  const delivery = await repository.introductionDelivery(claim.id);
-  if (!delivery) {
-    await repository.releaseIntroduction(claim.id);
-    return { shared: false, pending: await repository.hasPendingIntroduction(requestId) };
-  }
-  try {
-    const message = {
-      to: delivery.staffEmail,
-      subject: `Perkenalan alumni: ${delivery.title}`,
-      text: `Kepada ${delivery.staffName},\n\n${delivery.memberName} (${delivery.memberEmail}) menyetujui emailnya dibagikan kepada Anda untuk kebutuhan sekolah berikut.\n\nKebutuhan: ${delivery.title}\nTujuan sekolah: ${delivery.purpose}\nBantuan yang diminta: ${delivery.requestedHelp}\n\nAlumni tersebut telah memberikan persetujuan eksplisit untuk perkenalan ini. Silakan hubungi langsung melalui email di atas.`,
-    };
-    const shared = await sendEmail(env, message, () =>
-      repository.captureIntroduction(claim.id, message, initiatingCoordinatorId)
-    );
-    if (!shared) await repository.releaseIntroduction(claim.id);
-    return { shared, pending: await repository.hasPendingIntroduction(requestId) };
-  } catch {
-    await repository.releaseIntroduction(claim.id);
-    return { shared: false, pending: await repository.hasPendingIntroduction(requestId) };
-  }
+  return deliverIntroductionAttempt({
+    requestId,
+    initiatingCoordinatorId,
+    now: new Date().toISOString(),
+    repository: outreachRepository(env.DB),
+    send: (message, options) => sendEmail(env, message, options),
+  });
 }
 
 export async function giveConsent(request: Request, env: Env, requestId: string, input: unknown) {

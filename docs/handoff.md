@@ -1,3 +1,65 @@
+# Resend email delivery adapter — 2026-10-24
+
+PR 1 of the Cloudflare deployment work is implemented on branch
+`feat/resend-email-adapter` in worktree
+`/Users/akbar/projects/alumni-platform-resend-email`. This change adds the live email
+adapter and introduction-sharing evidence path only. No staging/production environment
+resources, deployment workflow, remote migration, administrator appointment or live
+email send was added.
+
+## Behavior
+
+- `app/email/resend.server.ts` posts to `https://api.resend.com/emails` with configured
+  `from` and `reply_to` values, a bounded 10-second timeout, sanitized errors and no
+  logging of recipients, bodies, OTPs or credentials.
+- `app/email/email.server.ts` selects local KV capture only for
+  `ENVIRONMENT=development` in a development build. Staging/production select Resend;
+  missing or unknown configuration fails closed. The local mailbox endpoint now also
+  requires `ENVIRONMENT=development`.
+- Retryable sends pass stable `Idempotency-Key` values for membership notifications,
+  reference requests, invitations, email changes, outreach requests/reminders and
+  introductions. Resend retains these keys for 24 hours.
+- Consented introductions keep the atomic local D1 mailbox for development. In
+  staging/production, provider acceptance is followed by a conditional
+  `markIntroductionShared` update with the same eligibility, consent, staff-role,
+  recipient-email and coordinator checks as local capture. A rejected or failed
+  sharing write leaves the introduction retryable and does not mark it shared.
+- Top-level Wrangler configuration now declares `ENVIRONMENT`, `EMAIL_FROM`,
+  `EMAIL_REPLY_TO`, and required `BETTER_AUTH_SECRET`, `LOCAL_MAIL_KEY` and
+  `RESEND_API_KEY` names. Staging/production sections and deploy commands remain the
+  next delivery slice.
+
+## Verification
+
+- `npm run test:unit` passes 17 helper tests: five mocked-provider adapter checks, six
+  introduction orchestration checks, and six existing location-list checks.
+- Focused introduction verification passes all 12 HTTP journeys and all three Chromium
+  journeys:
+  `node scripts/test.mjs tests/introductions.test.mjs tests/browser/introductions.spec.ts`.
+- Full `npm test` passed the helper suites, every HTTP suite and all 23 Chromium
+  journeys with no failures or skips. A repeat run after the final provider-only SQL
+  simplification was blocked by an unrelated dev server on `127.0.0.1:5173` from another
+  worktree; that server was left running. Unit tests, typecheck, lint and build pass after
+  the final change.
+- The `markIntroductionShared` statement was separately syntax- and behavior-checked
+  against a disposable SQLite schema, including the `captured`/`shared_at` constraint.
+- `npm run typecheck`, `npm run build`, `npm run lint` and `npm run format:check` pass.
+  The local build copies `.dev.vars` into ignored `build/server/.dev.vars`; that copy is
+  not committed and must be deleted before any deploy.
+- No live Resend request was made. The adapter tests use an injected fake `fetch`; local
+  integration tests still use captured mail.
+
+## Remaining boundaries
+
+No staging/production Wrangler environments, resource IDs, deploy script, CI deploy
+jobs, remote migrations, seed retargeting, remote bootstrap or operational runbook are
+included yet. Resend domain/SPF/DKIM/DMARC verification and real sends to two mailbox
+providers remain human deployment checks. Provider acceptance followed by a D1 sharing
+write failure is not atomic; the idempotency key prevents duplicate retries within the
+provider window, but scheduled retries and webhooks remain future work.
+
+---
+
 # Cloudflare deployment planning — 2026-10-24
 
 Created the agreed [Cloudflare deployment specification](deployment.md) for staging at

@@ -21,11 +21,15 @@ export async function issueInvitation(request: Request, env: Env, input: unknown
   });
   let delivered = true;
   try {
-    await sendEmail(env, {
-      to: invitation.email,
-      subject: "Undangan perwakilan sekolah",
-      text: `Anda diundang sebagai ${roleLabels[invitation.role]} dengan nama perwakilan ${invitation.representativeName}. Masuk dengan kode menggunakan email ini, lalu buka ${new URL(`/invitations/${invitation.id}`, env.BETTER_AUTH_URL)} untuk menerima. Undangan berlaku tujuh hari hingga ${invitation.expiresAt}. Tidak perlu pengajuan atau profil alumni.`,
-    });
+    await sendEmail(
+      env,
+      {
+        to: invitation.email,
+        subject: "Undangan perwakilan sekolah",
+        text: `Anda diundang sebagai ${roleLabels[invitation.role]} dengan nama perwakilan ${invitation.representativeName}. Masuk dengan kode menggunakan email ini, lalu buka ${new URL(`/invitations/${invitation.id}`, env.BETTER_AUTH_URL)} untuk menerima. Undangan berlaku tujuh hari hingga ${invitation.expiresAt}. Tidak perlu pengajuan atau profil alumni.`,
+      },
+      { idempotencyKey: `invitation:${invitation.id}` }
+    );
   } catch {
     delivered = false;
   }
