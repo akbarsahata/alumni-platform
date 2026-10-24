@@ -13,7 +13,7 @@ npm run db:migrate
 npm run dev
 ```
 
-Open http://localhost:5173/ for the guest login page; `/login` remains supported for invitation and identity-change redirects. `local:setup` creates a private `.dev.vars` with separate random authentication and local mailbox keys, plus a `RESEND_API_KEY=local-capture-only` placeholder so required-secret typing is satisfied, preserving any existing file. `.dev.vars.example` documents the names without credentials. Keep BETTER_AUTH_URL equal to the development origin, including its port. The committed D1 and KV IDs are local placeholders; no remote provisioning is needed. Wrangler persists synthetic D1/KV state under ignored `.wrangler/`.
+Open http://localhost:5173/ for the guest login page; `/login` remains supported for invitation and identity-change redirects. `local:setup` creates a private `.dev.vars` with separate random authentication and local mailbox keys, plus a `RESEND_API_KEY=local-capture-only` placeholder so required-secret typing is satisfied, preserving any existing file. `.dev.vars.example` documents the names without credentials. Keep BETTER_AUTH_URL equal to the development origin, including its port. The committed D1 and KV IDs are local placeholders; no remote provisioning is needed. Wrangler persists synthetic D1/KV state under ignored `.wrangler/`. The top-level `wrangler.jsonc` environment is development and keeps `workers_dev` disabled; deployed environments are selected only through `CLOUDFLARE_ENV`.
 
 ## Formatting and linting
 
@@ -77,7 +77,20 @@ References: [Better Auth Email OTP](https://better-auth.com/docs/plugins/email-o
 
 ## Build and deployment boundary
 
-`npm run build` builds the Worker; `npm run preview -- --host 127.0.0.1` previews it locally. The built Worker fails closed when `ENVIRONMENT=development`; with `ENVIRONMENT=staging|production` and configured `RESEND_API_KEY`, `EMAIL_FROM` and `EMAIL_REPLY_TO`, it sends through Resend. Domain configuration, remote resource IDs, environment secrets and deploy workflows remain separate deployment work. Never publish `.dev.vars`, `.wrangler/`, build-local secrets, or test artifacts. The Vite plugin copies `.dev.vars` into `build/server/.dev.vars`; delete that copy before any deploy. Do not run the deployment command for local verification.
+`npm run build` builds the Worker; `npm run preview -- --host 127.0.0.1` previews it locally. The built Worker fails closed when `ENVIRONMENT=development`; with `ENVIRONMENT=staging|production` and configured `RESEND_API_KEY`, `EMAIL_FROM` and `EMAIL_REPLY_TO`, it sends through Resend.
+
+`wrangler.jsonc` now defines development, staging and production environments. Development and both deployed environments repeat the non-inheritable bindings, routes, variables, required secrets and observability settings. Staging and production D1/KV IDs are guarded placeholders until the owner provisions the resources.
+
+`npm run deploy` intentionally fails without an environment. Use:
+
+```sh
+npm run deploy:staging -- --check
+npm run deploy:production -- --check
+```
+
+`--check` builds the selected environment, validates `build/server/wrangler.json`, removes any copied `.dev.vars`, and exits without applying migrations or deploying. A real deploy requires the environment's Cloudflare credentials and `PRODUCTION_URL` for production. The deploy script rejects placeholder resource IDs, missing custom-domain routes and missing required secrets, captures a production D1 Time Travel bookmark before migrations, applies remote migrations, and deletes its temporary secrets file. Operators who already keep a private reviewed file can pass `--secrets-file <path>`; they are responsible for deleting that file.
+
+Deployed environments disable `workers_dev` and include a non-production `X-Robots-Tag: noindex` response header. Never publish `.dev.vars`, `.wrangler/`, build-local secrets, or test artifacts. The Vite plugin copies `.dev.vars` into `build/server/.dev.vars`; delete that copy before any deploy. Local commands remove the ignored `.wrangler/deploy/config.json` redirect before running so a previous staging build cannot change local D1, KV or type generation. Do not run a real deployment command for local verification.
 
 For suspension/reinstatement and controlled review requests, see
 [membership-suspensions.md](membership-suspensions.md). Focused verification:

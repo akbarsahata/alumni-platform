@@ -158,6 +158,8 @@ process.env.RESEND_MOCK_URL = `http://127.0.0.1:${mockPort}`;
 
 await mkdir("test-results", { recursive: true });
 await mkdir(".wrangler", { recursive: true });
+// Wrangler CLI commands must not inherit the last deployment's flattened config.
+await rm(".wrangler/deploy", { recursive: true, force: true });
 process.env.ALUMNI_TEST_STATE = resolve(await mkdtemp(".wrangler/integration-state-"));
 process.env.ALUMNI_TEST_CONFIG = `${process.env.ALUMNI_TEST_STATE}/wrangler.jsonc`;
 process.env.ALUMNI_TEST_VARS = `${process.env.ALUMNI_TEST_STATE}/.dev.vars`;
