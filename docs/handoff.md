@@ -15,9 +15,9 @@ in this documentation commit.
 
 Issue [#31](https://github.com/akbarsahata/alumni-platform/issues/31) is implemented
 on branch `feat/local-timestamp-display-31` in worktree
-`/Users/akbar/projects/alumni-platform-issue-31`. The delivery PR is being opened
-from this branch. No migration, deployment, remote database change or live email is
-included.
+`/Users/akbar/projects/alumni-platform-issue-31`. Delivery PR:
+[#35](https://github.com/akbarsahata/alumni-platform/pull/35). No migration,
+deployment, remote database change or live email is included.
 
 ## Behavior
 
