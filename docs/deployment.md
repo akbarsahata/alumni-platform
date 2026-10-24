@@ -36,7 +36,7 @@ Provisioned on 2026-10-24 in the Cloudflare account that owns `akbarsahata.id`:
 | --------------- | --------------------------------------------------------------------- |
 | D1 database     | `alumni_staging` (`3cebe648-9065-4be8-ab8f-48958e9d36be`, APAC)       |
 | KV namespace    | `alumni-staging-local-mail` (`72a57fe4e83c4029a2ada4e5a84ddd80`)      |
-| Migrations      | 24 applied; a repeat list reports no migrations                       |
+| Migrations      | 25 applied; a repeat list reports no migrations                       |
 | Worker          | `alumni-platform-staging` configured, not yet deployed                |
 | Custom domain   | `kasmanss.akbarsahata.id` configured, created by the first deploy     |
 | Deployment type | Normal production deployment; preview URLs and `workers_dev` disabled |

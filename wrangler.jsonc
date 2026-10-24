@@ -51,6 +51,7 @@
         "BETTER_AUTH_URL": "https://kasmanss.akbarsahata.id",
         "EMAIL_FROM": "iam@akbarsahata.id",
         "EMAIL_REPLY_TO": "iam@akbarsahata.id",
+        "RESEND_API_URL": "https://api.resend.com/emails",
         "ENVIRONMENT": "staging",
       },
       "secrets": {
@@ -80,6 +81,7 @@
         "BETTER_AUTH_URL": "https://production.invalid",
         "EMAIL_FROM": "iam@akbarsahata.id",
         "EMAIL_REPLY_TO": "iam@akbarsahata.id",
+        "RESEND_API_URL": "https://api.resend.com/emails",
         "ENVIRONMENT": "production",
       },
       "secrets": {
