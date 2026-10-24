@@ -1,3 +1,4 @@
+import { LocalTimestamp } from "../components/local-timestamp";
 import type { Revision } from "./model";
 
 export function RevisionView({ revision }: { revision: Revision }) {
@@ -28,8 +29,10 @@ export function RevisionView({ revision }: { revision: Revision }) {
         <dd className="whitespace-pre-wrap">{revision.explanation}</dd>
       </div>
       <div>
-        <dt>Diajukan (UTC)</dt>
-        <dd>{revision.submittedAt}</dd>
+        <dt>Diajukan</dt>
+        <dd>
+          <LocalTimestamp value={revision.submittedAt} />
+        </dd>
       </div>
     </dl>
   );

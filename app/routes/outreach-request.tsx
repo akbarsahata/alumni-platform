@@ -18,6 +18,7 @@ import {
 } from "../outreach/model";
 import { OutcomeStateSelect, OutcomeSummary } from "../outreach/outcome-summary";
 import { pageTitle } from "../content/page-title";
+import { LocalTimestamp } from "../components/local-timestamp";
 export function meta() {
   return [{ title: pageTitle("Tanggapi permintaan bantuan") }];
 }
@@ -130,7 +131,9 @@ export default function OutreachRequest({ loaderData: d, actionData }: Route.Com
       <h1>{d.need.title}</h1>
       <p role="status">{outreachStatusLabels[d.request.status]}</p>
       <NeedDetails need={{ ...d.need, staffContactName: staffName }} />
-      <p>Batas respons (UTC): {d.request.expiresAt}</p>
+      <p>
+        Batas respons: <LocalTimestamp value={d.request.expiresAt} />
+      </p>
       <p>Menyatakan minat tidak membagikan email Anda.</p>
       <p>Penolakan dan alasannya hanya dilihat koordinator direktori.</p>
       {actionData?.error && <p role="alert">{actionData.error}</p>}
@@ -162,7 +165,9 @@ export default function OutreachRequest({ loaderData: d, actionData }: Route.Com
                         ? "Koordinator direktori"
                         : "Alumni"}
                   </p>
-                  <p className="text-sm">Waktu (UTC): {message.createdAt}</p>
+                  <p className="text-sm">
+                    Waktu: <LocalTimestamp value={message.createdAt} />
+                  </p>
                   <p className="whitespace-pre-wrap">{message.body}</p>
                 </li>
               ))}
@@ -207,7 +212,8 @@ export default function OutreachRequest({ loaderData: d, actionData }: Route.Com
           {active && (
             <>
               <p role="status">
-                Persetujuan tercatat pada {active.consentedAt} untuk {active.staffName}.
+                Persetujuan tercatat pada <LocalTimestamp value={active.consentedAt} /> untuk{" "}
+                {active.staffName}.
               </p>
               {d.access.canWithdraw && (
                 <Form method="post" className="space-y-2">
@@ -251,8 +257,9 @@ export default function OutreachRequest({ loaderData: d, actionData }: Route.Com
           )}
           {shared.map((item) => (
             <p key={item.id}>
-              Email Anda sudah dibagikan kepada {item.staffName} pada {item.sharedAt}. Email yang
-              sudah dibagikan tidak dapat ditarik kembali.
+              Email Anda sudah dibagikan kepada {item.staffName} pada{" "}
+              {item.sharedAt ? <LocalTimestamp value={item.sharedAt} /> : "waktu yang tercatat"}.
+              Email yang sudah dibagikan tidak dapat ditarik kembali.
             </p>
           ))}
           {latestInactive && (

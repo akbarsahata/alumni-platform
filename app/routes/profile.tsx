@@ -11,6 +11,7 @@ import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
 import { Button } from "../components/ui/button";
 import { pageTitle } from "../content/page-title";
+import { LocalTimestamp } from "../components/local-timestamp";
 export function meta() {
   return [{ title: pageTitle("Profil & Keahlian") }];
 }
@@ -110,7 +111,14 @@ export default function Profile({ loaderData, actionData }: Route.ComponentProps
             Status relevansi profil:{" "}
             {eligibility.eligible ? "Memenuhi syarat" : reasons[eligibility.reason!]}
           </p>
-          <p>Konfirmasi terakhir (UTC): {profile.confirmedAt ?? "Belum dikonfirmasi"}</p>
+          <p>
+            Konfirmasi terakhir:{" "}
+            {profile.confirmedAt ? (
+              <LocalTimestamp value={profile.confirmedAt} />
+            ) : (
+              "Belum dikonfirmasi"
+            )}
+          </p>
           <details>
             <summary>Konfirmasi setiap 12 bulan</summary>{" "}
             <p>

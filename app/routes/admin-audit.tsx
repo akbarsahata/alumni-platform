@@ -5,6 +5,7 @@ import type { Route } from "./+types/admin-audit";
 import { requirePrimary } from "../authorization/permissions.server";
 import { readAudit } from "../authorization/administration.server";
 import { roleLabels, type Role } from "../authorization/roles";
+import { LocalTimestamp } from "../components/local-timestamp";
 
 export function meta() {
   return [{ title: pageTitle("Riwayat perubahan peran") }];
@@ -36,7 +37,8 @@ export default function AdminAudit({ loaderData }: Route.ComponentProps) {
         Kelola peran
       </Link>
       <p>
-        Riwayat penunjukan, perubahan peran, dan identitas perwakilan. Waktu ditampilkan dalam UTC.
+        Riwayat penunjukan, perubahan peran, dan identitas perwakilan. Waktu ditampilkan dalam zona
+        waktu browser Anda.
       </p>
       <ol className="space-y-6">
         {loaderData.events.map((event) => (
@@ -61,7 +63,7 @@ export default function AdminAudit({ loaderData }: Route.ComponentProps) {
             )}
             {event.house && <p>House: {event.house}</p>}
             {event.reason && <p>Alasan: {event.reason}</p>}
-            <time dateTime={event.occurredAt}>{event.occurredAt}</time>
+            <LocalTimestamp value={event.occurredAt} />
           </li>
         ))}
       </ol>

@@ -11,6 +11,7 @@ import { getAccess } from "../authorization/permissions.server";
 import { readApplication, submitApplication } from "../membership/applications.server";
 import { houses, statusLabels, type Revision } from "../membership/model";
 import { RevisionView } from "../membership/revision-view";
+import { LocalTimestamp } from "../components/local-timestamp";
 import { recoverReference, requestReference } from "../membership/references.server";
 import { referenceStatusLabels } from "../membership/model";
 
@@ -196,7 +197,9 @@ export default function Membership({ loaderData, actionData }: Route.ComponentPr
                 Versi {decision.revision}: {statusLabels[decision.outcome]}
               </p>
               <p className="whitespace-pre-wrap">{decision.applicantMessage}</p>
-              <p>Waktu (UTC): {decision.occurredAt}</p>
+              <p>
+                Waktu: <LocalTimestamp value={decision.occurredAt} />
+              </p>
             </div>
           ))}
         </section>
@@ -210,7 +213,9 @@ export default function Membership({ loaderData, actionData }: Route.ComponentPr
                 : "Keanggotaan dipulihkan"}
             </p>
             <p>{decision.applicantMessage}</p>
-            <p>Waktu (UTC): {decision.occurredAt}</p>
+            <p>
+              Waktu: <LocalTimestamp value={decision.occurredAt} />
+            </p>
           </article>
         ))}
         {loaderData.suspension.requests.map((review) => (
@@ -221,7 +226,9 @@ export default function Membership({ loaderData, actionData }: Route.ComponentPr
                 : "Permintaan tinjauan menunggu pemeriksa"}
             </p>
             <p>{review.explanation}</p>
-            <p>Waktu (UTC): {review.requestedAt}</p>
+            <p>
+              Waktu: <LocalTimestamp value={review.requestedAt} />
+            </p>
           </article>
         ))}
         {membership.status === "suspended" &&

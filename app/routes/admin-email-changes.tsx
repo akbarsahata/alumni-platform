@@ -1,6 +1,7 @@
 import { pageTitle } from "../content/page-title";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
+import { LocalTimestamp } from "../components/local-timestamp";
 import { Textarea } from "../components/ui/textarea";
 import { env } from "cloudflare:workers";
 import { Form, Link, data, useNavigation } from "react-router";
@@ -66,7 +67,7 @@ export default function AdminEmailChanges({ loaderData, actionData }: Route.Comp
           <Link className="underline" to={`/email-changes/${actionData.requestId}`}>
             verifikasi perubahan email
           </Link>
-          . Berlaku hingga {actionData.expiresAt} UTC.
+          . Berlaku hingga <LocalTimestamp value={actionData.expiresAt} />.
         </p>
       )}
       <Form method="post" className="space-y-4">

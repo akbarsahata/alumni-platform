@@ -29,6 +29,7 @@ import {
 import { NeedDetails } from "../outreach/need-details";
 import { OutcomeStateSelect, OutcomeSummary } from "../outreach/outcome-summary";
 import { pageTitle } from "../content/page-title";
+import { LocalTimestamp } from "../components/local-timestamp";
 export function meta() {
   return [{ title: pageTitle("Penjangkauan sekolah") }];
 }
@@ -166,9 +167,14 @@ export default function OutreachNeed({ loaderData: d, actionData }: Route.Compon
         )}
       </section>
       <p>
-        {d.closed
-          ? `Kebutuhan ditutup pada ${d.closedAt ?? "waktu yang tercatat"}.`
-          : "Maksimal 10 penerima per kebutuhan dan 3 permintaan baru per alumni dalam 30 hari."}
+        {d.closed ? (
+          <>
+            Kebutuhan ditutup pada{" "}
+            {d.closedAt ? <LocalTimestamp value={d.closedAt} /> : "waktu yang tercatat"}.
+          </>
+        ) : (
+          "Maksimal 10 penerima per kebutuhan dan 3 permintaan baru per alumni dalam 30 hari."
+        )}
       </p>
       {!!d.requests.length && (
         <p>
@@ -193,7 +199,9 @@ export default function OutreachNeed({ loaderData: d, actionData }: Route.Compon
                 Penerima (ID): <span className="break-all">{r.recipientUserId}</span>
               </p>
               <p>{outreachStatusLabels[r.status]}</p>
-              <p>Batas respons (UTC): {r.expiresAt}</p>
+              <p>
+                Batas respons: <LocalTimestamp value={r.expiresAt} />
+              </p>
               {r.declineReason && <p>Alasan penolakan: {r.declineReason}</p>}
               <p>
                 Koordinator (ID): <span className="break-all">{r.coordinatorUserId}</span>
@@ -225,7 +233,14 @@ export default function OutreachNeed({ loaderData: d, actionData }: Route.Compon
               )}
               {shared.map((item) => (
                 <p key={item.id}>
-                  Perkenalan: terkirim kepada {item.staffName} pada {item.sharedAt}.
+                  Perkenalan: terkirim kepada {item.staffName} pada{" "}
+                  {item.sharedAt ? (
+                    <>
+                      <LocalTimestamp value={item.sharedAt} />.
+                    </>
+                  ) : (
+                    "waktu yang tercatat."
+                  )}
                 </p>
               ))}
               {!active && !shared.length && latestInactive && (

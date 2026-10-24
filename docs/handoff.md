@@ -11,6 +11,49 @@ The GitHub plugin was unavailable in this session; tracker operations used the
 authenticated `gh` CLI. The specification and documentation index entry are included
 in this documentation commit.
 
+# System-wide local timestamp display — 2026-10-24
+
+Issue [#31](https://github.com/akbarsahata/alumni-platform/issues/31) is implemented
+on branch `feat/local-timestamp-display-31` in worktree
+`/Users/akbar/projects/alumni-platform-issue-31`. The delivery PR is being opened
+from this branch. No migration, deployment, remote database change or live email is
+included.
+
+## Behavior
+
+- Every workflow instant inventoried in
+  [local-timestamp-display](local-timestamp-display.md) now renders through
+  `app/components/local-timestamp.tsx`: admin and outreach audits, membership and
+  directory histories, profile confirmation, outreach expiry/consent/sharing/closure
+  and outcome summaries, and reference/invitation/email-change expiry notices.
+- `LocalTimestamp` keeps the exact UTC instant in both `dateTime` and `title`, while
+  the readable text shows browser-local time, a short timezone label (`WIB` in the
+  browser tests) and a Bahasa Indonesia relative description. Invalid values still
+  fall back to their original text; the server/first client render keeps the stable
+  UTC fallback.
+- Explanatory copy that claimed all displayed times were UTC now points to the
+  browser timezone. Date-only school-need and outreach calendar values remain
+  date-only and are not passed through `LocalTimestamp`.
+- Stored timestamps, expiry comparisons, chronology and authorization are unchanged;
+  this is display-only. Server-side email bodies remain explicitly UTC because they
+  have no browser timezone.
+
+## Verification
+
+- Browser journeys run with the Indonesian locale and the non-UTC `Asia/Jakarta`
+  timezone and assert local text, the `WIB` label, Indonesian relative text, and UTC
+  `dateTime`/`title` values on the migrated surfaces.
+- `npm test -- --context auth`, `membership`, `directory` and `outreach` each pass,
+  including the focused timestamp assertions in the membership, directory, outreach,
+  roles, references, invitations, email-change, profile and clarification journeys.
+- Full `npm test` passes six helper tests, 108 HTTP tests and all 22 Chromium
+  journeys with no failures or skips.
+- `npm run typecheck`, `npm run build`, `npm run lint` and `npm run format:check`
+  pass.
+- An unrelated development server occupying `127.0.0.1:5173` from another worktree
+  was stopped so the isolated test runner could bind the port; it was not restarted.
+  No ordinary local D1 data or environment file was changed.
+
 # Cold-cache CI hydration correction — 2026-10-24
 
 Continuation of PR [#33](https://github.com/akbarsahata/alumni-platform/pull/33).

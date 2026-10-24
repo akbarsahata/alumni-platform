@@ -4,6 +4,7 @@ import type { Route } from "./+types/directory-profile";
 import { searchDirectory } from "../profiles/directory.server";
 import { pageTitle } from "../content/page-title";
 import { helpLabels, availabilityLabels } from "../profiles/model";
+import { LocalTimestamp } from "../components/local-timestamp";
 export function meta() {
   return [{ title: pageTitle("Profil alumni") }];
 }
@@ -36,7 +37,10 @@ export default function DirectoryProfile({ loaderData }: Route.ComponentProps) {
       <p>{p.helpTypes.map((t) => helpLabels[t as keyof typeof helpLabels]).join(", ")}</p>
       <p>{p.availability ? availabilityLabels[p.availability] : ""}</p>
       <p>{p.availabilityNote}</p>
-      <p>Konfirmasi terakhir (UTC): {p.confirmedAt}</p>
+      <p>
+        Konfirmasi terakhir:{" "}
+        {p.confirmedAt ? <LocalTimestamp value={p.confirmedAt} /> : "Belum dikonfirmasi"}
+      </p>
     </main>
   );
 }

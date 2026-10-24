@@ -1,4 +1,10 @@
-import { gotoReady, reloadReady } from "./app-ready";
+import {
+  expectLocalTimestamp,
+  expectNoRawTimestampText,
+  gotoReady,
+  localBrowserOptions,
+  reloadReady,
+} from "./app-ready";
 import { test, expect } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 
@@ -9,8 +15,8 @@ test("applicant and independent administrator complete action, rejection, correc
   const fixture = JSON.parse(
     await readFile(`${process.env.ALUMNI_TEST_STATE}/membership-accounts.json`, "utf8")
   );
-  const applicantContext = await browser.newContext();
-  const reviewerContext = await browser.newContext();
+  const applicantContext = await browser.newContext(localBrowserOptions);
+  const reviewerContext = await browser.newContext(localBrowserOptions);
   for (const [context, account] of [
     [applicantContext, fixture.applicant],
     [reviewerContext, fixture.reviewer],
@@ -52,6 +58,7 @@ test("applicant and independent administrator complete action, rejection, correc
     await reviewer.getByLabel("Pesan untuk pemohon").fill("Mohon perbaiki nama semasa sekolah.");
     await reviewer.getByRole("button", { name: "Simpan keputusan" }).click();
     await expect(reviewer.getByRole("status")).toContainText("Keputusan tersimpan");
+    await expectLocalTimestamp(reviewer.locator("main time").first());
     await reloadReady(applicant);
     await expect(applicant.getByText("Perlu perbaikan", { exact: true }).first()).toBeVisible();
     await expect(applicant.getByText("Mohon perbaiki nama semasa sekolah.")).toBeVisible();
@@ -107,6 +114,8 @@ test("applicant and independent administrator complete action, rejection, correc
     await expect(applicant.getByText("Nama Browser Awal")).toBeVisible();
     await expect(applicant.getByText("Nama Browser Koreksi").first()).toBeVisible();
     await expect(applicant.getByText("Catatan pemeriksaan privat browser")).toHaveCount(0);
+    await expectLocalTimestamp(applicant.locator("main time").first());
+    await expectNoRawTimestampText(applicant);
   } finally {
     await applicantContext.close();
     await reviewerContext.close();

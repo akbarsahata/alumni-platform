@@ -6,6 +6,7 @@ import {
   type OutcomeEventKind,
   type OutcomeState,
 } from "./model";
+import { LocalTimestamp } from "../components/local-timestamp";
 
 export type OutcomeEventView = {
   id: string;
@@ -40,11 +41,10 @@ export function OutcomeSummary({ outcome }: { outcome: OutcomeView }) {
         <strong>Status saat ini:</strong> {outcomeStateLabels[outcome.state]}
       </p>
       <p>
-        <strong>Sumber:</strong> {source} · <time dateTime={sourceAt}>{sourceAt}</time>
+        <strong>Sumber:</strong> {source} · <LocalTimestamp value={sourceAt} />
       </p>
       <p>
-        <strong>Diperkenalkan:</strong>{" "}
-        <time dateTime={outcome.introducedAt}>{outcome.introducedAt}</time>
+        <strong>Diperkenalkan:</strong> <LocalTimestamp value={outcome.introducedAt} />
       </p>
       <p>
         <strong>Catatan terbaru:</strong> {latestNote ?? "Belum ada catatan hasil bantuan."}
@@ -66,7 +66,7 @@ export function OutcomeSummary({ outcome }: { outcome: OutcomeView }) {
                   Pelaku (ID): <span className="break-all">{event.actorUserId}</span>
                 </p>
                 <p>
-                  Waktu (UTC): <time dateTime={event.occurredAt}>{event.occurredAt}</time>
+                  Waktu: <LocalTimestamp value={event.occurredAt} />
                 </p>
                 {event.note && <p>Catatan: {event.note}</p>}
               </li>

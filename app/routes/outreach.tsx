@@ -4,6 +4,7 @@ import type { Route } from "./+types/outreach";
 import { readOutreach } from "../outreach/outreach.server";
 import { outreachStatusLabels } from "../outreach/model";
 import { pageTitle } from "../content/page-title";
+import { LocalTimestamp } from "../components/local-timestamp";
 export function meta() {
   return [{ title: pageTitle("Permintaan bantuan") }];
 }
@@ -31,7 +32,8 @@ export default function Outreach({ loaderData: d }: Route.ComponentProps) {
           <article className="rounded border p-4" key={r.id}>
             <Link to={`/outreach/requests/${r.id}`}>{r.title}</Link>
             <p>
-              {outreachStatusLabels[r.status]} · Batas respons (UTC): {r.expiresAt}
+              {outreachStatusLabels[r.status]} · Batas respons:{" "}
+              <LocalTimestamp value={r.expiresAt} />
             </p>
           </article>
         ))}

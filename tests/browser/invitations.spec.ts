@@ -1,6 +1,14 @@
-import { gotoReady, reloadReady } from "./app-ready";
+import {
+  expectLocalTimestamp,
+  expectNoRawTimestampText,
+  gotoReady,
+  localBrowserOptions,
+  reloadReady,
+} from "./app-ready";
 import { test, expect } from "@playwright/test";
 import { readFile } from "node:fs/promises";
+
+test.use(localBrowserOptions);
 
 test("primary invites a new school representative who verifies email and accepts without an alumni profile", async ({
   page,
@@ -32,6 +40,7 @@ test("primary invites a new school representative who verifies email and accepts
   await page.getByLabel("Alasan undangan").fill("Penunjukan siswa untuk uji browser");
   await page.getByRole("button", { name: "Kirim undangan" }).click();
   await expect(page.getByRole("status")).toContainText("Undangan telah dikirim.");
+  await expectLocalTimestamp(page.getByRole("status").locator("time").first());
   const invitationPath = await page
     .getByRole("link", { name: "Tautan undangan" })
     .getAttribute("href");
@@ -58,6 +67,8 @@ test("primary invites a new school representative who verifies email and accepts
   await expect(page).toHaveURL(new RegExp(`${invitationPath}$`));
   await expect(page.getByText("Peran: Perwakilan siswa")).toBeVisible();
   await expect(page.getByText("Nama perwakilan: Siti Rahma")).toBeVisible();
+  await expectLocalTimestamp(page.locator("main time").first());
+  await expectNoRawTimestampText(page);
   await page.getByRole("button", { name: "Terima undangan" }).click();
   await expect(page.getByRole("status")).toContainText("Undangan telah diterima.");
   const access = await (await page.request.get("/api/access")).json();
