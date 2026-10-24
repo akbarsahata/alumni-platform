@@ -23,6 +23,11 @@ writers cannot move or delete them, restrict the `production` environment to tho
 tags, and require reviewers on that environment. Reject prereleases and verify the
 release commit is on `master` before deploying.
 
+Staging is a normal production deployment of the `alumni-platform-staging` Worker,
+not a preview version. Preview URLs and `workers_dev` are disabled. Real production
+uses a separate `alumni-platform-production` Worker with its own D1 database, KV
+namespace, secrets and hostname.
+
 ## Goals
 
 - Deploy the React Router Worker to Cloudflare staging whenever `master` changes,

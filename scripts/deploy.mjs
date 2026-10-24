@@ -18,6 +18,10 @@ const placeholderKv = new Set([
   "00000000000000000000000000000001",
   "00000000000000000000000000000002",
 ]);
+// Keep aligned with env.staging in wrangler.jsonc. Production must never reuse
+// the staging database or namespace.
+const stagingD1 = "3cebe648-9065-4be8-ab8f-48958e9d36be";
+const stagingKv = "72a57fe4e83c4029a2ada4e5a84ddd80";
 
 function usage() {
   console.error(
@@ -96,6 +100,7 @@ function validateBuildConfig(config, environment, expected, allowPlaceholders) {
   );
   assert(config.env === undefined, "Flattened build config must not contain an env block");
   assert(config.workers_dev === false, "Deployed Workers must disable workers_dev");
+  assert(config.preview_urls === false, "Deployed Workers must disable preview URLs");
   assert(config.observability?.enabled === true, "Deployed Workers must enable observability");
   assert(config.vars?.ENVIRONMENT === environment, `Runtime ENVIRONMENT must be ${environment}`);
   assert(
@@ -123,6 +128,10 @@ function validateBuildConfig(config, environment, expected, allowPlaceholders) {
       "Replace the placeholder staging/production D1 ID"
     );
     assert(!placeholderKv.has(namespace.id), "Replace the placeholder staging/production KV ID");
+  }
+  if (environment === "production") {
+    assert(database.database_id !== stagingD1, "Production must not use the staging D1 ID");
+    assert(namespace.id !== stagingKv, "Production must not use the staging KV ID");
   }
   if (!expected.placeholder) {
     const route = config.routes?.find(

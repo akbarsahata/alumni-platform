@@ -90,7 +90,7 @@ npm run deploy:production -- --check
 
 `--check` builds the selected environment, validates `build/server/wrangler.json`, removes any copied `.dev.vars`, and exits without applying migrations or deploying. A real deploy requires the environment's Cloudflare credentials and `PRODUCTION_URL` for production. The deploy script rejects placeholder resource IDs, missing custom-domain routes and missing required secrets, captures a production D1 Time Travel bookmark before migrations, applies remote migrations, and deletes its temporary secrets file. Operators who already keep a private reviewed file can pass `--secrets-file <path>`; they are responsible for deleting that file.
 
-Deployed environments disable `workers_dev` and include a non-production `X-Robots-Tag: noindex` response header. Never publish `.dev.vars`, `.wrangler/`, build-local secrets, or test artifacts. Local commands remove the ignored `.wrangler/deploy/config.json` redirect before running so a previous staging build cannot change local D1, KV or type generation. Do not run a real deployment command for local verification.
+Deployed environments disable `workers_dev`, disable preview URLs, and include a non-production `X-Robots-Tag: noindex` response header. Never publish `.dev.vars`, `.wrangler/`, build-local secrets, or test artifacts. Local commands remove the ignored `.wrangler/deploy/config.json` redirect before running so a previous staging build cannot change local D1, KV or type generation. Do not run a real deployment command for local verification.
 
 For suspension/reinstatement and controlled review requests, see
 [membership-suspensions.md](membership-suspensions.md). Focused verification:
