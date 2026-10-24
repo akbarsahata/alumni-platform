@@ -74,11 +74,17 @@ test("primary corrects a representative name and the saved identity reaches scho
       .split("\n")
       .find((line) => line.startsWith("LOCAL_MAIL_KEY="))!
       .slice("LOCAL_MAIL_KEY=".length);
-    const mail = await (
-      await member.request.get(`/__local/mail?email=${encodeURIComponent(f.staff.email)}`, {
-        headers: { Authorization: `Bearer ${key}` },
-      })
-    ).json();
+    const mail = process.env.RESEND_MOCK_URL
+      ? await (
+          await fetch(
+            `${process.env.RESEND_MOCK_URL}/__messages?email=${encodeURIComponent(f.staff.email)}`
+          )
+        ).json()
+      : await (
+          await member.request.get(`/__local/mail?email=${encodeURIComponent(f.staff.email)}`, {
+            headers: { Authorization: `Bearer ${key}` },
+          })
+        ).json();
     expect(mail.text).toContain("Ibu Sari Browser Terbaru");
     expect(mail.text).toContain(f.recipient.email);
   } finally {

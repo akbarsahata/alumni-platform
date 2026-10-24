@@ -96,13 +96,24 @@ requests. Completed responses remain historical records.
   role and verified email, and that the account email still matches the consented
   email.
 - Failed capture leaves the introduction pending. A current directory coordinator
-  can retry it from the need page. Withdrawal is allowed until capture, including
-  while claimed and after request expiry. Capture rechecks eligibility, consent,
-  staff authority and both email destinations in the conditional write. Migration
+  can retry it from the need page. Withdrawal is allowed before a provider delivery
+  attempt starts, including while a local capture is merely claimed and after
+  request expiry. Once a provider attempt starts, withdrawal and eligibility/staff
+  invalidation are serialized against the irreversible send; they resume only after
+  a definite provider rejection. A shared email cannot be recalled. Migration
   `0019_atomic_introduction_capture.sql` adds the local introduction mailbox; its
-  insert and sharing/audit evidence commit atomically, so withdrawal and capture
-  cannot both win. A shared email cannot be recalled. A claimed row left by a
-  process crash remains withdrawable; general provider recovery is outside scope.
+  insert and sharing/audit evidence commit atomically, so local withdrawal and
+  capture cannot both win.
+- Migration `0025_introduction_delivery_attempts.sql` adds the provider attempt
+  projection and its serialization boundary. The attempt stores the stable
+  idempotency key, accepted provider message ID, recipient snapshot, first-attempt
+  time and `dispatching`, `accepted`, `failed` or `ambiguous` state. Provider
+  acceptance is recorded before sharing evidence; a failed evidence write stays
+  reconcilable without another provider send. A timeout or transport error is
+  ambiguous: withdrawal stays blocked and retries reuse the same key for at most
+  24 hours. After that window a coordinator retry is blocked for operator
+  reconciliation rather than risking a duplicate disclosure. A definite provider
+  rejection releases the introduction for ordinary retry and withdrawal.
 - Introduction captures use D1; other local mail uses KV. The authenticated local
   mailbox returns the latest capture across both stores, with ten-minute visibility.
   Expired introduction captures are removed lazily on subsequent captures. This is
@@ -206,8 +217,11 @@ partial uniqueness indexes and eligibility/replacement/audit triggers.
 mailbox. `0021_outreach_outcomes.sql` adds the outcome projection, append-only event
 history, introduced-baseline/share trigger, conditional revision enforcement,
 projection guards and minimal outcome audit actions. `0022_outreach_clarifications.sql`
-adds private message retention and a minimal clarification audit trigger. There are
-no new environment variables. Use the existing local setup and captured-mail adapter:
+adds private message retention and a minimal clarification audit trigger.
+`0025_introduction_delivery_attempts.sql` adds provider-attempt persistence,
+idempotency-window enforcement, accepted-message evidence and serialized
+withdrawal/invalidation. There are no new environment variables. Use the existing
+local setup and captured-mail adapter:
 
 ```sh
 npm run local:setup

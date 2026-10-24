@@ -12,11 +12,13 @@ export type EmailTransport = "local" | "resend";
 export interface EmailDeliveryResult {
   delivered: boolean;
   transport: EmailTransport;
+  messageId?: string;
 }
 
 export interface SendEmailOptions {
   idempotencyKey?: string;
   localCapture?: () => Promise<boolean>;
+  useProvider?: boolean;
 }
 
 export async function sendEmail(
@@ -24,9 +26,23 @@ export async function sendEmail(
   message: EmailMessage,
   options: SendEmailOptions = {}
 ): Promise<EmailDeliveryResult> {
-  if (env.ENVIRONMENT === "development") {
+  const environment: string = env.ENVIRONMENT;
+  if (environment === "development" || environment === "test") {
     if (!import.meta.env.DEV || !env.LOCAL_MAIL || !env.LOCAL_MAIL_KEY)
       throw new EmailDeliveryError();
+    if (environment === "test" && options.useProvider) {
+      const result = await sendWithResend(
+        {
+          apiKey: env.RESEND_API_KEY,
+          from: env.EMAIL_FROM,
+          replyTo: env.EMAIL_REPLY_TO,
+        },
+        message,
+        options.idempotencyKey,
+        { endpoint: env.RESEND_API_URL }
+      );
+      return { delivered: true, transport: "resend", messageId: result.messageId };
+    }
     if (options.localCapture)
       return { delivered: await options.localCapture(), transport: "local" };
     await env.LOCAL_MAIL.put(message.to.toLowerCase(), JSON.stringify(message), {
@@ -36,10 +52,9 @@ export async function sendEmail(
     return { delivered: true, transport: "local" };
   }
 
-  if (env.ENVIRONMENT !== "staging" && env.ENVIRONMENT !== "production")
-    throw new EmailDeliveryError();
+  if (environment !== "staging" && environment !== "production") throw new EmailDeliveryError();
 
-  await sendWithResend(
+  const result = await sendWithResend(
     {
       apiKey: env.RESEND_API_KEY,
       from: env.EMAIL_FROM,
@@ -48,13 +63,13 @@ export async function sendEmail(
     message,
     options.idempotencyKey
   );
-  return { delivered: true, transport: "resend" };
+  return { delivered: true, transport: "resend", messageId: result.messageId };
 }
 
 export async function readLocalMail(request: Request, env: Env) {
   const url = new URL(request.url);
   if (
-    env.ENVIRONMENT !== "development" ||
+    !["development", "test"].includes(env.ENVIRONMENT) ||
     !import.meta.env.DEV ||
     !["127.0.0.1", "localhost", "[::1]"].includes(url.hostname)
   ) {

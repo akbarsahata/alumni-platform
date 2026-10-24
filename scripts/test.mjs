@@ -1,5 +1,6 @@
 import { spawn } from "node:child_process";
 import { randomBytes } from "node:crypto";
+import { createServer } from "node:http";
 import { mkdir, open, mkdtemp, rm, readFile, readdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
@@ -85,6 +86,76 @@ for (const [directory, suffix, seam] of [
 }
 await run(process.execPath, ["--test", ...unitTests.map((file) => `tests/${file}`)]);
 
+const mockMessages = [];
+let mockMode = "success";
+let mockSequence = 0;
+const mockWaiters = [];
+const mockServer = createServer((request, response) => {
+  const url = new URL(request.url, "http://127.0.0.1");
+  if (request.method === "POST" && url.pathname === "/__control") {
+    let body = "";
+    request.on("data", (chunk) => (body += chunk));
+    request.on("end", () => {
+      mockMode = JSON.parse(body || "{}").mode ?? "success";
+      if (mockMode === "success") {
+        for (const waiter of mockWaiters.splice(0)) waiter();
+      }
+      response.writeHead(204).end();
+    });
+    return;
+  }
+  if (request.method === "GET" && url.pathname === "/__messages") {
+    const email = (url.searchParams.get("email") ?? "").toLowerCase();
+    const message = mockMessages.filter((item) => item.to === email).at(-1) ?? null;
+    response.writeHead(200, { "Content-Type": "application/json" });
+    response.end(JSON.stringify(message));
+    return;
+  }
+  if (request.method === "GET" && url.pathname === "/__requests") {
+    response.writeHead(200, { "Content-Type": "application/json" });
+    response.end(JSON.stringify(mockMessages));
+    return;
+  }
+  if (request.method === "POST" && url.pathname === "/__reset") {
+    mockMessages.splice(0);
+    mockMode = "success";
+    for (const waiter of mockWaiters.splice(0)) waiter();
+    response.writeHead(204).end();
+    return;
+  }
+  if (request.method !== "POST" || url.pathname !== "/emails") {
+    response.writeHead(404).end();
+    return;
+  }
+  let body = "";
+  request.on("data", (chunk) => (body += chunk));
+  request.on("end", async () => {
+    const message = JSON.parse(body || "{}");
+    mockMessages.push({
+      ...message,
+      to: String(message.to ?? "").toLowerCase(),
+      idempotencyKey: request.headers["idempotency-key"] ?? null,
+      capturedAt: Date.now(),
+    });
+    if (mockMode === "network") {
+      request.socket.destroy();
+      return;
+    }
+    if (mockMode === "hold") await new Promise((resolveHold) => mockWaiters.push(resolveHold));
+    if (mockMode === "error") {
+      response.writeHead(500, { "Content-Type": "application/json" });
+      response.end(JSON.stringify({ message: "synthetic provider failure" }));
+      return;
+    }
+    mockSequence += 1;
+    response.writeHead(200, { "Content-Type": "application/json" });
+    response.end(JSON.stringify({ id: `mock-email-${mockSequence}` }));
+  });
+});
+await new Promise((resolveListen) => mockServer.listen(0, "127.0.0.1", resolveListen));
+const mockPort = mockServer.address().port;
+process.env.RESEND_MOCK_URL = `http://127.0.0.1:${mockPort}`;
+
 await mkdir("test-results", { recursive: true });
 await mkdir(".wrangler", { recursive: true });
 process.env.ALUMNI_TEST_STATE = resolve(await mkdtemp(".wrangler/integration-state-"));
@@ -98,7 +169,7 @@ await writeFile(
 );
 await writeFile(
   process.env.ALUMNI_TEST_VARS,
-  `BETTER_AUTH_SECRET=${randomBytes(32).toString("hex")}\nBETTER_AUTH_URL=http://127.0.0.1:5173\nLOCAL_MAIL_KEY=${randomBytes(32).toString("hex")}\nRESEND_API_KEY=local-capture-only\n`,
+  `BETTER_AUTH_SECRET=${randomBytes(32).toString("hex")}\nBETTER_AUTH_URL=http://127.0.0.1:5173\nLOCAL_MAIL_KEY=${randomBytes(32).toString("hex")}\nENVIRONMENT=test\nRESEND_API_KEY=test\nEMAIL_FROM=iam@akbarsahata.id\nEMAIL_REPLY_TO=iam@akbarsahata.id\nRESEND_API_URL=http://127.0.0.1:${mockPort}/emails\n`,
   { mode: 0o600 }
 );
 await run("node_modules/.bin/wrangler", [
@@ -202,6 +273,7 @@ try {
 } finally {
   stop();
   await log.close();
+  await new Promise((resolveClose) => mockServer.close(resolveClose));
   // Remove only the disposable state created by this run.
   await rm(process.env.ALUMNI_TEST_STATE, { recursive: true, force: true });
 }

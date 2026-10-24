@@ -29,9 +29,11 @@ so they do not consume that build or share its artifacts.
 Each matrix job has its own Ubuntu runner, Node 24, locked dependencies, Chromium
 and system dependencies. It creates a fresh `.wrangler/integration-state-*`
 directory with synthetic keys, matching origin configuration, D1 migrations and
-KV state. Its HTTP tests produce the account/consent fixtures consumed by its
-browser tests. The Worker is stopped and disposable state removed afterward.
-Normal development data and `.dev.vars` are preserved.
+KV state. A loopback mock Resend endpoint records provider requests for the real
+introduction-attempt path; all other mail uses local capture. Its HTTP tests produce
+the account/consent fixtures consumed by its browser tests. The Worker and mock
+server are stopped and disposable state removed afterward. Normal development data
+and `.dev.vars` are preserved.
 
 Parallelism is between jobs. HTTP files run sequentially inside each context;
 Chromium uses one worker. Directory and outreach first run `roles.test.mjs` to

@@ -13,12 +13,16 @@ export interface ResendMessage {
 export interface ResendOptions {
   fetchImpl?: typeof fetch;
   timeoutMs?: number;
+  endpoint?: string;
 }
 
 export class EmailDeliveryError extends Error {
-  constructor() {
+  readonly ambiguous: boolean;
+
+  constructor(ambiguous = false) {
     super("Email delivery failed");
     this.name = "EmailDeliveryError";
+    this.ambiguous = ambiguous;
   }
 }
 
@@ -29,7 +33,7 @@ export async function sendWithResend(
   message: ResendMessage,
   idempotencyKey?: string,
   options: ResendOptions = {}
-): Promise<void> {
+): Promise<{ messageId: string }> {
   const apiKey = config.apiKey?.trim();
   const from = config.from?.trim();
   const replyTo = config.replyTo?.trim();
@@ -47,7 +51,7 @@ export async function sendWithResend(
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), options.timeoutMs ?? 10_000);
   try {
-    const response = await (options.fetchImpl ?? fetch)(resendEndpoint, {
+    const response = await (options.fetchImpl ?? fetch)(options.endpoint ?? resendEndpoint, {
       method: "POST",
       headers,
       body: JSON.stringify({
@@ -60,9 +64,12 @@ export async function sendWithResend(
       signal: controller.signal,
     });
     if (!response.ok) throw new EmailDeliveryError();
+    const payload = (await response.json().catch(() => null)) as { id?: unknown } | null;
+    if (typeof payload?.id !== "string" || !payload.id) throw new EmailDeliveryError(true);
+    return { messageId: payload.id };
   } catch (error) {
     if (error instanceof EmailDeliveryError) throw error;
-    throw new EmailDeliveryError();
+    throw new EmailDeliveryError(true);
   } finally {
     clearTimeout(timer);
   }

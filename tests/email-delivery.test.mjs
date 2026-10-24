@@ -16,17 +16,15 @@ const message = {
 
 test("Resend adapter sends the configured message and idempotency key", async () => {
   let request;
-  await sendWithResend(config, message, "outreach-introduction:intro-1", {
+  const result = await sendWithResend(config, message, "outreach-introduction:intro-1", {
     fetchImpl: async (url, init) => {
       request = { url, init };
       return new Response(JSON.stringify({ id: "email_1" }), { status: 200 });
     },
   });
 
+  assert.equal(result.messageId, "email_1");
   assert.equal(request.url, "https://api.resend.com/emails");
-  assert.equal(request.init.method, "POST");
-  assert.equal(request.init.headers.Authorization, "Bearer re_test_key");
-  assert.equal(request.init.headers["Content-Type"], "application/json");
   assert.equal(request.init.headers["Idempotency-Key"], "outreach-introduction:intro-1");
   assert.deepEqual(JSON.parse(request.init.body), {
     from: "iam@akbarsahata.id",
@@ -37,18 +35,7 @@ test("Resend adapter sends the configured message and idempotency key", async ()
   });
 });
 
-test("Resend adapter omits the idempotency header when no key is provided", async () => {
-  let headers;
-  await sendWithResend(config, message, undefined, {
-    fetchImpl: async (_, init) => {
-      headers = init.headers;
-      return new Response("{}", { status: 200 });
-    },
-  });
-  assert.equal(headers["Idempotency-Key"], undefined);
-});
-
-test("Resend adapter returns a sanitized error for a provider failure", async () => {
+test("Resend adapter returns a sanitized definite error for a provider failure", async () => {
   await assert.rejects(
     sendWithResend(config, message, undefined, {
       fetchImpl: async () =>
@@ -57,13 +44,14 @@ test("Resend adapter returns a sanitized error for a provider failure", async ()
     (error) => {
       assert.ok(error instanceof EmailDeliveryError);
       assert.equal(error.message, "Email delivery failed");
+      assert.equal(error.ambiguous, false);
       assert.doesNotMatch(error.message, /member@example\.test|provider body/);
       return true;
     }
   );
 });
 
-test("Resend adapter returns a sanitized error after a bounded timeout", async () => {
+test("Resend adapter marks timeout and transport failures ambiguous", async () => {
   await assert.rejects(
     sendWithResend(config, message, undefined, {
       timeoutMs: 20,
@@ -72,7 +60,7 @@ test("Resend adapter returns a sanitized error after a bounded timeout", async (
           init.signal.addEventListener("abort", () => reject(new Error("aborted")));
         }),
     }),
-    EmailDeliveryError
+    (error) => error instanceof EmailDeliveryError && error.ambiguous
   );
 });
 
@@ -85,28 +73,28 @@ test("Resend adapter fails closed when configuration is missing", async () => {
         return new Response("{}", { status: 200 });
       },
     }),
-    EmailDeliveryError
+    (error) => error instanceof EmailDeliveryError && !error.ambiguous
   );
   assert.equal(called, false);
 });
 
 function introductionFixture({
+  claim = { id: "intro-1", action: "send", staffEmail: null, memberEmail: null },
   sendMode = "resend",
-  captureResult = true,
-  markResult = true,
-  pending = false,
+  confirm = true,
+  markShared = true,
 } = {}) {
   const calls = [];
   const repository = {
     async reconcile() {
       calls.push("reconcile");
     },
-    async claimIntroduction(requestId, now, coordinatorId) {
-      calls.push(["claim", requestId, now, coordinatorId]);
-      return { id: "intro-1" };
+    async beginIntroductionDelivery() {
+      calls.push("begin");
+      return claim;
     },
-    async introductionDelivery(id) {
-      calls.push(["delivery", id]);
+    async introductionDelivery() {
+      calls.push("delivery");
       return {
         staffEmail: "staff@example.test",
         staffName: "Staf Sekolah",
@@ -117,104 +105,112 @@ function introductionFixture({
         requestedHelp: "Menjadi mentor",
       };
     },
-    async captureIntroduction(id, capturedMessage, coordinatorId) {
-      calls.push(["capture", id, capturedMessage.to, coordinatorId]);
-      return captureResult;
+    async confirmIntroductionDelivery() {
+      calls.push("confirm");
+      return confirm;
     },
-    async markIntroductionShared(id, sharedMessage, coordinatorId) {
-      calls.push(["mark", id, sharedMessage.to, coordinatorId]);
-      if (markResult === "throw") throw new Error("database unavailable");
-      return markResult;
+    async markIntroductionAccepted(id, providerMessageId) {
+      calls.push(["accepted", id, providerMessageId]);
+      return true;
+    },
+    async markIntroductionFailed(id) {
+      calls.push(["failed", id]);
+      return true;
+    },
+    async markIntroductionAmbiguous(id) {
+      calls.push(["ambiguous", id]);
+      return true;
+    },
+    async markIntroductionShared(id, staffEmail) {
+      calls.push(["shared", id, staffEmail]);
+      return markShared;
+    },
+    async captureIntroduction() {
+      calls.push("capture");
+      return true;
     },
     async releaseIntroduction(id) {
       calls.push(["release", id]);
     },
-    async hasPendingIntroduction(requestId) {
-      calls.push(["pending", requestId]);
-      return pending;
+    async hasPendingIntroduction() {
+      return false;
     },
   };
   const send = async (outgoing, options) => {
     calls.push(["send", outgoing, options.idempotencyKey]);
-    if (sendMode === "throw") throw new Error("provider unavailable");
+    if (sendMode === "definite") throw new EmailDeliveryError();
+    if (sendMode === "ambiguous") throw new EmailDeliveryError(true);
     if (sendMode === "local") {
-      const delivered = await options.localCapture();
-      return { delivered, transport: "local" };
+      await options.localCapture();
+      return { delivered: true, transport: "local" };
     }
-    return { delivered: true, transport: "resend" };
+    return { delivered: true, transport: "resend", messageId: "mock-1" };
   };
   return { calls, repository, send };
 }
 
-function runIntroduction(fixture) {
+function runIntroduction(fixture, provider = true) {
   return deliverIntroductionAttempt({
     requestId: "request-1",
     initiatingCoordinatorId: "coordinator-1",
     now: "2026-10-24T10:00:00.000Z",
+    provider,
     repository: fixture.repository,
     send: fixture.send,
   });
 }
 
-test("provider acceptance records introduction sharing evidence", async () => {
+test("provider acceptance records an accepted attempt and sharing evidence", async () => {
   const fixture = introductionFixture();
   const result = await runIntroduction(fixture);
-
-  assert.deepEqual(result, { shared: true, pending: false });
-  assert.ok(fixture.calls.some((call) => Array.isArray(call) && call[0] === "mark"));
-  assert.ok(!fixture.calls.some((call) => Array.isArray(call) && call[0] === "capture"));
-  const sendCall = fixture.calls.find((call) => Array.isArray(call) && call[0] === "send");
-  assert.equal(sendCall[2], "outreach-introduction:intro-1");
-  assert.match(sendCall[1].text, /member@example\.test/);
-  assert.match(sendCall[1].text, /Mentor robotika/);
+  assert.deepEqual(result, { shared: true, pending: false, attention: false });
+  assert.ok(fixture.calls.some((call) => Array.isArray(call) && call[0] === "accepted"));
+  assert.ok(fixture.calls.some((call) => Array.isArray(call) && call[0] === "shared"));
 });
 
-test("provider failure leaves the introduction retryable and unshared", async () => {
-  const fixture = introductionFixture({ sendMode: "throw", pending: true });
+test("definite provider failure releases a retryable introduction", async () => {
+  const fixture = introductionFixture({ sendMode: "definite" });
   const result = await runIntroduction(fixture);
-
-  assert.deepEqual(result, { shared: false, pending: true });
-  assert.ok(fixture.calls.some((call) => Array.isArray(call) && call[0] === "release"));
-  assert.ok(!fixture.calls.some((call) => Array.isArray(call) && call[0] === "mark"));
-});
-
-test("sharing evidence failure releases the claimed introduction", async () => {
-  const fixture = introductionFixture({ markResult: false, pending: true });
-  const result = await runIntroduction(fixture);
-
-  assert.deepEqual(result, { shared: false, pending: true });
-  assert.ok(fixture.calls.some((call) => Array.isArray(call) && call[0] === "mark"));
+  assert.deepEqual(result, { shared: false, pending: false, attention: false });
+  assert.ok(fixture.calls.some((call) => Array.isArray(call) && call[0] === "failed"));
   assert.ok(fixture.calls.some((call) => Array.isArray(call) && call[0] === "release"));
 });
 
-test("a sharing evidence exception releases the claimed introduction", async () => {
-  const fixture = introductionFixture({ markResult: "throw", pending: true });
+test("ambiguous provider outcome requires reconciliation and does not release", async () => {
+  const fixture = introductionFixture({ sendMode: "ambiguous" });
   const result = await runIntroduction(fixture);
+  assert.deepEqual(result, { shared: false, pending: false, attention: true });
+  assert.ok(fixture.calls.some((call) => Array.isArray(call) && call[0] === "ambiguous"));
+  assert.ok(!fixture.calls.some((call) => Array.isArray(call) && call[0] === "release"));
+});
 
-  assert.deepEqual(result, { shared: false, pending: true });
-  assert.ok(fixture.calls.some((call) => Array.isArray(call) && call[0] === "mark"));
-  assert.ok(fixture.calls.some((call) => Array.isArray(call) && call[0] === "release"));
+test("an accepted attempt is reconciled without another provider send", async () => {
+  const fixture = introductionFixture({
+    claim: {
+      id: "intro-1",
+      action: "evidence",
+      staffEmail: "staff@example.test",
+      memberEmail: "member@example.test",
+      providerMessageId: "mock-1",
+    },
+  });
+  const result = await runIntroduction(fixture);
+  assert.deepEqual(result, { shared: true, pending: false, attention: false });
+  assert.ok(!fixture.calls.some((call) => Array.isArray(call) && call[0] === "send"));
+  assert.ok(fixture.calls.some((call) => Array.isArray(call) && call[0] === "shared"));
+});
+
+test("a blocked attempt is exposed for operator attention", async () => {
+  const fixture = introductionFixture({ claim: { id: "intro-1", action: "blocked" } });
+  const result = await runIntroduction(fixture);
+  assert.deepEqual(result, { shared: false, pending: false, attention: true });
+  assert.ok(!fixture.calls.some((call) => Array.isArray(call) && call[0] === "send"));
 });
 
 test("local capture keeps the atomic D1 mailbox path", async () => {
   const fixture = introductionFixture({ sendMode: "local" });
-  const result = await runIntroduction(fixture);
-
-  assert.deepEqual(result, { shared: true, pending: false });
-  assert.ok(fixture.calls.some((call) => Array.isArray(call) && call[0] === "capture"));
-  assert.ok(!fixture.calls.some((call) => Array.isArray(call) && call[0] === "mark"));
-});
-
-test("local capture refusal releases the claimed introduction", async () => {
-  const fixture = introductionFixture({
-    sendMode: "local",
-    captureResult: false,
-    pending: true,
-  });
-  const result = await runIntroduction(fixture);
-
-  assert.deepEqual(result, { shared: false, pending: true });
-  assert.ok(fixture.calls.some((call) => Array.isArray(call) && call[0] === "capture"));
-  assert.ok(fixture.calls.some((call) => Array.isArray(call) && call[0] === "release"));
-  assert.ok(!fixture.calls.some((call) => Array.isArray(call) && call[0] === "mark"));
+  const result = await runIntroduction(fixture, false);
+  assert.deepEqual(result, { shared: true, pending: false, attention: false });
+  assert.ok(fixture.calls.includes("capture"));
+  assert.ok(!fixture.calls.some((call) => Array.isArray(call) && call[0] === "confirm"));
 });

@@ -157,7 +157,10 @@ export async function readOutreachRequest(request: Request, env: Env, requestId:
     row.eligible &&
     !!row.staffRecipient?.active;
   const canWithdraw =
-    isRecipient && !!active && ["pending", "claimed"].includes(active.deliveryState);
+    isRecipient &&
+    !!active &&
+    ["pending", "claimed"].includes(active.deliveryState) &&
+    !["dispatching", "accepted", "ambiguous"].includes(active.deliveryAttemptState ?? "");
   const canRespond = isRecipient && row.request.status === "pending" && !expired;
   const canClarify =
     isClarificationOpenStatus(row.request.status) && !expired && !row.closed && row.eligible;
@@ -279,6 +282,7 @@ async function deliverIntroduction(
     requestId,
     initiatingCoordinatorId,
     now: new Date().toISOString(),
+    provider: env.ENVIRONMENT !== "development",
     repository: outreachRepository(env.DB),
     send: (message, options) => sendEmail(env, message, options),
   });
