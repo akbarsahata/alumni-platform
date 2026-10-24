@@ -4,9 +4,10 @@
   "compatibility_date": "2026-10-01",
   "compatibility_flags": ["nodejs_compat"],
   "main": "./workers/app.ts",
-  // Local development never exposes the Worker on workers.dev. The deploy
-  // script refuses to run without an explicit staging or production target.
+  // Local development never exposes the Worker on workers.dev or preview URLs.
+  // The deploy script refuses to run without an explicit staging or production target.
   "workers_dev": false,
+  "preview_urls": false,
   "observability": { "enabled": true },
   "vars": {
     "BETTER_AUTH_URL": "http://localhost:5173",
@@ -29,21 +30,22 @@
   ],
   "kv_namespaces": [{ "binding": "LOCAL_MAIL", "id": "00000000000000000000000000000000" }],
   "env": {
-    // Replace the placeholder UUIDs with the staging resources before the
-    // first deploy. scripts/deploy.mjs rejects placeholder IDs.
+    // Staging is deployed as a normal production deployment of this Worker,
+    // not as a preview version. Real production remains a separate Worker.
     "staging": {
       "name": "alumni-platform-staging",
       "workers_dev": false,
+      "preview_urls": false,
       "observability": { "enabled": true },
       "d1_databases": [
         {
           "binding": "DB",
           "database_name": "alumni_staging",
-          "database_id": "00000000-0000-0000-0000-000000000001",
+          "database_id": "3cebe648-9065-4be8-ab8f-48958e9d36be",
           "migrations_dir": "migrations",
         },
       ],
-      "kv_namespaces": [{ "binding": "LOCAL_MAIL", "id": "00000000000000000000000000000001" }],
+      "kv_namespaces": [{ "binding": "LOCAL_MAIL", "id": "72a57fe4e83c4029a2ada4e5a84ddd80" }],
       "routes": [{ "pattern": "kasmanss.akbarsahata.id", "custom_domain": true }],
       "vars": {
         "BETTER_AUTH_URL": "https://kasmanss.akbarsahata.id",
@@ -55,12 +57,14 @@
         "required": ["BETTER_AUTH_SECRET", "RESEND_API_KEY"],
       },
     },
-    // Production stays deliberately undeliverable until the hostname,
-    // resources and secrets are chosen. Replace the placeholders and add the
-    // custom-domain route before the release phase.
+    // Real production uses this separate Worker and its own resources. Do not
+    // reuse staging IDs. It stays deliberately undeliverable until the hostname,
+    // resources and secrets are chosen; add the custom-domain route before the
+    // release phase.
     "production": {
       "name": "alumni-platform-production",
       "workers_dev": false,
+      "preview_urls": false,
       "observability": { "enabled": true },
       "d1_databases": [
         {
