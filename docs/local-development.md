@@ -13,7 +13,7 @@ npm run db:migrate
 npm run dev
 ```
 
-Open http://localhost:5173/ for the guest login page; `/login` remains supported for invitation and identity-change redirects. `local:setup` creates a private `.dev.vars` with separate random authentication and local mailbox keys, preserving any existing file. `.dev.vars.example` documents the names without credentials. Keep BETTER_AUTH_URL equal to the development origin, including its port. The committed D1 and KV IDs are local placeholders; no remote provisioning is needed. Wrangler persists synthetic D1/KV state under ignored `.wrangler/`.
+Open http://localhost:5173/ for the guest login page; `/login` remains supported for invitation and identity-change redirects. `local:setup` creates a private `.dev.vars` with separate random authentication and local mailbox keys, preserving any existing file. `.dev.vars.example` documents the names without credentials. It also writes a non-live `RESEND_API_KEY` placeholder so required-secret type generation stays local and deterministic; add that placeholder manually to an existing `.dev.vars` if Wrangler reports it missing. Keep BETTER_AUTH_URL equal to the development origin, including its port. The committed D1 and KV IDs are local placeholders; no remote provisioning is needed. Wrangler persists synthetic D1/KV state under ignored `.wrangler/`. The top-level `wrangler.jsonc` environment is development and keeps `workers_dev` disabled; deployed environments are selected only through `CLOUDFLARE_ENV`.
 
 ## Formatting and linting
 
@@ -27,7 +27,7 @@ The repository's VS Code/Cursor settings enable formatting on every save with th
 
 ## Local mailbox
 
-Codes never appear in product pages, API JSON, or logs. The local operator mailbox is available only in development builds, on a loopback hostname, with the separate LOCAL_MAIL_KEY bearer token. Read a captured message with `npm run mail -- synthetic@example.test` in your local terminal. Alternatively, use a local operator HTTP client to GET `/__local/mail?email=synthetic@example.test` with `Authorization: Bearer <LOCAL_MAIL_KEY from .dev.vars>`. Do not paste the key into URLs or chat. The response has `to`, `subject` and `text`. It returns the latest message per address with ten-minute visibility. Most captures use KV; consented introductions use a local D1 mailbox so capture and sharing evidence commit atomically (migration `0019_atomic_introduction_capture.sql`). Expired D1 captures are removed lazily on subsequent introduction captures. There is no public mailbox page.
+Codes never appear in product pages, API JSON, or logs. The local operator mailbox is available only in development builds, on a loopback hostname, with the separate LOCAL_MAIL_KEY bearer token. Read a captured message with `npm run mail -- synthetic@example.test` in your local terminal. Alternatively, use a local operator HTTP client to GET `/__local/mail?email=synthetic@example.test` with `Authorization: Bearer <LOCAL_MAIL_KEY from .dev.vars>`. Do not paste the key into URLs or chat. The response has `to`, `subject` and `text`. It returns the latest message per address with ten-minute visibility. Most captures use KV; consented introductions use a local D1 mailbox so capture and sharing evidence commit atomically (migration `0019_atomic_introduction_capture.sql`). Expired D1 captures are removed lazily on subsequent introduction captures. There is no public mailbox page. Staging and production bindings are configured separately; the local mailbox endpoint remains development-only.
 
 Login requires a sign-in code and proves email ownership; it does not grant alumni membership or administrative roles. Applicants and administrators use the same authentication. Issue #3 adds the private appointment command and primary-administrator role management; see [administrator-bootstrap.md](administrator-bootstrap.md). Logout deletes the database session and clears its HttpOnly cookie. Password login, code-retrieval, password reset and self-service identity-change endpoints are not exposed by this Worker.
 
@@ -77,7 +77,20 @@ References: [Better Auth Email OTP](https://better-auth.com/docs/plugins/email-o
 
 ## Build and deployment boundary
 
-`npm run build` builds the Worker; `npm run preview -- --host 127.0.0.1` previews it locally. The built Worker disables local capture and fails closed on sending email. Live mail, domain configuration, secrets, resource IDs and deployment are outside this slice. A future deployment must configure a live email adapter and separate environment bindings first; never publish `.dev.vars`, `.wrangler/`, build-local secrets, or test artifacts. Do not run the deployment command for this local verification.
+`npm run build` builds the local Worker; `npm run preview -- --host 127.0.0.1` previews it locally. The built Worker disables local capture and still fails closed on sending email until the live email adapter slice lands.
+
+`wrangler.jsonc` now defines development, staging and production environments. Development and both deployed environments repeat the non-inheritable bindings, routes, variables, required secrets and observability settings. Staging and production D1/KV IDs are guarded placeholders until the owner provisions the resources.
+
+`npm run deploy` intentionally fails without an environment. Use:
+
+```sh
+npm run deploy:staging -- --check
+npm run deploy:production -- --check
+```
+
+`--check` builds the selected environment, validates `build/server/wrangler.json`, removes any copied `.dev.vars`, and exits without applying migrations or deploying. A real deploy requires the environment's Cloudflare credentials and `PRODUCTION_URL` for production. The deploy script rejects placeholder resource IDs, missing custom-domain routes and missing required secrets, captures a production D1 Time Travel bookmark before migrations, applies remote migrations, and deletes its temporary secrets file. Operators who already keep a private reviewed file can pass `--secrets-file <path>`; they are responsible for deleting that file.
+
+Deployed environments disable `workers_dev` and include a non-production `X-Robots-Tag: noindex` response header. Never publish `.dev.vars`, `.wrangler/`, build-local secrets, or test artifacts. Local commands remove the ignored `.wrangler/deploy/config.json` redirect before running so a previous staging build cannot change local D1, KV or type generation. Do not run a real deployment command for local verification.
 
 For suspension/reinstatement and controlled review requests, see
 [membership-suspensions.md](membership-suspensions.md). Focused verification:

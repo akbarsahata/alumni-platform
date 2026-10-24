@@ -163,8 +163,8 @@ Extend the existing [Tests workflow](../.github/workflows/tests.yml) so the stab
       through the same adapter.
 - [ ] A successful introduction send records sharing evidence; a provider failure
       leaves the introduction retryable and does not mark it shared.
-- [ ] All 23 migrations are applied to the staging D1 database, and a repeat deploy
-      applies none.
+- [ ] All committed migrations are applied to the staging D1 database, and a repeat
+      deploy applies none.
 - [ ] Production resources and secrets are never used by a staging deploy; the
       production job cannot run from `master`, a pull request, a merge queue, or a
       prerelease.

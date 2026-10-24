@@ -2,3 +2,5 @@
 BETTER_AUTH_SECRET=replace-with-a-random-secret-at-least-32-characters
 BETTER_AUTH_URL=http://localhost:5173
 LOCAL_MAIL_KEY=replace-with-a-separate-random-local-operator-key
+# Local capture does not call Resend; this placeholder satisfies required-secret typing.
+RESEND_API_KEY=local-capture-only

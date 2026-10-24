@@ -4,6 +4,20 @@
   "compatibility_date": "2026-10-01",
   "compatibility_flags": ["nodejs_compat"],
   "main": "./workers/app.ts",
+  // Local development never exposes the Worker on workers.dev. The deploy
+  // script refuses to run without an explicit staging or production target.
+  "workers_dev": false,
+  "observability": { "enabled": true },
+  "vars": {
+    "BETTER_AUTH_URL": "http://localhost:5173",
+    "EMAIL_FROM": "iam@akbarsahata.id",
+    "EMAIL_REPLY_TO": "iam@akbarsahata.id",
+    "ENVIRONMENT": "development",
+  },
+  "secrets": {
+    // secrets.required replaces .dev.vars inference for generated types.
+    "required": ["BETTER_AUTH_SECRET", "LOCAL_MAIL_KEY", "RESEND_API_KEY"],
+  },
   "d1_databases": [
     {
       "binding": "DB",
@@ -13,4 +27,59 @@
     },
   ],
   "kv_namespaces": [{ "binding": "LOCAL_MAIL", "id": "00000000000000000000000000000000" }],
+  "env": {
+    // Replace the placeholder UUIDs with the staging resources before the
+    // first deploy. scripts/deploy.mjs rejects placeholder IDs.
+    "staging": {
+      "name": "alumni-platform-staging",
+      "workers_dev": false,
+      "observability": { "enabled": true },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "alumni_staging",
+          "database_id": "00000000-0000-0000-0000-000000000001",
+          "migrations_dir": "migrations",
+        },
+      ],
+      "kv_namespaces": [{ "binding": "LOCAL_MAIL", "id": "00000000000000000000000000000001" }],
+      "routes": [{ "pattern": "kasmanss.akbarsahata.id", "custom_domain": true }],
+      "vars": {
+        "BETTER_AUTH_URL": "https://kasmanss.akbarsahata.id",
+        "EMAIL_FROM": "iam@akbarsahata.id",
+        "EMAIL_REPLY_TO": "iam@akbarsahata.id",
+        "ENVIRONMENT": "staging",
+      },
+      "secrets": {
+        "required": ["BETTER_AUTH_SECRET", "RESEND_API_KEY"],
+      },
+    },
+    // Production stays deliberately undeliverable until the hostname,
+    // resources and secrets are chosen. Replace the placeholders and add the
+    // custom-domain route before the release phase.
+    "production": {
+      "name": "alumni-platform-production",
+      "workers_dev": false,
+      "observability": { "enabled": true },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "alumni_production",
+          "database_id": "00000000-0000-0000-0000-000000000002",
+          "migrations_dir": "migrations",
+        },
+      ],
+      "kv_namespaces": [{ "binding": "LOCAL_MAIL", "id": "00000000000000000000000000000002" }],
+      "routes": [],
+      "vars": {
+        "BETTER_AUTH_URL": "https://production.invalid",
+        "EMAIL_FROM": "iam@akbarsahata.id",
+        "EMAIL_REPLY_TO": "iam@akbarsahata.id",
+        "ENVIRONMENT": "production",
+      },
+      "secrets": {
+        "required": ["BETTER_AUTH_SECRET", "RESEND_API_KEY"],
+      },
+    },
+  },
 }
