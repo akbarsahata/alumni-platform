@@ -21,7 +21,9 @@ export async function useAccount(context: BrowserContext, account: { cookie: str
       sameSite: "Lax",
     },
   ]);
-  return context.newPage();
+  const page = await context.newPage();
+  page.on("pageerror", (error) => console.error(`[browser-error] ${error.message}`));
+  return page;
 }
 
 // Navigation/load completion can precede React attaching form handlers.

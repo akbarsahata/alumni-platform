@@ -82,7 +82,13 @@ provision a Worker, migrations or fixtures.
 Keep `127.0.0.1:5173` free. Separate GitHub runners can use that same port; local
 context commands should run sequentially. Run typecheck/build separately from a
 running test Worker because React Router generates shared route types in the
-checkout. Neither local hooks nor CI require live email or Cloudflare credentials.
+checkout. CI starts with a cold Vite cache. To reproduce first-navigation failures
+locally, stop the test Worker, remove only generated `node_modules/.vite`, and rerun
+the affected context. The existing `optimizeDeps.include` list explicitly includes
+lazy-route validation (`zod`) and timestamp dependencies (`date-fns` and
+`date-fns/locale`). Discovering them during a journey can invalidate imported
+modules with `504 Outdated Optimize Dep` and prevent hydration. Keep this list
+aligned with lazy client dependencies; do not hide such failures with test retries. Neither local hooks nor CI require live email or Cloudflare credentials.
 
 ## Failure and required-check behavior
 

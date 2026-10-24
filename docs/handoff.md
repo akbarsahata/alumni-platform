@@ -1,3 +1,29 @@
+# Cold-cache CI hydration correction — 2026-10-24
+
+Continuation of PR [#33](https://github.com/akbarsahata/alumni-platform/pull/33).
+The font-isolation change alone did not make hosted runs green. Run #64 still
+failed directory hydration on `/school-needs` and a clarification browser journey,
+while HTTP suites, auth, membership and static checks passed.
+
+Clearing only generated `node_modules/.vite` reproduced the failure locally:
+Vite returned `504 Outdated Optimize Dep`, followed by failure to dynamically
+import React Router's client entry. Adding `zod` to pre-optimization resolved the
+representative journey, then exposed the same invalidation on a detail page when
+`date-fns` and `date-fns/locale` were first discovered. All three now belong to
+`optimizeDeps.include` so lazy browser routes do not invalidate active modules.
+Browser page exceptions are reported without publishing trace/session artifacts;
+clarification cleanup now preserves the original failure instead of masking it.
+The earlier external-font probes demonstrated a separate dependency risk, not a
+complete explanation of the hosted failures.
+
+Validation passes both cold-cache directory and outreach context runs: every
+HTTP suite, five directory Chromium journeys and seven outreach Chromium journeys.
+Formatting/lint/typecheck run in the commit hook; the production build is checked
+separately after stopping the test Worker. Hosted success and merge are still pending
+at this source snapshot. The user authorized continued fixes/pushes until all PR
+checks pass, then merging to `master`. No deployment is authorized or performed.
+See [CI testing](ci-testing.md) for cold-cache reproduction and dependency rules.
+
 # Parallel CI integration contexts — 2026-10-23
 
 Implementation is pushed on `codex/parallel-ci-tests` in managed worktree
