@@ -39,7 +39,7 @@ test("coordinator selects a recipient and member declines privately on mobile", 
     );
     await expect(student.locator("main")).not.toContainText("Jadwal keluarga");
   } finally {
-    await context.close();
+    await Promise.allSettled([context.close()]);
   }
 });
 
@@ -69,6 +69,6 @@ test("coordinator sends one reminder and takes over; expired requests reject res
     await expect(member.getByRole("button", { name: "Saya berminat" })).toHaveCount(0);
     await expect(member.getByRole("button", { name: "Tolak permintaan" })).toHaveCount(0);
   } finally {
-    await context.close();
+    await Promise.allSettled([context.close()]);
   }
 });

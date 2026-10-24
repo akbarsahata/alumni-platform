@@ -68,6 +68,13 @@ CLI is an operator tool outside the application repository layer.
 
 ## Verification and references
 
+CI schedules the backend suite in the `membership` integration context, alongside
+its roles/bootstrap dependencies. Each context has a fresh local Worker/D1/KV and
+runs HTTP fixture producers before Chromium consumers. The same application-boundary
+verification applies across all four parallel contexts; see
+[CI testing and context ownership](ci-testing.md). For this context, run
+`npm test -- --context membership`.
+
 Use the existing Worker/browser/HTTP seam with synthetic accounts, real local D1,
 Better Auth, and captured mail. `tests/backend.test.mjs` adds method/unknown-route,
 origin/cache, malformed JSON/form, authorization-order, and forged-actor coverage.

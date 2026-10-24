@@ -76,3 +76,9 @@ Acceptance: optional updates respect preferences; account mail remains separate;
 ## Definition of done for each session
 
 Relevant acceptance criteria exercised; build/type checks pass; consequential workflow tests pass; migrations and configuration documented; handoff updated with exact checks, remaining risks and next ticket. Do not describe unfinished or untested behavior as complete.
+
+CI schedules the same accepted real Worker/D1/Better Auth/captured-mail/Chromium
+coverage in four isolated contexts. Assign new HTTP/browser files to the runner
+context map and retain producer/consumer order; see [CI testing](ci-testing.md).
+Passing local checks and a successful hosted `tests` gate are distinct evidence;
+record their actual status in the handoff.

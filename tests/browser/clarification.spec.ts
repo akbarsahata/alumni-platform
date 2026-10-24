@@ -71,7 +71,6 @@ test("member asks privately and coordinator replies without exposing the thread 
       "Apakah kegiatan ini menyediakan transportasi?"
     );
   } finally {
-    await coordinatorContext.close();
-    await context.close();
+    await Promise.allSettled([coordinatorContext.close(), context.close()]);
   }
 });

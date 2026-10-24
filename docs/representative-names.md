@@ -53,6 +53,13 @@ approval history, invitation records or introduction evidence.
 
 ## Verification
 
+These HTTP and browser tests belong to the `directory` CI context; run
+`npm test -- --context directory` to include its shared roles bootstrap and
+related fixtures. The browser journey retains name propagation, consent, captured
+mail and mobile-width assertions. Its optional desktop/mobile screenshots were
+removed after a stalled-font probe reproduced the CI timeout. See
+[CI diagnostics](ci-testing.md#timing-and-browser-diagnostics).
+
 ```sh
 node scripts/test.mjs tests/representative-names.test.mjs tests/browser/representative-names.spec.ts
 node scripts/test.mjs tests/invitations.test.mjs tests/browser/invitations.spec.ts

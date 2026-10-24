@@ -1,19 +1,87 @@
 import { spawn } from "node:child_process";
 import { randomBytes } from "node:crypto";
-import { mkdir, open, mkdtemp, rm, readFile, writeFile } from "node:fs/promises";
+import { mkdir, open, mkdtemp, rm, readFile, readdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
 
 function run(command, args) {
   return new Promise((resolve, reject) => {
+    const started = performance.now();
     const child = spawn(command, args, { stdio: "inherit" });
     child.once("error", reject);
-    child.once("exit", (code) =>
-      code === 0 ? resolve() : reject(new Error(`${command} exited with ${code}`))
-    );
+    child.once("exit", (code) => {
+      console.log(
+        `[timing] ${command} ${args.join(" ")}: ${((performance.now() - started) / 1000).toFixed(1)}s`
+      );
+      code === 0 ? resolve() : reject(new Error(`${command} exited with ${code}`));
+    });
   });
 }
 
+const contextIndex = process.argv.indexOf("--context");
+const contexts = {
+  auth: { http: ["auth", "logout"], browser: ["login"] },
+  membership: {
+    http: [
+      "roles",
+      "membership",
+      "references",
+      "backend",
+      "corrections",
+      "account-bar",
+      "invitations",
+      "suspensions",
+      "email-changes",
+    ],
+    browser: [
+      "roles",
+      "membership",
+      "references",
+      "corrections",
+      "account-bar",
+      "invitations",
+      "suspensions",
+      "email-changes",
+      "hydration",
+    ],
+  },
+  directory: {
+    http: ["profiles", "directory", "school-needs", "representative-names"],
+    browser: [
+      "profiles",
+      "directory",
+      "school-needs",
+      "representative-names",
+      "navigation-preview",
+    ],
+  },
+  outreach: {
+    http: ["outreach", "introductions", "outcomes", "clarification"],
+    browser: ["outreach", "introductions", "outcomes", "clarification"],
+  },
+};
+const context = contextIndex === -1 ? undefined : contexts[process.argv[contextIndex + 1]];
+if (contextIndex !== -1 && (!context || process.argv.length !== 4)) {
+  throw new Error(`Usage: node scripts/test.mjs --context ${Object.keys(contexts).join("|")}`);
+}
+
+// Fail closed when a new test file has not been assigned to a CI context.
+for (const [directory, suffix, seam] of [
+  ["tests", ".test.mjs", "http"],
+  ["tests/browser", ".spec.ts", "browser"],
+]) {
+  const actual = (await readdir(directory))
+    .filter((file) => file.endsWith(suffix) && file !== "location-list.test.mjs")
+    .sort();
+  const assigned = Object.values(contexts)
+    .flatMap((group) => group[seam].map((name) => `${name}${suffix}`))
+    .sort();
+  if (JSON.stringify(actual) !== JSON.stringify(assigned)) {
+    throw new Error(
+      `Update CI contexts for ${directory}: assigned files must match test files exactly`
+    );
+  }
+}
 await run(process.execPath, ["--test", "tests/location-list.test.mjs"]);
 
 await mkdir("test-results", { recursive: true });
@@ -82,38 +150,53 @@ try {
     if (ready) break;
   }
   if (!ready) throw new Error("Worker did not become ready; see test-results/worker.log.");
-  // AllSettled keeps the Worker alive until both suites have finished, even if one fails.
-  if (!process.argv[2]) {
-    await run(process.execPath, ["--test", "tests/roles.test.mjs"]);
-    await run(process.execPath, ["--test", "tests/membership.test.mjs"]);
-    await run(process.execPath, ["--test", "tests/references.test.mjs"]);
-    await run(process.execPath, ["--test", "tests/backend.test.mjs"]);
-    await run(process.execPath, ["--test", "tests/corrections.test.mjs"]);
-    await run(process.execPath, ["--test", "tests/account-bar.test.mjs"]);
-    await run(process.execPath, ["--test", "tests/invitations.test.mjs"]);
-    await run(process.execPath, ["--test", "tests/representative-names.test.mjs"]);
-    await run(process.execPath, ["--test", "tests/suspensions.test.mjs"]);
-    await run(process.execPath, ["--test", "tests/email-changes.test.mjs"]);
-    await run(process.execPath, ["--test", "tests/profiles.test.mjs"]);
-    await run(process.execPath, ["--test", "tests/directory.test.mjs"]);
-    await run(process.execPath, ["--test", "tests/school-needs.test.mjs"]);
-    await run(process.execPath, ["--test", "tests/outreach.test.mjs"]);
-    await run(process.execPath, ["--test", "tests/introductions.test.mjs"]);
-    await run(process.execPath, ["--test", "tests/outcomes.test.mjs"]);
-    await run(process.execPath, ["--test", "tests/clarification.test.mjs"]);
+  if (context) {
+    // Keep fixture producers and consumers on the same isolated Worker/D1.
+    // Shared reviewers load accounts.json; only the roles suite establishes it.
+    if (!context.http.includes("roles") && process.argv[contextIndex + 1] !== "auth") {
+      await run(process.execPath, ["--test", "tests/roles.test.mjs"]);
+    }
+    for (const name of context.http) {
+      await run(process.execPath, ["--test", `tests/${name}.test.mjs`]);
+    }
+    await run("node_modules/.bin/playwright", [
+      "test",
+      ...context.browser.map((name) => `tests/browser/${name}.spec.ts`),
+    ]);
+  } else {
+    // AllSettled keeps the Worker alive until both suites have finished, even if one fails.
+    if (!process.argv[2]) {
+      await run(process.execPath, ["--test", "tests/roles.test.mjs"]);
+      await run(process.execPath, ["--test", "tests/membership.test.mjs"]);
+      await run(process.execPath, ["--test", "tests/references.test.mjs"]);
+      await run(process.execPath, ["--test", "tests/backend.test.mjs"]);
+      await run(process.execPath, ["--test", "tests/corrections.test.mjs"]);
+      await run(process.execPath, ["--test", "tests/account-bar.test.mjs"]);
+      await run(process.execPath, ["--test", "tests/invitations.test.mjs"]);
+      await run(process.execPath, ["--test", "tests/representative-names.test.mjs"]);
+      await run(process.execPath, ["--test", "tests/suspensions.test.mjs"]);
+      await run(process.execPath, ["--test", "tests/email-changes.test.mjs"]);
+      await run(process.execPath, ["--test", "tests/profiles.test.mjs"]);
+      await run(process.execPath, ["--test", "tests/directory.test.mjs"]);
+      await run(process.execPath, ["--test", "tests/school-needs.test.mjs"]);
+      await run(process.execPath, ["--test", "tests/outreach.test.mjs"]);
+      await run(process.execPath, ["--test", "tests/introductions.test.mjs"]);
+      await run(process.execPath, ["--test", "tests/outcomes.test.mjs"]);
+      await run(process.execPath, ["--test", "tests/clarification.test.mjs"]);
+    }
+    const results = await Promise.allSettled(
+      process.argv[2]
+        ? [run(process.execPath, ["--test", process.argv[2]])]
+        : [
+            run(process.execPath, ["--test", "tests/auth.test.mjs"]),
+            run(process.execPath, ["--test", "tests/logout.test.mjs"]),
+            run("node_modules/.bin/playwright", ["test"]),
+          ]
+    );
+    const failure = results.find((result) => result.status === "rejected");
+    if (failure) throw failure.reason;
+    if (process.argv[3]) await run("node_modules/.bin/playwright", ["test", process.argv[3]]);
   }
-  const results = await Promise.allSettled(
-    process.argv[2]
-      ? [run(process.execPath, ["--test", process.argv[2]])]
-      : [
-          run(process.execPath, ["--test", "tests/auth.test.mjs"]),
-          run(process.execPath, ["--test", "tests/logout.test.mjs"]),
-          run("node_modules/.bin/playwright", ["test"]),
-        ]
-  );
-  const failure = results.find((result) => result.status === "rejected");
-  if (failure) throw failure.reason;
-  if (process.argv[3]) await run("node_modules/.bin/playwright", ["test", process.argv[3]]);
 } finally {
   stop();
   await log.close();

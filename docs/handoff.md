@@ -1,3 +1,90 @@
+# Cold-cache CI hydration correction — 2026-10-24
+
+Continuation of PR [#33](https://github.com/akbarsahata/alumni-platform/pull/33).
+The font-isolation change alone did not make hosted runs green. Run #64 still
+failed directory hydration on `/school-needs` and a clarification browser journey,
+while HTTP suites, auth, membership and static checks passed.
+
+Clearing only generated `node_modules/.vite` reproduced the failure locally:
+Vite returned `504 Outdated Optimize Dep`, followed by failure to dynamically
+import React Router's client entry. Adding `zod` to pre-optimization resolved the
+representative journey, then exposed the same invalidation on a detail page when
+`date-fns` and `date-fns/locale` were first discovered. All three now belong to
+`optimizeDeps.include` so lazy browser routes do not invalidate active modules.
+Browser page exceptions are reported without publishing trace/session artifacts;
+clarification cleanup now preserves the original failure instead of masking it.
+The earlier external-font probes demonstrated a separate dependency risk, not a
+complete explanation of the hosted failures.
+
+Validation passes both cold-cache directory and outreach context runs: every
+HTTP suite, five directory Chromium journeys and seven outreach Chromium journeys.
+Formatting/lint/typecheck run in the commit hook; the production build is checked
+separately after stopping the test Worker. Hosted success and merge are still pending
+at this source snapshot. The user authorized continued fixes/pushes until all PR
+checks pass, then merging to `master`. No deployment is authorized or performed.
+See [CI testing](ci-testing.md) for cold-cache reproduction and dependency rules.
+
+# Parallel CI integration contexts — 2026-10-23
+
+Implementation is pushed on `codex/parallel-ci-tests` in managed worktree
+`/Users/akbar/.codex/worktrees/parallel-ci-tests/alumni-platform`, rebased onto
+`origin/master` at `b01fbfa` after source PR #32 merged. Open delivery PR:
+[#33](https://github.com/akbarsahata/alumni-platform/pull/33), targeting `master`.
+Implementation commit: `bdea30a`; diagnostic screenshot fix: `107f454`.
+No deployment, remote migration, live email or repository-rule change occurred.
+
+## Current design and documentation
+
+[CI testing](ci-testing.md) is the operational reference for the stage graph,
+exact context ownership, fixture/bootstrap dependencies, commands, required gate,
+test assignment and diagnostics. [Architecture](architecture.md#verification-architecture)
+and [backend architecture](backend-architecture.md#verification-and-references)
+describe the verification boundary; [local development](local-development.md#verification)
+contains setup and focused commands. Older handoff sections below are historical;
+current OTP checks age disposable verification/limiter rows instead of sleeping.
+
+The Tests workflow runs static checks/build/helpers, then four parallel context
+jobs (`auth`, `membership`, `directory`, `outreach`), then the stable `tests` gate.
+Each context owns its Worker/D1/KV, runs HTTP producers before Chromium consumers,
+and keeps one browser worker. Directory/outreach repeat roles bootstrap for
+`accounts.json`; helpers also repeat. File assignment fails closed for missing,
+stale or duplicate entries. The final gate rejects unsuccessful/skipped prerequisites;
+`fail-fast: false` preserves sibling results. Plain/full and file-focused commands
+remain supported. Parallelism requires separate runners, not competing local
+Workers on port 5173. Run typecheck/build apart from a running test Worker to
+avoid shared generated-route-type races.
+
+## Verification and hosted boundary
+
+All four context commands passed locally: 108 distinct HTTP tests, six helper
+tests and 22 Chromium journeys, with repeated helper/bootstrap execution excluded
+from distinct counts. Typecheck, production build, lint, formatting and diff checks
+passed. Command totals excluding Worker readiness were approximately 9s auth,
+35s membership, 35s directory and 67s outreach; these local numbers are not hosted
+speedup evidence. Sequential baseline [run #59](https://github.com/akbarsahata/alumni-platform/actions/runs/39877810992)
+completed in 5m 21s, including about 4m 14s of HTTP/browser execution.
+
+The [first parallel run](https://github.com/akbarsahata/alumni-platform/actions/runs/39878646139)
+passed directory HTTP checks but hit its representative-name browser timeout.
+A deliberately stalled font reproduced the 30-second timeout and masked cleanup
+error: optional screenshots waited for fonts. Removing those two captures passed
+the identical probe in 2.3s. Temporary instrumentation was removed. All identity,
+consent, captured-mail and mobile-width assertions remain; final local directory
+validation passes every HTTP check and five Chromium journeys. Hosted logs alone
+do not prove that font loading caused the original failure.
+
+Follow-up after `daa79e1`: [run #62](https://github.com/akbarsahata/alumni-platform/actions/runs/39879576352)
+failed both directory and outreach browser journeys after their HTTP suites passed.
+The screenshot-only change was insufficient. A stalled Google Fonts stylesheet
+reproduced the representative timeout in `page.goto`; after preserving cleanup
+errors, the original wait was visible. The shared account helper now aborts remote
+Google Fonts requests once per browser context. The same unavailable-host probe
+passes in 2.0s, and remains as regression coverage in the representative journey.
+Directory/outreach cleanup uses settled promises to preserve the primary error.
+Local full directory/outreach context validation passes every HTTP suite,
+five directory Chromium journeys and seven outreach Chromium journeys. Hosted validation of this correction is still required; no longer timeout
+or automatic retry was introduced. PR #33 is not yet confirmed hosted-green.
+
 # School-need form refinements — 2026-10-23
 
 The `/school-needs` create and edit forms now collect structured time and location

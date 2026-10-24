@@ -24,6 +24,10 @@ export default defineConfig({
       "class-variance-authority",
       "clsx",
       "tailwind-merge",
+      // Lazy validation and timestamp routes must not invalidate active client modules.
+      "zod",
+      "date-fns",
+      "date-fns/locale",
     ],
   },
   resolve: {
