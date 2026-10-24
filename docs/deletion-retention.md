@@ -81,6 +81,10 @@ Verify exactly one snapshot exists before deleting anything:
 SELECT * FROM school_need_retention_snapshot WHERE need_id='<needId>';
 ```
 
+Once a snapshot exists, the school-need page and API read it for aggregate
+reporting. The counts therefore remain visible after the individual outreach
+records are deleted.
+
 ## 3. Record execution evidence
 
 Every ordinary deletion needs a matching `retention_execution`. The trigger

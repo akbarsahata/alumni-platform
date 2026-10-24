@@ -1,110 +1,97 @@
-import { sql } from "drizzle-orm";
+import { and, asc, desc, eq, getTableColumns, sql } from "drizzle-orm";
 import { database } from "./database.server";
+import {
+  alumniMembership,
+  expertiseProfile,
+  membershipApplication,
+  membershipRevision,
+  profileDeletionEvent,
+  profileDeletionRequest,
+} from "./schema";
 
-type RequestRow = {
-  id: string;
-  memberUserId: string;
-  requestedAt: string;
-  dueAt: string;
-  status: "active" | "completed";
-  profileRemovedAt: string | null;
-  profileRemovedBy: string | null;
-  profileRemovalCount: number | null;
-  clarificationRemovedAt: string | null;
-  clarificationRemovedBy: string | null;
-  clarificationRemovalCount: number | null;
-  completedAt: string | null;
-  completedBy: string | null;
-  completionNote: string | null;
+export type ProfileDeletionRequestRow = typeof profileDeletionRequest.$inferSelect;
+export type ProfileDeletionEventRow = typeof profileDeletionEvent.$inferSelect;
+
+const identityColumns = {
+  ...getTableColumns(profileDeletionRequest),
+  schoolName: membershipRevision.schoolName,
+  house: alumniMembership.house,
+  profileExists: sql<number>`EXISTS(SELECT 1 FROM expertise_profile p
+   WHERE p.user_id=${profileDeletionRequest.memberUserId})`,
 };
-
-type IdentityRow = RequestRow & {
-  schoolName: string | null;
-  house: string | null;
-  profileExists: number;
-};
-
-type EventRow = {
-  id: string;
-  requestId: string;
-  actorUserId: string;
-  action: "requested" | "profile-removed" | "clarification-removed" | "completed";
-  count: number | null;
-  note: string | null;
-  occurredAt: string;
-};
-
-const requestColumns = `d.id, d.member_user_id AS memberUserId, d.requested_at AS requestedAt,
- d.due_at AS dueAt, d.status, d.profile_removed_at AS profileRemovedAt,
- d.profile_removed_by AS profileRemovedBy, d.profile_removal_count AS profileRemovalCount,
- d.clarification_removed_at AS clarificationRemovedAt,
- d.clarification_removed_by AS clarificationRemovedBy,
- d.clarification_removal_count AS clarificationRemovalCount,
- d.completed_at AS completedAt, d.completed_by AS completedBy,
- d.completion_note AS completionNote`;
 
 export function profileDeletionRepository(binding: D1Database) {
   const db = database(binding);
+  const identityRows = () =>
+    db
+      .select(identityColumns)
+      .from(profileDeletionRequest)
+      .leftJoin(
+        membershipApplication,
+        eq(membershipApplication.userId, profileDeletionRequest.memberUserId)
+      )
+      .leftJoin(
+        membershipRevision,
+        and(
+          eq(membershipRevision.userId, membershipApplication.userId),
+          eq(membershipRevision.revision, membershipApplication.revision)
+        )
+      )
+      .leftJoin(alumniMembership, eq(alumniMembership.userId, profileDeletionRequest.memberUserId));
   return {
     async profileExists(userId: string) {
-      return !!(await db.get<{ found: number }>(
-        sql`SELECT 1 AS found FROM expertise_profile WHERE user_id=${userId}`
-      ));
+      return !!(
+        await db
+          .select({ userId: expertiseProfile.userId })
+          .from(expertiseProfile)
+          .where(eq(expertiseProfile.userId, userId))
+          .limit(1)
+      )[0];
     },
     async latestForMember(userId: string) {
       return (
-        (await db.get<RequestRow>(
-          sql`SELECT ${sql.raw(requestColumns)} FROM profile_deletion_request d
-           WHERE d.member_user_id=${userId}
-           ORDER BY d.requested_at DESC, d.id DESC LIMIT 1`
-        )) ?? null
+        (
+          await db
+            .select()
+            .from(profileDeletionRequest)
+            .where(eq(profileDeletionRequest.memberUserId, userId))
+            .orderBy(desc(profileDeletionRequest.requestedAt), desc(profileDeletionRequest.id))
+            .limit(1)
+        )[0] ?? null
       );
     },
     async detail(requestId: string) {
-      const [request, events] = await Promise.all([
-        db.get<IdentityRow>(
-          sql`SELECT ${sql.raw(requestColumns)}, mr.school_name AS schoolName, m.house,
-           EXISTS(SELECT 1 FROM expertise_profile p WHERE p.user_id=d.member_user_id) AS profileExists
-           FROM profile_deletion_request d
-           LEFT JOIN membership_application a ON a.user_id=d.member_user_id
-           LEFT JOIN membership_revision mr
-             ON mr.user_id=a.user_id AND mr.revision=a.revision
-           LEFT JOIN alumni_membership m ON m.user_id=d.member_user_id
-           WHERE d.id=${requestId}`
-        ),
-        db.all<EventRow>(
-          sql`SELECT id, request_id AS requestId, actor_user_id AS actorUserId, action,
-           count, note, occurred_at AS occurredAt
-           FROM profile_deletion_event WHERE request_id=${requestId}
-           ORDER BY occurred_at, rowid`
-        ),
+      const [requests, events] = await Promise.all([
+        identityRows().where(eq(profileDeletionRequest.id, requestId)),
+        db
+          .select({
+            id: profileDeletionEvent.id,
+            requestId: profileDeletionEvent.requestId,
+            actorUserId: profileDeletionEvent.actorUserId,
+            action: profileDeletionEvent.action,
+            count: profileDeletionEvent.count,
+            note: profileDeletionEvent.note,
+            occurredAt: profileDeletionEvent.occurredAt,
+          })
+          .from(profileDeletionEvent)
+          .where(eq(profileDeletionEvent.requestId, requestId))
+          .orderBy(asc(profileDeletionEvent.occurredAt), asc(profileDeletionEvent.id)),
       ]);
-      return request ? { request, events } : null;
+      return requests[0] ? { request: requests[0], events } : null;
     },
     async queue() {
       const [active, completed] = await Promise.all([
-        db.all<IdentityRow>(
-          sql`SELECT ${sql.raw(requestColumns)}, mr.school_name AS schoolName, m.house,
-           EXISTS(SELECT 1 FROM expertise_profile p WHERE p.user_id=d.member_user_id) AS profileExists
-           FROM profile_deletion_request d
-           LEFT JOIN membership_application a ON a.user_id=d.member_user_id
-           LEFT JOIN membership_revision mr
-             ON mr.user_id=a.user_id AND mr.revision=a.revision
-           LEFT JOIN alumni_membership m ON m.user_id=d.member_user_id
-           WHERE d.status='active'
-           ORDER BY d.due_at, d.requested_at, d.id`
-        ),
-        db.all<IdentityRow>(
-          sql`SELECT ${sql.raw(requestColumns)}, mr.school_name AS schoolName, m.house,
-           EXISTS(SELECT 1 FROM expertise_profile p WHERE p.user_id=d.member_user_id) AS profileExists
-           FROM profile_deletion_request d
-           LEFT JOIN membership_application a ON a.user_id=d.member_user_id
-           LEFT JOIN membership_revision mr
-             ON mr.user_id=a.user_id AND mr.revision=a.revision
-           LEFT JOIN alumni_membership m ON m.user_id=d.member_user_id
-           WHERE d.status='completed'
-           ORDER BY d.completed_at DESC, d.id DESC LIMIT 50`
-        ),
+        identityRows()
+          .where(eq(profileDeletionRequest.status, "active"))
+          .orderBy(
+            asc(profileDeletionRequest.dueAt),
+            asc(profileDeletionRequest.requestedAt),
+            asc(profileDeletionRequest.id)
+          ),
+        identityRows()
+          .where(eq(profileDeletionRequest.status, "completed"))
+          .orderBy(desc(profileDeletionRequest.completedAt), desc(profileDeletionRequest.id))
+          .limit(50),
       ]);
       return { active, completed };
     },
@@ -184,6 +171,3 @@ export function profileDeletionRepository(binding: D1Database) {
     },
   };
 }
-
-export type ProfileDeletionRequestRow = RequestRow;
-export type ProfileDeletionEventRow = EventRow;

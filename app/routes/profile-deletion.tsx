@@ -79,7 +79,7 @@ export default function ProfileDeletion({ loaderData, actionData }: Route.Compon
         </p>
       )}
 
-      {request ? (
+      {request && (
         <section
           aria-label="Status permintaan penghapusan"
           className="space-y-2 rounded border p-4"
@@ -122,24 +122,24 @@ export default function ProfileDeletion({ loaderData, actionData }: Route.Compon
                 : "belum"}
             </li>
           </ul>
-          {request.status === "active" ? (
+          {request.status === "active" && (
             <p>
               Permintaan ini tidak dapat dibatalkan dari halaman ini. Hubungi operator utama bila
               ada kekeliruan.
             </p>
-          ) : (
-            <p>
-              Profil tidak lagi tersedia.{" "}
-              <Link className="underline" to="/profile">
-                Buka profil untuk membuat profil baru
-              </Link>
-              .
-            </p>
           )}
         </section>
-      ) : loaderData.profileExists ? (
+      )}
+
+      {request?.status === "active" ? null : loaderData.profileExists ? (
         <Form method="post" className="space-y-3 rounded border p-4">
           <h2 className="text-xl font-semibold">Ajukan penghapusan profil</h2>
+          {request && (
+            <p>
+              Profil yang Anda buat setelah penyelesaian sebelumnya dapat dihapus melalui permintaan
+              baru. Riwayat penyelesaian di atas tetap tersimpan.
+            </p>
+          )}
           <label className="flex items-start gap-2">
             <input type="checkbox" name="confirm" value="true" required />
             <span>
@@ -152,9 +152,9 @@ export default function ProfileDeletion({ loaderData, actionData }: Route.Compon
         </Form>
       ) : (
         <p>
-          Belum ada profil direktori untuk dihapus.{" "}
+          {request ? "Profil tidak lagi tersedia. " : "Belum ada profil direktori untuk dihapus. "}
           <Link className="underline" to="/profile">
-            Kembali ke profil
+            {request ? "Buka profil untuk membuat profil baru" : "Kembali ke profil"}
           </Link>
           .
         </p>

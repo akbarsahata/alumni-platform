@@ -62,7 +62,8 @@ Issue [#20](https://github.com/akbarsahata/alumni-platform/issues/20) is impleme
 on branch `feat/profile-deletion-retention`, following
 [the local specification](profile-deletion-retention-spec.md) and the
 [manual retention runbook](deletion-retention.md). No deployment, remote migration,
-live email or scheduled purge was added. Hosted checks are pending the PR.
+live email or scheduled purge was added. Hosted verification runs on PR
+[#36](https://github.com/akbarsahata/alumni-platform/pull/36).
 
 ## Behavior
 
@@ -79,6 +80,8 @@ live email or scheduled purge was added. Hosted checks are pending the PR.
 - Profile save and confirmation are rejected while a request is active, including
   after the profile row has been removed. A completed lifecycle leaves the profile
   row absent; the member may create a new profile and start a later lifecycle.
+  Once a new profile exists, `/profile/deletion` shows the request form again while
+  retaining the completed request as visible history.
 - The primary-only `/admin/profile-deletions` queue orders active requests by due
   date and recent completions by completion time, marks overdue work, and shows
   safe membership identity only. Its detail page has separate **Hapus konten
@@ -116,12 +119,20 @@ live email or scheduled purge was added. Hosted checks are pending the PR.
   are removed. Delete guards defer outcome/introduction/request removal during an
   active or unexpired profile-deletion hold. The profile-deletion processing path
   is the only non-retention exception, for the member's own clarification thread.
+- School-need reports read the latest retained aggregate snapshot once it exists,
+  so counts remain visible after the individual outreach rows are purged. The
+  snapshot contains no member identity, contact, content or individual timestamp.
 - The runbook covers export/backup, candidate review, aggregate snapshot,
   execution evidence, deletion order, profile-deletion evidence removal, and
   verification queries. No trigger may be disabled to bypass a guard.
 
 ## Verification
 
+- Review follow-up: deletion request/detail/queue reads now use schema-typed
+  Drizzle projections instead of hand-typed raw SQL; `/profile/deletion` offers a
+  new request once a profile exists after completion; and the retention journey
+  verifies an authorized school-need report still shows the preserved aggregate
+  after outreach rows are purged.
 - Focused:
   `node scripts/test.mjs tests/deletion.test.mjs tests/browser/deletion.spec.ts`
   passes all five HTTP journeys and the Chromium deletion journey.

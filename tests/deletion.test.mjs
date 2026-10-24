@@ -183,10 +183,23 @@ test("profile editing and confirmation stay blocked until processing completes; 
   assert.equal(completed.status, 200, await completed.clone().text());
   assert.equal((await completed.json()).request.status, "completed");
 
+  const completedPage = await call(recipient, "/profile/deletion");
+  assert.equal(completedPage.status, 200);
+  const completedHtml = await completedPage.text();
+  assert.match(completedHtml, /Penghapusan selesai\./);
+  assert.match(completedHtml, /Profil tidak lagi tersedia\./);
+  assert.doesNotMatch(completedHtml, /Ajukan penghapusan profil/);
+
   assert.equal((await call(recipient, "/api/profile", profile)).status, 200);
   const afterProfile = await (await call(recipient, "/api/profile")).json();
   assert.equal(afterProfile.deletion.status, "completed");
   assert.equal(afterProfile.deletion.profileExists, true);
+  const recreatedPage = await call(recipient, "/profile/deletion");
+  assert.equal(recreatedPage.status, 200);
+  const recreatedHtml = await recreatedPage.text();
+  assert.match(recreatedHtml, /Penghapusan selesai\./);
+  assert.match(recreatedHtml, /Ajukan penghapusan profil/);
+  assert.doesNotMatch(recreatedHtml, /Profil tidak lagi tersedia\./);
   const noProfile = await requestDeletion(recipient);
   assert.equal(noProfile.status, 200, await noProfile.clone().text());
   const second = await (await requestDeletion(recipient)).json();
@@ -644,6 +657,24 @@ test("the manual retention boundary rejects premature deletion, preserves aggreg
     } catch {}
     await delay(250);
   }
+
+  const retainedReport = await call(f.student, `/api/school-needs/${needId}`);
+  assert.equal(retainedReport.status, 200, await retainedReport.clone().text());
+  assert.deepEqual((await retainedReport.json()).outreach, {
+    total: 1,
+    pending: 0,
+    interested: 1,
+    declined: 0,
+    cancelled: 0,
+    expired: 0,
+    introduced: 1,
+    helpConfirmed: 0,
+    completed: 0,
+    didNotProceed: 0,
+    introducedTotal: 1,
+    closed: true,
+    closedAt: "2024-01-01T00:00:00.000Z",
+  });
 });
 
 after(async () => {

@@ -11,6 +11,7 @@ import {
   outreachIntroduction,
   outreachOutcome,
   outreachStaffRecipient,
+  schoolNeedRetentionSnapshot,
   user,
 } from "./schema";
 import type { EmailMessage } from "../email/email.server";
@@ -224,7 +225,7 @@ export function outreachRepository(binding: D1Database) {
       };
     },
     async aggregate(needId: string) {
-      const [rows, closures, outcomeRows, introductionRows] = await db.batch([
+      const [rows, closures, outcomeRows, introductionRows, snapshots] = await db.batch([
         db
           .select({ status: requestColumns.status, count: count() })
           .from(outreachRequest)
@@ -246,7 +247,45 @@ export function outreachRepository(binding: D1Database) {
               sql`${outreachIntroduction.sharedAt} IS NOT NULL`
             )
           ),
+        db
+          .select({
+            requestCount: schoolNeedRetentionSnapshot.requestCount,
+            pendingCount: schoolNeedRetentionSnapshot.pendingCount,
+            interestedCount: schoolNeedRetentionSnapshot.interestedCount,
+            declinedCount: schoolNeedRetentionSnapshot.declinedCount,
+            cancelledCount: schoolNeedRetentionSnapshot.cancelledCount,
+            introducedCount: schoolNeedRetentionSnapshot.introducedCount,
+            helpConfirmedCount: schoolNeedRetentionSnapshot.helpConfirmedCount,
+            completedCount: schoolNeedRetentionSnapshot.completedCount,
+            didNotProceedCount: schoolNeedRetentionSnapshot.didNotProceedCount,
+            sharedCount: schoolNeedRetentionSnapshot.sharedCount,
+          })
+          .from(schoolNeedRetentionSnapshot)
+          .where(eq(schoolNeedRetentionSnapshot.needId, needId))
+          .orderBy(
+            desc(schoolNeedRetentionSnapshot.capturedAt),
+            desc(schoolNeedRetentionSnapshot.id)
+          )
+          .limit(1),
       ]);
+      const snapshot = snapshots[0];
+      if (snapshot) {
+        return {
+          total: snapshot.requestCount,
+          pending: snapshot.pendingCount,
+          interested: snapshot.interestedCount,
+          declined: snapshot.declinedCount,
+          cancelled: snapshot.cancelledCount,
+          expired: 0,
+          introduced: snapshot.introducedCount,
+          helpConfirmed: snapshot.helpConfirmedCount,
+          completed: snapshot.completedCount,
+          didNotProceed: snapshot.didNotProceedCount,
+          introducedTotal: snapshot.sharedCount,
+          closed: !!closures[0],
+          closedAt: closures[0]?.closedAt ?? null,
+        };
+      }
       const counts: Record<OutreachStatus, number> = {
         pending: 0,
         interested: 0,
