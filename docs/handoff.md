@@ -1,3 +1,16 @@
+# Cloudflare deployment planning — 2026-10-24
+
+Created the agreed [Cloudflare deployment specification](deployment.md) for staging at
+`https://kasmanss.akbarsahata.id` and release-gated production. Published flat
+implementation issue [#34](https://github.com/akbarsahata/alumni-platform/issues/34)
+with `enhancement` and `ready-for-human`; the first deploy needs owner Cloudflare and
+GitHub environment access. A non-prerelease GitHub Release on a protected `v*` tag is
+the safest production trigger, with a reviewer-gated `production` environment. No
+application code, remote resource, secret, deployment, or live email change was made.
+The GitHub plugin was unavailable in this session; tracker operations used the
+authenticated `gh` CLI. The specification and documentation index entry are included
+in this documentation commit.
+
 # Cold-cache CI hydration correction — 2026-10-24
 
 Continuation of PR [#33](https://github.com/akbarsahata/alumni-platform/pull/33).
