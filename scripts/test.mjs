@@ -64,6 +64,7 @@ const context = contextIndex === -1 ? undefined : contexts[process.argv[contextI
 if (contextIndex !== -1 && (!context || process.argv.length !== 4)) {
   throw new Error(`Usage: node scripts/test.mjs --context ${Object.keys(contexts).join("|")}`);
 }
+const unitTests = ["location-list.test.mjs", "email-delivery.test.mjs"];
 
 // Fail closed when a new test file has not been assigned to a CI context.
 for (const [directory, suffix, seam] of [
@@ -71,7 +72,7 @@ for (const [directory, suffix, seam] of [
   ["tests/browser", ".spec.ts", "browser"],
 ]) {
   const actual = (await readdir(directory))
-    .filter((file) => file.endsWith(suffix) && file !== "location-list.test.mjs")
+    .filter((file) => file.endsWith(suffix) && !unitTests.includes(file))
     .sort();
   const assigned = Object.values(contexts)
     .flatMap((group) => group[seam].map((name) => `${name}${suffix}`))
@@ -82,7 +83,7 @@ for (const [directory, suffix, seam] of [
     );
   }
 }
-await run(process.execPath, ["--test", "tests/location-list.test.mjs"]);
+await run(process.execPath, ["--test", ...unitTests.map((file) => `tests/${file}`)]);
 
 await mkdir("test-results", { recursive: true });
 await mkdir(".wrangler", { recursive: true });
@@ -97,7 +98,7 @@ await writeFile(
 );
 await writeFile(
   process.env.ALUMNI_TEST_VARS,
-  `BETTER_AUTH_SECRET=${randomBytes(32).toString("hex")}\nBETTER_AUTH_URL=http://127.0.0.1:5173\nLOCAL_MAIL_KEY=${randomBytes(32).toString("hex")}\n`,
+  `BETTER_AUTH_SECRET=${randomBytes(32).toString("hex")}\nBETTER_AUTH_URL=http://127.0.0.1:5173\nLOCAL_MAIL_KEY=${randomBytes(32).toString("hex")}\nRESEND_API_KEY=local-capture-only\n`,
   { mode: 0o600 }
 );
 await run("node_modules/.bin/wrangler", [

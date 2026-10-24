@@ -13,7 +13,7 @@ npm run db:migrate
 npm run dev
 ```
 
-Open http://localhost:5173/ for the guest login page; `/login` remains supported for invitation and identity-change redirects. `local:setup` creates a private `.dev.vars` with separate random authentication and local mailbox keys, preserving any existing file. `.dev.vars.example` documents the names without credentials. Keep BETTER_AUTH_URL equal to the development origin, including its port. The committed D1 and KV IDs are local placeholders; no remote provisioning is needed. Wrangler persists synthetic D1/KV state under ignored `.wrangler/`.
+Open http://localhost:5173/ for the guest login page; `/login` remains supported for invitation and identity-change redirects. `local:setup` creates a private `.dev.vars` with separate random authentication and local mailbox keys, plus a `RESEND_API_KEY=local-capture-only` placeholder so required-secret typing is satisfied, preserving any existing file. `.dev.vars.example` documents the names without credentials. Keep BETTER_AUTH_URL equal to the development origin, including its port. The committed D1 and KV IDs are local placeholders; no remote provisioning is needed. Wrangler persists synthetic D1/KV state under ignored `.wrangler/`.
 
 ## Formatting and linting
 
@@ -27,7 +27,7 @@ The repository's VS Code/Cursor settings enable formatting on every save with th
 
 ## Local mailbox
 
-Codes never appear in product pages, API JSON, or logs. The local operator mailbox is available only in development builds, on a loopback hostname, with the separate LOCAL_MAIL_KEY bearer token. Read a captured message with `npm run mail -- synthetic@example.test` in your local terminal. Alternatively, use a local operator HTTP client to GET `/__local/mail?email=synthetic@example.test` with `Authorization: Bearer <LOCAL_MAIL_KEY from .dev.vars>`. Do not paste the key into URLs or chat. The response has `to`, `subject` and `text`. It returns the latest message per address with ten-minute visibility. Most captures use KV; consented introductions use a local D1 mailbox so capture and sharing evidence commit atomically (migration `0019_atomic_introduction_capture.sql`). Expired D1 captures are removed lazily on subsequent introduction captures. There is no public mailbox page.
+Codes never appear in product pages, API JSON, or logs. The local operator mailbox is available only when `ENVIRONMENT=development`, in development builds, on a loopback hostname, with the separate LOCAL_MAIL_KEY bearer token. Read a captured message with `npm run mail -- synthetic@example.test` in your local terminal. Alternatively, use a local operator HTTP client to GET `/__local/mail?email=synthetic@example.test` with `Authorization: Bearer <LOCAL_MAIL_KEY from .dev.vars>`. Do not paste the key into URLs or chat. The response has `to`, `subject` and `text`. It returns the latest message per address with ten-minute visibility. Most captures use KV; consented introductions use a local D1 mailbox so capture and sharing evidence commit atomically (migration `0019_atomic_introduction_capture.sql`). Expired D1 captures are removed lazily on subsequent introduction captures. There is no public mailbox page. Staging and production Workers use Resend instead and do not expose this endpoint.
 
 Login requires a sign-in code and proves email ownership; it does not grant alumni membership or administrative roles. Applicants and administrators use the same authentication. Issue #3 adds the private appointment command and primary-administrator role management; see [administrator-bootstrap.md](administrator-bootstrap.md). Logout deletes the database session and clears its HttpOnly cookie. Password login, code-retrieval, password reset and self-service identity-change endpoints are not exposed by this Worker.
 
@@ -77,7 +77,7 @@ References: [Better Auth Email OTP](https://better-auth.com/docs/plugins/email-o
 
 ## Build and deployment boundary
 
-`npm run build` builds the Worker; `npm run preview -- --host 127.0.0.1` previews it locally. The built Worker disables local capture and fails closed on sending email. Live mail, domain configuration, secrets, resource IDs and deployment are outside this slice. A future deployment must configure a live email adapter and separate environment bindings first; never publish `.dev.vars`, `.wrangler/`, build-local secrets, or test artifacts. Do not run the deployment command for this local verification.
+`npm run build` builds the Worker; `npm run preview -- --host 127.0.0.1` previews it locally. The built Worker fails closed when `ENVIRONMENT=development`; with `ENVIRONMENT=staging|production` and configured `RESEND_API_KEY`, `EMAIL_FROM` and `EMAIL_REPLY_TO`, it sends through Resend. Domain configuration, remote resource IDs, environment secrets and deploy workflows remain separate deployment work. Never publish `.dev.vars`, `.wrangler/`, build-local secrets, or test artifacts. The Vite plugin copies `.dev.vars` into `build/server/.dev.vars`; delete that copy before any deploy. Do not run the deployment command for local verification.
 
 For suspension/reinstatement and controlled review requests, see
 [membership-suspensions.md](membership-suspensions.md). Focused verification:

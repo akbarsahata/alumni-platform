@@ -52,8 +52,10 @@ Names below omit `tests/` and `.test.mjs` for HTTP, and `tests/browser/` and
 | `directory`  | profiles, directory, school-needs, representative-names                                                   | profiles, directory, school-needs, representative-names, navigation-preview                                 |
 | `outreach`   | outreach, introductions, outcomes, clarification, deletion                                                | outreach, introductions, outcomes, clarification, deletion                                                  |
 
-`location-list.test.mjs` is the helper suite, run by the static job and by each
-runner invocation. Roles setup repeats in directory and outreach. These repeated
+`location-list.test.mjs` and `email-delivery.test.mjs` are the helper suites, run by
+the static job and by each runner invocation. The email suite exercises the Resend
+adapter with a mocked provider and the introduction delivery orchestration without
+live credentials. Roles setup repeats in directory and outreach. These repeated
 checks must not be counted as additional distinct acceptance tests.
 
 Before provisioning state, the runner compares all top-level `tests/*.test.mjs`

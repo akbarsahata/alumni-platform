@@ -67,11 +67,15 @@ export async function startEmailChange(request: Request, env: Env, input: unknow
 
   let delivered = true;
   try {
-    await sendEmail(env, {
-      to: newEmail,
-      subject: "Verifikasi perubahan email akun alumni",
-      text: `Kode verifikasi perubahan email: ${verificationToken}. Buka ${new URL(`/email-changes/${emailChange.id}`, env.BETTER_AUTH_URL)} setelah masuk menggunakan email akun saat ini. Kode berlaku hingga ${emailChange.expiresAt}. Jangan bagikan kode ini.`,
-    });
+    await sendEmail(
+      env,
+      {
+        to: newEmail,
+        subject: "Verifikasi perubahan email akun alumni",
+        text: `Kode verifikasi perubahan email: ${verificationToken}. Buka ${new URL(`/email-changes/${emailChange.id}`, env.BETTER_AUTH_URL)} setelah masuk menggunakan email akun saat ini. Kode berlaku hingga ${emailChange.expiresAt}. Jangan bagikan kode ini.`,
+      },
+      { idempotencyKey: `email-change:${emailChange.id}` }
+    );
   } catch {
     delivered = false;
   }

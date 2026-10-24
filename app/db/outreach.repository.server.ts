@@ -732,6 +732,37 @@ export function outreachRepository(binding: D1Database) {
         RETURNING recipient`);
       return rows.length > 0;
     },
+    async markIntroductionShared(
+      id: string,
+      message: EmailMessage,
+      initiatingCoordinatorId: string | null
+    ) {
+      const rows = await db.all<{ id: string }>(sql`
+        UPDATE outreach_introduction SET delivery_state='captured',
+          shared_at=strftime('%Y-%m-%dT%H:%M:%fZ','now')
+        WHERE id=${id} AND delivery_state='claimed'
+          AND shared_at IS NULL AND withdrawn_at IS NULL AND invalidated_at IS NULL
+          AND EXISTS(
+            SELECT 1 FROM outreach_introduction i
+            JOIN outreach_request r ON r.id=i.request_id
+            JOIN outreach_staff_recipient sr ON sr.need_id=i.need_id AND sr.user_id=i.staff_user_id
+            JOIN user mu ON mu.id=i.member_user_id
+            JOIN user su ON su.id=i.staff_user_id
+            WHERE i.id=${id} AND r.status='interested'
+              AND i.consented_at<=r.expires_at
+              AND i.member_email=mu.email AND su.email=${message.to}
+              AND mu.email_verified=1 AND su.email_verified=1
+              AND EXISTS(SELECT 1 FROM outreach_eligible_recipient er
+                WHERE er.user_id=i.member_user_id)
+              AND EXISTS(SELECT 1 FROM role_assignment rr
+                WHERE rr.user_id=i.staff_user_id AND rr.role='staff'))
+          AND (${initiatingCoordinatorId} IS NULL OR EXISTS(
+            SELECT 1 FROM role_assignment cr
+            WHERE cr.user_id=${initiatingCoordinatorId}
+              AND cr.role='directory-coordinator'))
+        RETURNING id`);
+      return rows.length > 0;
+    },
     async releaseIntroduction(id: string) {
       return db.all<{ id: string }>(sql`
         UPDATE outreach_introduction SET delivery_state='pending',claimed_at=NULL

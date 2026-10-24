@@ -12,11 +12,15 @@ export async function captureNotifications(env: Env, userId: string) {
   const pending = await notificationRepository(env.DB).pending({ userId: userId });
   for (const message of pending) {
     try {
-      await sendEmail(env, {
-        to: message.email,
-        subject: subjects[message.kind],
-        text: `${message.message}\nLihat pengajuan Anda: ${new URL("/membership", env.BETTER_AUTH_URL).href}`,
-      });
+      await sendEmail(
+        env,
+        {
+          to: message.email,
+          subject: subjects[message.kind],
+          text: `${message.message}\nLihat pengajuan Anda: ${new URL("/membership", env.BETTER_AUTH_URL).href}`,
+        },
+        { idempotencyKey: `membership-notification:${message.id}` }
+      );
       await notificationRepository(env.DB).markDelivered({ id: message.id });
     } catch {
       // The committed decision stays valid. A mutation retry can retry capture.
