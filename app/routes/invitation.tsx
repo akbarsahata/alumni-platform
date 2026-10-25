@@ -55,7 +55,7 @@ export default function Invitation({ loaderData, actionData }: Route.ComponentPr
             <p>Undangan sudah kedaluwarsa. Hubungi administrator utama untuk undangan baru.</p>
           ) : (
             <Form method="post">
-              <Button>Terima undangan</Button>
+              <Button type="submit">Terima undangan</Button>
             </Form>
           )}
         </>

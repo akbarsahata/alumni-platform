@@ -1,3 +1,48 @@
+# Navigation progress and action hierarchy — 2026-10-26
+
+Added the global loading indicator and aligned form action colors on `master`. No
+migration, environment, deployment or email behavior changed.
+
+## Loading indicator
+
+- `app/components/navigation-progress.tsx` watches React Router `useNavigation` and
+  calls BProgress `start()` for `loading`/`submitting` states and `stop()` when idle.
+  It is mounted at the root, so link navigations, redirects and `Form` submissions on
+  every route use it.
+- Added `@bprogress/react@1.2.7` (with transitive `@bprogress/core@1.3.4`) and wrapped
+  the app in `ProgressProvider`. The bar is 6px, teal-to-gold (`#17665e` → `#dcae48`)
+  with a teal/gold glow, starts at a 15% minimum width and has no spinner.
+- It covers client-side navigations and form submissions, not the initial document
+  load.
+- The first implementation delayed the start by 120ms to avoid flashes on fast
+  loaders. Local navigations completed before that, so the bar never appeared; the
+  delay was removed.
+
+## Submit and cancel actions
+
+- Primary form submissions remain the default filled teal `Button` (or the shared
+  plain-button style). Explicit `type="submit"` was added where missing.
+- Added a neutral `cancel` variant to `app/components/ui/button.tsx` and matching
+  `data-variant="cancel"` styles for plain buttons. Decline/close actions use it:
+  **Tolak permintaan** and **Tutup kebutuhan**.
+- Added `data-variant="destructive"` red-outline treatment for irreversible actions:
+  profile/clarification deletion and completion, consent withdrawal, membership
+  suspension and role revocation. Removed the old `border rounded px-4 py-2`
+  overrides from primary submit buttons.
+
+## Verification
+
+- `npm run lint`, `npm run typecheck`, `npm run build` and `npm run test:unit` pass
+  (16 helper tests).
+- Chromium smoke against the local dev server: the progress bar appeared at 6px with
+  `rgb(23, 102, 94)` during a deliberately delayed client navigation, completed and
+  was removed; `/`, `/login` and the 404 route hydrated without console errors.
+- Full `npm test` was not run in this checkout because the ordinary local dev server
+  occupies port 5173, which the browser runner requires. Hosted CI is the full-suite
+  gate for this push.
+
+---
+
 # Staging verified and issue #34 closed — 2026-10-26
 
 Post-merge [Tests run 40238633521](https://github.com/akbarsahata/alumni-platform/actions/runs/40238633521)

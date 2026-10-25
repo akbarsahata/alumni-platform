@@ -148,7 +148,9 @@ export default function ProfileDeletion({ loaderData, actionData }: Route.Compon
               dapat ditarik kembali.
             </span>
           </label>
-          <button disabled={busy}>{busy ? "Memproses…" : "Ajukan penghapusan profil"}</button>
+          <button type="submit" data-variant="destructive" disabled={busy}>
+            {busy ? "Memproses…" : "Ajukan penghapusan profil"}
+          </button>
         </Form>
       ) : (
         <p>

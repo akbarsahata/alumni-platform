@@ -112,22 +112,10 @@ export default function AdminRoles({ loaderData, actionData }: Route.ComponentPr
           />
         </label>
         <div className="flex flex-wrap gap-4">
-          <Button
-            type="submit"
-            name="action"
-            value="grant"
-            disabled={busy}
-            className="border rounded px-4 py-2"
-          >
+          <Button type="submit" name="action" value="grant" disabled={busy}>
             Berikan peran
           </Button>
-          <Button
-            type="submit"
-            name="action"
-            value="revoke"
-            disabled={busy}
-            className="border rounded px-4 py-2"
-          >
+          <Button type="submit" name="action" value="revoke" variant="destructive" disabled={busy}>
             Cabut peran
           </Button>
         </div>
@@ -159,7 +147,9 @@ export default function AdminRoles({ loaderData, actionData }: Route.ComponentPr
               Nama perwakilan
               <Input name="representativeName" required maxLength={200} />
             </label>
-            <Button disabled={busy}>Simpan nama</Button>
+            <Button type="submit" disabled={busy}>
+              Simpan nama
+            </Button>
           </Form>
         ) : (
           <p>Belum ada akun perwakilan staf atau siswa terverifikasi.</p>

@@ -153,7 +153,7 @@ function DecisionForm({
         Pesan untuk pemohon ditampilkan dalam status dan email. Jelaskan perbaikan yang diperlukan
         tanpa menyertakan catatan pemeriksaan privat.
       </p>
-      <Button type="submit" disabled={busy} className="border rounded px-4 py-2">
+      <Button type="submit" disabled={busy}>
         {correction ? "Simpan koreksi house setelah tinjauan" : "Simpan keputusan"}
       </Button>
     </Form>
@@ -228,7 +228,11 @@ export default function MembershipReview({ loaderData, actionData }: Route.Compo
                 Alasan internal hanya untuk pemeriksa. Perubahan ini tidak mengubah peran yang
                 ditetapkan secara terpisah.
               </p>
-              <Button type="submit" disabled={busy}>
+              <Button
+                type="submit"
+                variant={loaderData.membership.status === "approved" ? "destructive" : "default"}
+                disabled={busy}
+              >
                 {loaderData.membership.status === "approved"
                   ? "Tangguhkan keanggotaan"
                   : "Pulihkan keanggotaan"}

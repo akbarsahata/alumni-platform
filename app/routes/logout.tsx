@@ -28,7 +28,7 @@ export default function Logout() {
       <h1 className="text-2xl font-semibold">Keluar dari akun</h1>
       <p>Konfirmasi untuk mengakhiri sesi akun di perangkat ini.</p>
       <Form method="post">
-        <Button type="submit" disabled={busy} className="border rounded px-4 py-2">
+        <Button type="submit" disabled={busy}>
           Keluar
         </Button>
       </Form>

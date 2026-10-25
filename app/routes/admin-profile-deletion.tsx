@@ -131,7 +131,9 @@ export default function AdminProfileDeletion({ loaderData, actionData }: Route.C
                 <input type="checkbox" required />
                 <span>Saya memahami tindakan ini menghapus konten profil secara permanen.</span>
               </label>
-              <button disabled={busy}>Hapus konten profil</button>
+              <button type="submit" data-variant="destructive" disabled={busy}>
+                Hapus konten profil
+              </button>
             </Form>
           )}
         </div>
@@ -160,7 +162,9 @@ export default function AdminProfileDeletion({ loaderData, actionData }: Route.C
                 <input type="checkbox" required />
                 <span>Saya memahami tindakan ini menghapus teks klarifikasi secara permanen.</span>
               </label>
-              <button disabled={busy}>Hapus teks klarifikasi privat</button>
+              <button type="submit" data-variant="destructive" disabled={busy}>
+                Hapus teks klarifikasi privat
+              </button>
             </Form>
           )}
         </div>
@@ -179,7 +183,9 @@ export default function AdminProfileDeletion({ loaderData, actionData }: Route.C
                 Bukti penyelesaian
                 <textarea name="note" rows={3} maxLength={1000} minLength={1} required />
               </label>
-              <button disabled={busy || !bothRemoved}>Selesaikan penghapusan</button>
+              <button type="submit" data-variant="destructive" disabled={busy || !bothRemoved}>
+                Selesaikan penghapusan
+              </button>
               {!bothRemoved && <p>Kedua langkah penghapusan harus selesai terlebih dahulu.</p>}
             </Form>
           )}

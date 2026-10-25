@@ -48,6 +48,7 @@ export default function Tags({ loaderData, actionData }: Route.ComponentProps) {
           <input name="label" required maxLength={100} />
         </label>
         <button
+          type="submit"
           className="directory-icon-action"
           aria-label="Tambah keahlian"
           title="Tambah keahlian"
@@ -82,6 +83,7 @@ export default function Tags({ loaderData, actionData }: Route.ComponentProps) {
                 </Form>
                 <div className="taxonomy-actions">
                   <button
+                    type="submit"
                     className="directory-icon-action"
                     form={`tag-edit-${tag.id}`}
                     disabled={busy}
@@ -93,6 +95,7 @@ export default function Tags({ loaderData, actionData }: Route.ComponentProps) {
                     <Pencil size={18} aria-hidden="true" />
                   </button>
                   <button
+                    type="submit"
                     className="directory-icon-action"
                     form={`tag-edit-${tag.id}`}
                     disabled={busy}
@@ -108,6 +111,7 @@ export default function Tags({ loaderData, actionData }: Route.ComponentProps) {
                     <input type="hidden" name="expectedVersion" value={tag.version} />
                     <input type="hidden" name="action" value="retire" />
                     <button
+                      type="submit"
                       className="directory-icon-action taxonomy-retire"
                       disabled={busy}
                       aria-label="Hentikan keahlian"

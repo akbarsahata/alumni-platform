@@ -174,7 +174,9 @@ export default function Profile({ loaderData, actionData }: Route.ComponentProps
           {membershipStatus === "approved" && profile.confirmedAt && !deletionActive && (
             <Form method="post">
               <input type="hidden" name="intent" value="confirm" />
-              <Button disabled={busy}>Konfirmasi profil masih benar</Button>
+              <Button type="submit" disabled={busy}>
+                Konfirmasi profil masih benar
+              </Button>
             </Form>
           )}
         </section>

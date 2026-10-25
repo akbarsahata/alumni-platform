@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { env } from "cloudflare:workers";
+import { ProgressProvider } from "@bprogress/react";
 import { getAccount } from "./auth/auth.server";
 import { SiteNavigation } from "./components/site-navigation";
+import { NavigationProgress } from "./components/navigation-progress";
 import { getAccess } from "./authorization/permissions.server";
 import { pageTitle } from "./content/page-title";
 import {
@@ -66,43 +68,50 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body data-hydrated={hydrated ? "true" : undefined}>
-        <a className="skip-link" href="#page-content">
-          Langsung ke konten
-        </a>
-        <header className="site-header">
-          <Link className="brand" to="/" aria-label="Alumni SMAN Sumsel — beranda">
-            <img
-              className="brand-logo"
-              src="/alumni-logo.png"
-              alt=""
-              width={787}
-              height={787}
-              decoding="async"
-            />
-            <span>
-              <span className="brand-kicker">KELUARGA ALUMNI</span>
-              <span className="brand-name">SMAN Sumatera Selatan</span>
-            </span>
-          </Link>
-          <a
-            className="school-link"
-            href="https://www.smansumsel.sch.id/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Tentang sekolah <span aria-hidden="true">↗</span>
+        <ProgressProvider
+          color="var(--color-primary, #17665e)"
+          height="6px"
+          options={{ showSpinner: false, minimum: 0.15 }}
+        >
+          <NavigationProgress />
+          <a className="skip-link" href="#page-content">
+            Langsung ke konten
           </a>
-        </header>
-        {rootData?.account && (
-          <SiteNavigation access={rootData.navigationAccess} account={rootData.account} />
-        )}
-        <div id="page-content" className="app-shell" tabIndex={-1}>
-          {children}
-        </div>
-        <footer className="site-footer">
-          <span>SMAN Sumatera Selatan</span>
-          <span lang="en">{alumniMessages.footer}</span>
-        </footer>
+          <header className="site-header">
+            <Link className="brand" to="/" aria-label="Alumni SMAN Sumsel — beranda">
+              <img
+                className="brand-logo"
+                src="/alumni-logo.png"
+                alt=""
+                width={787}
+                height={787}
+                decoding="async"
+              />
+              <span>
+                <span className="brand-kicker">KELUARGA ALUMNI</span>
+                <span className="brand-name">SMAN Sumatera Selatan</span>
+              </span>
+            </Link>
+            <a
+              className="school-link"
+              href="https://www.smansumsel.sch.id/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Tentang sekolah <span aria-hidden="true">↗</span>
+            </a>
+          </header>
+          {rootData?.account && (
+            <SiteNavigation access={rootData.navigationAccess} account={rootData.account} />
+          )}
+          <div id="page-content" className="app-shell" tabIndex={-1}>
+            {children}
+          </div>
+          <footer className="site-footer">
+            <span>SMAN Sumatera Selatan</span>
+            <span lang="en">{alumniMessages.footer}</span>
+          </footer>
+        </ProgressProvider>
         <ScrollRestoration />
         <Scripts />
       </body>

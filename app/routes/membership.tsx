@@ -161,7 +161,7 @@ function ApplicationForm({ current, revision }: { current?: Revision; revision: 
         tepercaya atau staf sekolah. Jangan kirim dokumen identitas atau rincian riwayat disiplin.
       </p>
       <p>Setiap perbaikan disimpan sebagai versi baru dan memerlukan tinjauan baru.</p>
-      <Button type="submit" disabled={busy} className="border rounded px-4 py-2">
+      <Button type="submit" disabled={busy}>
         {revision ? "Kirim perbaikan" : "Kirim pengajuan"}
       </Button>
     </Form>

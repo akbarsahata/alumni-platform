@@ -69,7 +69,9 @@ export default function Invitations({ actionData }: Route.ComponentProps) {
           Alasan undangan
           <Textarea name="reason" required maxLength={1000} />
         </label>
-        <Button disabled={busy}>Kirim undangan</Button>
+        <Button type="submit" disabled={busy}>
+          Kirim undangan
+        </Button>
       </Form>
     </main>
   );

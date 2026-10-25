@@ -18,6 +18,7 @@ import {
 } from "../outreach/model";
 import { OutcomeStateSelect, OutcomeSummary } from "../outreach/outcome-summary";
 import { pageTitle } from "../content/page-title";
+import { Button } from "../components/ui/button";
 import { LocalTimestamp } from "../components/local-timestamp";
 export function meta() {
   return [{ title: pageTitle("Tanggapi permintaan bantuan") }];
@@ -182,7 +183,9 @@ export default function OutreachRequest({ loaderData: d, actionData }: Route.Com
                 Pesan klarifikasi
                 <textarea name="body" maxLength={2000} rows={4} required />
               </label>
-              <button disabled={busy}>Kirim klarifikasi</button>
+              <button type="submit" disabled={busy}>
+                Kirim klarifikasi
+              </button>
             </Form>
           ) : (
             <p>Permintaan ini sudah berakhir. Percakapan klarifikasi hanya dapat dibaca.</p>
@@ -196,12 +199,12 @@ export default function OutreachRequest({ loaderData: d, actionData }: Route.Com
             <textarea name="reason" maxLength={1000} rows={3} />
           </label>
           <div className="flex flex-wrap gap-3">
-            <button name="outcome" value="interested" disabled={busy}>
+            <Button type="submit" name="outcome" value="interested" disabled={busy}>
               Saya berminat
-            </button>
-            <button name="outcome" value="declined" disabled={busy}>
+            </Button>
+            <Button type="submit" name="outcome" value="declined" variant="cancel" disabled={busy}>
               Tolak permintaan
-            </button>
+            </Button>
           </div>
         </Form>
       )}
@@ -222,7 +225,9 @@ export default function OutreachRequest({ loaderData: d, actionData }: Route.Com
                     Anda dapat menarik persetujuan ini sebelum email dikirim. Email yang sudah
                     dibagikan tidak dapat ditarik kembali.
                   </p>
-                  <button disabled={busy}>Tarik persetujuan</button>
+                  <button type="submit" data-variant="destructive" disabled={busy}>
+                    Tarik persetujuan
+                  </button>
                 </Form>
               )}
               {!d.access.canWithdraw &&
@@ -261,7 +266,9 @@ export default function OutreachRequest({ loaderData: d, actionData }: Route.Com
                 Persetujuan dapat ditarik sebelum email dikirim. Setelah email dikirim, email tidak
                 dapat ditarik kembali.
               </p>
-              <button disabled={busy}>Setujui perkenalan</button>
+              <button type="submit" disabled={busy}>
+                Setujui perkenalan
+              </button>
             </Form>
           )}
           {shared.map((item) => (
@@ -307,7 +314,9 @@ export default function OutreachRequest({ loaderData: d, actionData }: Route.Com
             <Form method="post">
               <input type="hidden" name="intent" value="confirm-outcome" />
               <input type="hidden" name="expectedRevision" value={d.outcome.revision} />
-              <button disabled={busy}>Konfirmasi hasil</button>
+              <button type="submit" disabled={busy}>
+                Konfirmasi hasil
+              </button>
             </Form>
           )}
           {!d.access.canConfirm && d.viewer.isRecipient && d.outcome.latest?.kind === "confirm" && (
@@ -339,7 +348,9 @@ export default function OutreachRequest({ loaderData: d, actionData }: Route.Com
                 Catatan terlihat oleh Anda dan koordinator direktori. Jangan tulis kontak, alamat
                 rumah, atau isi klarifikasi pribadi.
               </p>
-              <button disabled={busy}>Koreksi hasil</button>
+              <button type="submit" disabled={busy}>
+                Koreksi hasil
+              </button>
             </Form>
           )}
           {d.viewer.isRecipient && !d.access.canCorrect && (
@@ -370,7 +381,9 @@ export default function OutreachRequest({ loaderData: d, actionData }: Route.Com
                 rows={3}
                 defaultValue={submitted?.note ?? ""}
               />
-              <button disabled={busy}>Catat hasil</button>
+              <button type="submit" disabled={busy}>
+                Catat hasil
+              </button>
             </Form>
           )}
         </section>

@@ -163,7 +163,9 @@ export default function OutreachNeed({ loaderData: d, actionData }: Route.Compon
                 ))}
               </select>
             </label>
-            <button disabled={busy}>Simpan kontak penerima</button>
+            <button type="submit" disabled={busy}>
+              Simpan kontak penerima
+            </button>
           </Form>
         )}
         {d.canChangeStaff && (
@@ -303,7 +305,9 @@ export default function OutreachNeed({ loaderData: d, actionData }: Route.Compon
                         Catatan ini hanya terlihat oleh alumni penerima dan koordinator direktori.
                         Jangan tulis kontak, alamat rumah, atau isi klarifikasi pribadi.
                       </p>
-                      <button disabled={busy}>Catat hasil</button>
+                      <button type="submit" disabled={busy}>
+                        Catat hasil
+                      </button>
                     </Form>
                   </>
                 ) : (
@@ -314,20 +318,20 @@ export default function OutreachNeed({ loaderData: d, actionData }: Route.Compon
                 <input type="hidden" name="requestId" value={r.id} />
                 <input type="hidden" name="expectedCoordinatorUserId" value={r.coordinatorUserId} />
                 {r.coordinatorUserId !== d.actorId && (
-                  <button name="intent" value="take-over" disabled={busy}>
+                  <button type="submit" name="intent" value="take-over" disabled={busy}>
                     Ambil alih koordinasi
                   </button>
                 )}
                 {r.status === "pending" &&
                   !r.reminderAt &&
                   Date.parse(r.sentAt) + 7 * 86400000 <= Date.now() && (
-                    <button name="intent" value="remind" disabled={busy}>
+                    <button type="submit" name="intent" value="remind" disabled={busy}>
                       Kirim satu pengingat
                     </button>
                   )}
                 {r.status === "pending" &&
                   d.notifications.some((n) => n.requestId === r.id && n.state === "pending") && (
-                    <button name="intent" value="deliver" disabled={busy}>
+                    <button type="submit" name="intent" value="deliver" disabled={busy}>
                       Coba kirim notifikasi
                     </button>
                   )}
@@ -336,7 +340,12 @@ export default function OutreachNeed({ loaderData: d, actionData }: Route.Compon
                     (active.deliveryAttemptState === "ambiguous" &&
                       !!active.deliveryAttemptStartedAt &&
                       Date.parse(active.deliveryAttemptStartedAt) + 86400000 > Date.now())) && (
-                    <button name="intent" value="deliver-introduction" disabled={busy}>
+                    <button
+                      type="submit"
+                      name="intent"
+                      value="deliver-introduction"
+                      disabled={busy}
+                    >
                       Coba kirim perkenalan
                     </button>
                   )}
@@ -355,7 +364,7 @@ export default function OutreachNeed({ loaderData: d, actionData }: Route.Compon
       </section>
       {!d.closed && (
         <Form method="post" className="space-y-2 rounded border border-dashed p-4">
-          <button name="intent" value="close" disabled={busy}>
+          <button type="submit" name="intent" value="close" data-variant="cancel" disabled={busy}>
             Tutup kebutuhan
           </button>
           <p>
@@ -385,7 +394,7 @@ export default function OutreachNeed({ loaderData: d, actionData }: Route.Compon
                 ))}
               </select>
             </label>
-            <button>Cari penerima</button>
+            <button type="submit">Cari penerima</button>
           </Form>
           {d.directory.profiles
             .filter((p) => !d.requests.some((r) => r.recipientUserId === p.id))
@@ -400,7 +409,9 @@ export default function OutreachNeed({ loaderData: d, actionData }: Route.Compon
                   <input type="hidden" name="intent" value="send" />
                   <input type="hidden" name="expectedVersion" value={d.need.version} />
                   <input type="hidden" name="recipientUserId" value={p.id} />
-                  <button disabled={busy}>Kirim permintaan</button>
+                  <button type="submit" disabled={busy}>
+                    Kirim permintaan
+                  </button>
                 </Form>
               </article>
             ))}

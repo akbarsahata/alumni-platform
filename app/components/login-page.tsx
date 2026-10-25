@@ -40,13 +40,7 @@ export function LoginPage({
               required
             />
           </label>
-          <Button
-            type="submit"
-            disabled={busy}
-            name="intent"
-            value="send"
-            className="border rounded px-4 py-2"
-          >
+          <Button type="submit" disabled={busy} name="intent" value="send">
             {actionData?.sent ? "Kirim ulang kode" : "Kirim kode"}
           </Button>
         </Form>
@@ -66,13 +60,7 @@ export function LoginPage({
                 required
               />
             </label>
-            <Button
-              type="submit"
-              disabled={busy}
-              name="intent"
-              value="verify"
-              className="border rounded px-4 py-2"
-            >
+            <Button type="submit" disabled={busy} name="intent" value="verify">
               Masuk
             </Button>
           </Form>

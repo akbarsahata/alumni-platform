@@ -967,3 +967,44 @@ main :is(input, select, textarea)[aria-invalid="true"]:focus {
   outline-color: #a9222a55;
   border-color: var(--red);
 }
+
+/* Make the global loading bar read as part of the brand instead of a faint 1px line. */
+html body .bprogress .bar {
+  height: 6px;
+  background: linear-gradient(90deg, #17665e 0%, #2f9486 55%, #dcae48 100%);
+  box-shadow:
+    0 0 14px #17665e80,
+    0 2px 8px #183b4540;
+}
+html body .bprogress .peg {
+  box-shadow:
+    0 0 14px #dcae48,
+    0 0 6px #dcae48;
+}
+
+/* Action hierarchy: primary submit actions stay teal, while cancel and destructive
+   actions use neutral or red outlines so they cannot be mistaken for confirmation. */
+main button[data-variant="cancel"],
+.directory-page button[data-variant="cancel"] {
+  background: #fffefa;
+  border-color: #bfd4cd;
+  color: var(--ink);
+}
+main button[data-variant="cancel"]:hover,
+.directory-page button[data-variant="cancel"]:hover {
+  background: var(--muted);
+  border-color: #9fb8ae;
+  color: var(--ink);
+}
+main button[data-variant="destructive"],
+.directory-page button[data-variant="destructive"] {
+  background: #fff4f2;
+  border-color: #ecc8c5;
+  color: #a22e35;
+}
+main button[data-variant="destructive"]:hover,
+.directory-page button[data-variant="destructive"]:hover {
+  background: #fae3df;
+  border-color: #dca8a3;
+  color: #87242b;
+}
