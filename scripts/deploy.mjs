@@ -2,6 +2,7 @@ import { execFileSync } from "node:child_process";
 import { access, appendFile, mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
+import { smokeCheck } from "./smoke.mjs";
 
 const root = process.cwd();
 const wrangler = resolve(root, "node_modules/.bin/wrangler");
@@ -53,6 +54,29 @@ function runJson(command, args) {
 async function appendSummary(line) {
   if (!process.env.GITHUB_STEP_SUMMARY) return;
   await appendFile(process.env.GITHUB_STEP_SUMMARY, `${line}\n`);
+}
+
+async function recordDeployment(expected) {
+  const deployment = runJson(wrangler, [
+    "deployments",
+    "status",
+    "--name",
+    expected.workerName,
+    "--json",
+  ]);
+  const deploymentId = deployment.id ?? deployment.deployment_id;
+  const versions = Array.isArray(deployment.versions)
+    ? deployment.versions.map((version) => version?.version_id).filter(Boolean)
+    : [];
+  assert(
+    typeof deploymentId === "string" && deploymentId.length > 0,
+    "Deployment status returned no deployment ID"
+  );
+
+  await appendSummary(`- Deployment ID: \`${deploymentId}\``);
+  if (versions.length) await appendSummary(`- Worker version: \`${versions.join(", ")}\``);
+  console.log(`[deploy] Deployment ID: ${deploymentId}`);
+  if (versions.length) console.log(`[deploy] Worker version: ${versions.join(", ")}`);
 }
 
 function expectedEnvironment(environment, allowPlaceholders) {
@@ -232,6 +256,11 @@ async function main() {
     }
   }
 
+  const configuredEnvironment = process.env.CLOUDFLARE_ENV?.trim();
+  assert(
+    !configuredEnvironment || configuredEnvironment === environment,
+    `CLOUDFLARE_ENV is ${configuredEnvironment}, not ${environment}`
+  );
   process.env.CLOUDFLARE_ENV = environment;
   await rm(redirectPath, { force: true });
   run("npm", ["run", "build"]);
@@ -281,6 +310,12 @@ async function main() {
 
   await appendSummary(`- Worker: ${expected.workerName}`);
   await appendSummary(`- Origin: ${expected.origin}`);
+  if (process.env.GITHUB_SHA) await appendSummary(`- Commit: \`${process.env.GITHUB_SHA}\``);
+  await recordDeployment(expected);
+  await smokeCheck(expected.origin, { expectNoindex: environment !== "production" });
+  await appendSummary(
+    `- Smoke check: \`/login\` served${environment !== "production" ? " with noindex" : ""}`
+  );
   console.log(`[deploy] Deployed ${expected.workerName} to ${expected.origin}`);
 }
 

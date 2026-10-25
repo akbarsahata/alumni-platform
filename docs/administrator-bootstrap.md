@@ -20,10 +20,93 @@ Issue [#3](https://github.com/akbarsahata/alumni-platform/issues/3) establishes 
 
 Every trusted alumnus must have exactly one house: Komodo, Lion, Rhino, Hornbill, Dove, Eagle, Dolphin, Shark or Mantaray. Duplicate IDs, missing/unknown houses, unverified/nonexistent accounts and blank reasons/operators are rejected. An empty alumni list is allowed, but once-only bootstrap cannot later add alumni; later members use the membership workflow.
 
-5. From the repository root, run `npm run bootstrap -- /private/path/appointment.json`. The command is permanently restricted to Wrangler **local** D1, with no remote flag, public endpoint, shared bootstrap secret or public role selector. Production provisioning is outside this slice. A private temporary SQL file is escaped and removed afterward. Wrangler output is suppressed to keep appointment details private.
+5. From the repository root, run `npm run bootstrap -- /private/path/appointment.json`. The command is permanently restricted to Wrangler **local** D1, with no remote flag, public endpoint, shared bootstrap secret or public role selector. A private temporary SQL file is escaped and removed afterward. Wrangler output is suppressed to keep appointment details private.
 6. Sign in as the primary and open `/admin/audit`. Verify the appointment and each alumni event: actor account ID, named operator, target ID, reason, house where applicable and UTC timestamp. Keep appointment evidence privately and remove the input JSON when no longer needed.
 
 Bootstrap is one database statement. SQLite triggers validate accounts and atomically create the appointment, approved memberships and audit history. A failure rolls back all of it. A singleton constraint rejects a second invocation, including a different primary ID. Do not delete bootstrap records or rerun it to transfer authority. Primary succession and adding more trusted members are outside this slice.
+
+## Remote appointment
+
+Use this procedure for staging or production after the Worker is deployed, live email
+works and the appointed people have verified their accounts. `scripts/bootstrap.mjs`
+remains intentionally local-only; do not add a remote flag to it. Remote appointment
+uses a private, reviewed SQL file and Wrangler's `d1 execute --remote` command.
+
+1. Sign in at the deployed `/login` with the appointed primary email. Complete email
+   verification. Live email must work first; bootstrap cannot create or verify an
+   account.
+2. Obtain the account ID from the authenticated
+   `GET /api/auth/get-session` response (`user.id`). Do the same for each initial
+   trusted alumnus. Independently match the IDs to the organization appointment and
+   verify each alumnus's school identity and house. Never paste a session cookie or
+   OTP into an issue, chat or commit.
+3. Check that no appointment exists yet:
+
+   ```sh
+   npx wrangler d1 execute DB --remote --env staging --json \
+     --command "SELECT singleton, primary_user_id, operator, reason, occurred_at FROM organization_bootstrap"
+   ```
+
+   Stop if a row exists. Reconcile it with the organization; never delete or overwrite
+   an existing appointment to make a new one succeed.
+
+4. Create a private SQL file outside the repository with mode `0600`. Replace the
+   placeholders with verified IDs and the actual operator identity and reason. This
+   example appoints one trusted alumnus; add more `json_object(...)` entries or use
+   `json_array()` for none:
+
+   ```sql
+   INSERT INTO organization_bootstrap
+     (singleton, primary_user_id, operator, reason, trusted_alumni)
+   VALUES
+     (1,
+      'VERIFIED_PRIMARY_ACCOUNT_ID',
+      'Organization-appointed operator name',
+      'Organization appointment; independent school identity and house checks completed',
+      json_array(
+        json_object('userId', 'VERIFIED_TRUSTED_ALUMNUS_ACCOUNT_ID', 'house', 'Komodo')
+      ));
+   ```
+
+   Every trusted alumnus must have exactly one house: Komodo, Lion, Rhino, Hornbill,
+   Dove, Eagle, Dolphin, Shark or Mantaray. Double any single quotes inside the
+   operator or reason text. The database triggers still validate verified accounts,
+   houses, the singleton and the audit records atomically.
+
+5. Review the private file, then apply it from the repository root:
+
+   ```sh
+   npx wrangler d1 execute DB --remote --env staging \
+     --file /private/path/remote-bootstrap.sql --yes
+   ```
+
+   Run this in a private terminal. Wrangler may echo appointment details; do not paste
+   the output into a public issue or commit. The command applies one statement; a
+   failure rolls back the appointment, memberships and audit events.
+
+6. Verify the appointment and audit history:
+
+   ```sh
+   npx wrangler d1 execute DB --remote --env staging --json \
+     --command "SELECT singleton, primary_user_id, operator, reason, occurred_at FROM organization_bootstrap"
+   npx wrangler d1 execute DB --remote --env staging --json \
+     --command "SELECT user_id, status, house FROM alumni_membership ORDER BY user_id"
+   npx wrangler d1 execute DB --remote --env staging --json \
+     --command "SELECT action, actor_user_id, target_user_id, role, house, operator, reason, occurred_at FROM authorization_audit ORDER BY occurred_at"
+   ```
+
+7. Sign in as the primary, open `/admin/audit`, and verify the appointment and each
+   alumni event: actor account ID, named operator, target ID, reason, house where
+   applicable and UTC timestamp. Keep appointment evidence privately, then remove the
+   private SQL file when no longer needed.
+
+8. For production, repeat after the production deploy and live email are proven, using
+   `--env production`, the production account IDs and a separate private file. Never
+   copy staging IDs or reuse staging evidence.
+
+The remote procedure is deliberately manual and review-gated: there is no public
+bootstrap endpoint, shared bootstrap secret or remote flag on the local command. Do
+not seed an appointment through `seeds/seed.sql`; use the reviewed file above.
 
 ## Administration and permissions
 

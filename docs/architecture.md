@@ -72,9 +72,11 @@ Use an outbox to separate committed workflow changes from email delivery. Persis
 
 ## Environments and recovery
 
-Local development uses Wrangler-backed local bindings and synthetic data. Staging and production have separate databases, buckets, secrets, and email settings. Use the organization's Cloudflare account and domain for production.
+Local development uses Wrangler-backed local bindings and synthetic data. Staging and production have separate databases, secrets, email settings and deploy concurrency groups; R2 remains deferred. The Tests workflow deploys staging only after the stable `tests` gate passes on a `master` push. Production is deployed only from a published non-prerelease `v*` release whose commit is on `master`, through the reviewer-gated `production` environment. Each deploy applies remote D1 migrations before uploading the Worker, records the deployment ID/version, and smoke-checks the origin. A Worker rollback does not undo a migration.
 
-Before live use, document D1 recovery/export and R2 recovery arrangements, verify current provider retention limits, and perform a restore exercise. Define retention/deletion for profiles, rejected applications, payment evidence and audit records; preserve only justified financial records after account deletion. Scrub private data and tokens from logs.
+Remote administrator appointment is a reviewed `wrangler d1 execute --remote` file after live email and account verification; the local bootstrap command remains local-only. Seeding targets staging from `master` and production from a published release, with writes disabled until the environment is ready.
+
+Before live use, document D1 recovery/export and R2 recovery arrangements, verify current provider retention limits, and perform a restore exercise. Production captures a D1 Time Travel bookmark before migrations; Time Travel is an undo window, not a backup. Define retention/deletion for profiles, rejected applications, payment evidence and audit records; preserve only justified financial records after account deletion. Scrub private data and tokens from logs.
 
 ## Ticket 0 compatibility gate
 

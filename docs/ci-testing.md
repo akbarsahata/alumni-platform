@@ -19,6 +19,8 @@ flowchart TD
   membership --> gate
   directory --> gate
   outreach --> gate
+  gate --> staging[Deploy staging on master]
+  gate --> release[Verify release] --> production[Deploy production]
 ```
 
 The first job runs formatting, advisory lint, typecheck, production build and
@@ -92,7 +94,7 @@ the affected context. The existing `optimizeDeps.include` list explicitly includ
 lazy-route validation (`zod`) and timestamp dependencies (`date-fns` and
 `date-fns/locale`). Discovering them during a journey can invalidate imported
 modules with `504 Outdated Optimize Dep` and prevent hydration. Keep this list
-aligned with lazy client dependencies; do not hide such failures with test retries. Neither local hooks nor CI require live email or Cloudflare credentials.
+aligned with lazy client dependencies; do not hide such failures with test retries. Local hooks and the test jobs require neither live email nor Cloudflare credentials; only the post-gate deploy jobs use environment secrets.
 
 ## Failure and required-check behavior
 
@@ -104,10 +106,16 @@ Failed, cancelled or skipped prerequisites cannot produce a passing gate.
 Existing branch protection can continue requiring `tests`; the workflow does not
 change repository rules.
 
-Events remain pushes to `master`, pull requests and merge queue groups. Feature
-pushes without a PR and tag pushes do not run it. Newer runs do not cancel older
-runs. See [local development](local-development.md#github-actions) for setup and
-branch-protection instructions.
+Events are pushes to `master`, pull requests, merge queue groups and published
+GitHub Releases. Feature pushes without a PR and raw tag pushes do not run it. After
+the `tests` gate, a `master` push deploys staging, and a published non-prerelease
+`v*` release verifies ancestry and deploys production. A staging run that waited
+behind a newer deployment checks the current `master` head and exits without
+mutations when superseded. Pull requests and merge queue runs never deploy. Newer runs
+do not cancel older runs; deploy jobs use separate staging/production concurrency
+groups and never cancel an in-progress migration. See
+[local development](local-development.md#github-actions) and
+[Cloudflare deployment](deployment.md) for setup, secrets and rollback.
 
 ## Timing and browser diagnostics
 

@@ -3,18 +3,36 @@ import { tmpdir } from "node:os";
 import { resolve, join } from "node:path";
 import { execFileSync } from "node:child_process";
 
+const targets = ["staging", "production"];
 const target = process.env.SEED_ENVIRONMENT;
 const enabled = process.env.SEEDING_ENABLED;
-if (!["production", "default"].includes(target)) throw new Error("Invalid seed environment.");
+if (!targets.includes(target)) throw new Error("SEED_ENVIRONMENT must be staging or production.");
 if (!["true", "false"].includes(enabled)) throw new Error("Invalid SEEDING_ENABLED flag.");
-const expected = process.env.GITHUB_REF_NAME === "master" ? "production" : "default";
-if (process.env.GITHUB_REF_NAME && target !== expected)
-  throw new Error("Seed environment does not match the pushed branch.");
+
+const event = process.env.GITHUB_EVENT_NAME;
+const ref = process.env.GITHUB_REF_NAME;
+const releaseTag = process.env.SEED_RELEASE_TAG?.trim() || ref;
+const releasePrerelease = process.env.SEED_RELEASE_PRERELEASE;
+if (event === "push") {
+  if (ref !== "master" || target !== "staging")
+    throw new Error("Only a push to master may seed staging.");
+} else if (event === "release") {
+  if (target !== "production" || releasePrerelease !== "false" || !releaseTag?.startsWith("v"))
+    throw new Error("Only a published non-prerelease v* release may seed production.");
+} else if (event) {
+  throw new Error("Seeds run only from master pushes or published v* releases.");
+}
 
 const file = resolve("seeds/seed.sql");
 const sql = await readFile(file, "utf8");
 if (!sql.replace(/--[^\n]*/g, "").trim()) throw new Error("Seed file is empty.");
-const message = `Seed target: ${target}. Remote seeding ${enabled === "true" ? "enabled" : "disabled; no database writes"}.`;
+const trigger =
+  event === "release"
+    ? `release ${releaseTag}`
+    : event === "push"
+      ? `push ${ref}`
+      : "local invocation";
+const message = `Seed target: ${target} (${trigger}). Remote seeding ${enabled === "true" ? "enabled" : "disabled; no database writes"}.`;
 console.log(message);
 if (process.env.GITHUB_STEP_SUMMARY)
   await appendFile(process.env.GITHUB_STEP_SUMMARY, `${message}\n`);

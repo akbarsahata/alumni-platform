@@ -51,17 +51,18 @@ See [membership-review.md](membership-review.md) for manual testing, decision hi
 
 ## GitHub Actions
 
-The `Tests` workflow runs on pushes to `master`, when a pull request is opened or reopened or its branch receives new commits, and for merge queue groups. A feature-branch push with an open pull request triggers one pull-request run, testing GitHub's proposed merge commit. Feature branches without an open pull request and tag pushes do not trigger tests. Every matching event gets its own run; newer pushes do not cancel earlier runs.
+The `Tests` workflow runs on pushes to `master`, when a pull request is opened or reopened or its branch receives new commits, for merge queue groups, and for published GitHub Releases. A feature-branch push with an open pull request triggers one pull-request run, testing GitHub's proposed merge commit. Feature branches without an open pull request and raw tag pushes do not trigger tests. Every matching event gets its own run; newer pushes do not cancel earlier runs. Only the `tests` gate on `master` deploys staging, and only a published non-prerelease `v*` release can deploy production.
 
 To enforce the pull-request quality gate, configure the target branch (normally `master`) in GitHub Settings → Rules → Rulesets, or branch protection. Require a pull request before merging and require the `tests` status check from GitHub Actions to pass. Select the check after this workflow has run on GitHub. Enable the up-to-date branch requirement if merges must pass against the latest target branch. The `merge_group` trigger also supports a merge queue. No manual workflow run is needed; editing this YAML alone does not configure GitHub's merge restrictions.
 
 See [CI testing and parallel integration contexts](ci-testing.md) for the architecture, exact file ownership, fixture dependencies, new-test assignment rules and failure diagnosis.
 
-CI uses Ubuntu runners and Node 24 in three stages:
+CI uses Ubuntu runners and Node 24 in three test stages plus deployment:
 
 1. Static checks: formatting, advisory lint, typecheck, production build and helper tests.
 2. Four parallel integration contexts: `auth`, `membership`, `directory` (including school needs and representative names), and `outreach` (including introductions, outcomes and clarification). Each job installs Chromium and runs its HTTP fixture producers before its browser consumers against its own disposable Worker/D1/KV state. Tests inside a context remain sequential to preserve bootstrap and fixture dependencies. Directory and outreach also run the roles suite first to create the shared primary-administrator fixture.
 3. The stable `tests` gate requires both stages to succeed, including every matrix job. Failed, cancelled or skipped prerequisites cannot pass this gate. Existing branch protection can continue requiring `tests`.
+4. A successful `tests` gate on a push to `master` runs `deploy-staging` in the `staging` GitHub environment. A published non-prerelease `v*` release additionally runs `verify-release` and then `deploy-production` in the reviewer-gated `production` environment. Pull requests and merge queue runs never deploy, and production never deploys from a branch push.
 
 Run one context locally with `npm test -- --context directory`. Keep port 5173 free; contexts run in separate CI runners, not concurrently in one checkout. Plain `npm test` and focused file arguments keep their existing behavior. The runner checks that every HTTP and browser test file is assigned to exactly one context (with the roles bootstrap repeated where required), so new files must be assigned in `scripts/test.mjs`.
 
@@ -79,18 +80,24 @@ References: [Better Auth Email OTP](https://better-auth.com/docs/plugins/email-o
 
 `npm run build` builds the Worker; `npm run preview -- --host 127.0.0.1` previews it locally. The built Worker fails closed when `ENVIRONMENT=development`; with `ENVIRONMENT=staging|production` and configured `RESEND_API_KEY`, `EMAIL_FROM` and `EMAIL_REPLY_TO`, it sends through Resend.
 
-`wrangler.jsonc` now defines development, staging and production environments. Development and both deployed environments repeat the non-inheritable bindings, routes, variables, required secrets and observability settings. Staging D1/KV resources are provisioned; production resources remain guarded placeholders until the production phase.
+`wrangler.jsonc` defines development, staging and production environments. Development and both deployed environments repeat the non-inheritable bindings, routes, variables, required secrets and observability settings. Staging D1/KV resources are provisioned; production resources remain guarded placeholders until the production phase.
 
 `npm run deploy` intentionally fails without an environment. Use:
 
 ```sh
 npm run deploy:staging -- --check
 npm run deploy:production -- --check
+npm run deploy:staging
+npm run deploy:production
 ```
 
-`--check` builds the selected environment, validates `build/server/wrangler.json`, removes any copied `.dev.vars`, and exits without applying migrations or deploying. A real deploy requires the environment's Cloudflare credentials and `PRODUCTION_URL` for production. The deploy script rejects placeholder resource IDs, missing custom-domain routes and missing required secrets, captures a production D1 Time Travel bookmark before migrations, applies remote migrations, and deletes its temporary secrets file. Operators who already keep a private reviewed file can pass `--secrets-file <path>`; they are responsible for deleting that file.
+`--check` builds the selected environment, validates `build/server/wrangler.json`, removes any copied `.dev.vars`, and exits without applying migrations or deploying. A real deploy requires the environment's Cloudflare credentials and `PRODUCTION_URL` for production. The deploy script rejects placeholder resource IDs, missing custom-domain routes and missing required secrets, captures a production D1 Time Travel bookmark before migrations, applies remote migrations, uploads the Worker with a temporary secrets file, deletes that file immediately, records the deployment ID and Worker version in the job summary, and smoke-checks `/login`. Staging must return `X-Robots-Tag: noindex`; production must serve the application. Operators who already keep a private reviewed file can pass `--secrets-file <path>`; they are responsible for deleting that file.
 
-Deployed environments disable `workers_dev`, disable preview URLs, and include a non-production `X-Robots-Tag: noindex` response header. Never publish `.dev.vars`, `.wrangler/`, build-local secrets, or test artifacts. The Vite plugin copies `.dev.vars` into `build/server/.dev.vars`; delete that copy before any deploy. Local commands remove the ignored `.wrangler/deploy/config.json` redirect before running so a previous staging build cannot change local D1, KV or type generation. Do not run a real deployment command for local verification.
+The [Tests workflow](../.github/workflows/tests.yml) is the normal deployment path. A push to `master` runs `deploy-staging` after the stable `tests` gate. A published non-prerelease `v*` release runs `verify-release` and `deploy-production` after the same gate, using the reviewer-gated `production` environment. Pull requests, merge queue runs and prereleases never deploy. Staging and production use separate concurrency groups, and cancelling an in-progress migration is disabled. After acquiring its concurrency group, staging confirms the run is still the current `master` head and exits without mutations when a newer push superseded it. `PRODUCTION_URL` is a production environment variable, not a secret. Run the same origin check manually with `npm run smoke -- https://kasmanss.akbarsahata.id --expect-noindex`.
+
+Deployed environments disable `workers_dev` and preview URLs. Non-production responses include `X-Robots-Tag: noindex`; this is not access control. Never publish `.dev.vars`, `.wrangler/`, build-local secrets, or test artifacts. The Vite plugin copies `.dev.vars` into `build/server/.dev.vars`; the deploy script deletes that copy before deploying. Local commands remove the ignored `.wrangler/deploy/config.json` redirect before running so a previous staging build cannot change local D1, KV or type generation. Do not run a real deployment command for local verification.
+
+Use `npx wrangler deployments list --env staging` and `npx wrangler rollback <version-id> --env staging` for a code rollback. A rollback does not undo a migration. See [Cloudflare deployment](deployment.md) for the full runbook, D1 restore and remote bootstrap procedure.
 
 For suspension/reinstatement and controlled review requests, see
 [membership-suspensions.md](membership-suspensions.md). Focused verification:

@@ -1,3 +1,101 @@
+# PR 3 deployment automation — 2026-10-26
+
+Implemented on branch `feat/cloudflare-deploy-ci` in worktree
+`/Users/akbar/.local/share/opencode/worktree/7d1130/cloudflare-deploy-ci`. Delivery PR:
+[#40](https://github.com/akbarsahata/alumni-platform/pull/40). No merge, remote
+migration, deployment, live email send or administrator appointment was performed.
+Issue [#34](https://github.com/akbarsahata/alumni-platform/issues/34) remains open until
+the first staging deploy and bootstrap evidence exist.
+
+## Workflow and runner changes
+
+- The Tests workflow now also runs for published releases. `deploy-staging` requires
+  the stable `tests` gate, runs only for a `master` push, uses the `staging`
+  environment and the `deploy-staging` concurrency group.
+- `verify-release` requires a published non-prerelease `v*` release and proves
+  `GITHUB_SHA` is an ancestor of `master` using full history. `deploy-production`
+  needs both `tests` and `verify-release`, uses the reviewer-gated `production`
+  environment and the separate `deploy-production` concurrency group. Neither deploy
+  job can run from a pull request, merge queue, feature branch or prerelease.
+- Both deploy jobs set `CLOUDFLARE_ENV` and pass only environment secrets. The deploy
+  script uses a temporary `--secrets-file`, deletes it in `finally`, rejects an
+  environment mismatch, records the deployment ID/Worker version in the job summary,
+  and smoke-checks `/login`. Staging must also return `X-Robots-Tag: noindex`.
+- `scripts/smoke.mjs` bounds each attempt and retries deployment propagation. It
+  checks status, HTML content type, the application shell and the noindex header; it
+  does not log bodies or secrets.
+- `seed.yml` now triggers only on `master` pushes or published non-prerelease `v*`
+  releases. `scripts/seed.mjs` targets staging for `master` and production for a
+  release, rejects mismatched event/target combinations, and keeps
+  `SEEDING_ENABLED: "false"`.
+
+## PR #40 review follow-up
+
+The P2 review finding noted that the staging concurrency group does not preserve push
+order: an older push with slower tests can start after a newer push and overwrite it.
+`deploy-staging` now acquires the staging concurrency group, queries the current
+`master` head with the workflow token, and skips all remote mutations when
+`GITHUB_SHA` is no longer that head. A newer push that arrives after the check still
+deploys afterward through the same group, so the final successful deployment follows
+the newest tested `master` commit. In-progress migrations remain uncancelled.
+
+## Documentation
+
+Updated `docs/deployment.md`, `docs/local-development.md`, `docs/seeding.md`,
+`docs/architecture.md`, `docs/administrator-bootstrap.md`, `docs/ci-testing.md`,
+`docs/README.md`, `README.md` and this handoff. The administrator guide now separates
+the local command from the reviewed remote `wrangler d1 execute --file` procedure and
+requires live email/verified account IDs first.
+
+## Verification
+
+- `npm run format:check`, `npm run lint`, `npm run typecheck` and `npm run build`
+  pass.
+- `npm run deploy:staging -- --check` and `npm run deploy:production -- --check` pass
+  sequentially. The deploy check removed a deliberately copied
+  `build/server/.dev.vars`. Parallel deploy checks race on the shared `build/`
+  directory and must be run sequentially.
+- `npm run deploy:production -- --check` with `CLOUDFLARE_ENV=staging` fails before
+  building, proving the environment mismatch guard.
+- Seed checks pass for `master`→staging and published release→production, and reject
+  release→staging, master→production, prerelease, non-`v*` and feature-branch cases.
+- The smoke runner passed against a local HTML/noindex probe and rejected a response
+  without noindex.
+- Both workflow files parse as YAML and pass `actionlint`; `node --check` passes for
+  the changed scripts.
+- `npm run test:unit` passes all 16 helper tests.
+
+The full `npm test` suite was not run in this worktree because port `5173` is occupied
+by the main-repository development server. Hosted PR
+[#40](https://github.com/akbarsahata/alumni-platform/pull/40) checks pass: static
+checks/build, all four integration contexts and the stable `tests` gate. The deploy
+jobs skipped as expected on a pull request. No live Resend request, Cloudflare API
+call, remote migration or deployment was made.
+
+## Remaining human checks
+
+- The `staging` GitHub environment already exposes the expected five secret names
+  (`CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `BETTER_AUTH_SECRET`,
+  `RESEND_API_KEY`, `D1_DATABASE_ID`); values were not inspected.
+- The `production` environment now requires reviewer approval. It has no secrets,
+  `PRODUCTION_URL` variable, resources or hostname yet. Production remains deliberately
+  undeliverable.
+- After merge, verify the first `deploy-staging` run, TLS and `/login`, noindex, real
+  Resend login and transactional sends, the introduction evidence path, 25 applied
+  migrations plus a repeat no-op, and the remote administrator bootstrap. Close #34
+  only after that evidence exists.
+
+## Remaining risks
+
+- The seed workflow is independent of the deployment workflow. Keep seeding disabled
+  until the target database has the committed migrations and the deployment path is
+  proven.
+- The smoke check proves only that `/login` serves the application and that staging
+  carries noindex; it does not prove email, all notifications or introduction
+  evidence.
+
+---
+
 # PR #37 review fixes — 2026-10-25
 
 Addressed the three review findings on PR

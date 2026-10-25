@@ -11,11 +11,12 @@ English.
 bootstrap, role management, membership applications/manual review, same-house references, reviewed
 house corrections, school invitations, profiles, expertise discovery, independently approved
 school needs, and bounded school outreach with private interest/decline responses, consented
-introductions, and append-only outcome tracking with need closure. A Resend delivery adapter is
-implemented for configured staging/production Workers; local development and automated tests still
-use captured email. Initiatives, finance, and broader engagement workflows remain planned. The latest
-entries in the [session handoff](docs/handoff.md) describe implementation and verification; earlier
-planning statuses are historical.
+introductions, and append-only outcome tracking with need closure. A Resend delivery adapter and
+Cloudflare staging deployment workflow are implemented; local development and automated tests still
+use captured email. Staging deploys after the `tests` gate on `master`; production is gated on a
+published non-prerelease `v*` release. Initiatives, finance, and broader engagement workflows remain
+planned. The latest entries in the [session handoff](docs/handoff.md) describe implementation and
+verification; earlier planning statuses are historical.
 
 ## Quick start
 
@@ -56,15 +57,16 @@ without an alumni profile. Each need requires validation by its named verified s
 and separate directory-coordinator approval.
 
 The primary administrator is appointed privately and alone manages privileged roles and their audit
-history. Bootstrap is local-only, runs once, and requires verified account IDs, an operator, a reason,
-and a valid house for each trusted alumnus:
+history. Bootstrap runs once and requires verified account IDs, an operator, a reason, and a valid house
+for each trusted alumnus. Local development uses the private command:
 
 ```sh
 npm run bootstrap -- /private/path/appointment.json
 ```
 
-Follow the [administrator bootstrap guide](docs/administrator-bootstrap.md) for the input format,
-identity checks, role permissions, and audit behavior. There is no public bootstrap endpoint.
+Staging and production use a reviewed `wrangler d1 execute --remote` file after live email and account
+verification. Follow the [administrator bootstrap guide](docs/administrator-bootstrap.md) for both
+procedures, identity checks, role permissions, and audit behavior. There is no public bootstrap endpoint.
 
 Applicants submit school identity and a required house, track status, and correct/resubmit for manual
 review. Membership administrators independently check applications, record decisions, and inspect
@@ -102,11 +104,14 @@ format files. VS Code/Cursor [settings](.vscode/settings.json) enable formatting
 files, lints, and typechecks. The full test suite runs in GitHub Actions. See
 [formatting and linting](docs/local-development.md#formatting-and-linting).
 
-The [Tests workflow](.github/workflows/tests.yml) runs on pushes to `master`, pull requests, and merge queue groups. It
-uses Ubuntu, Node 24, and Chromium to check formatting, lint, types, build, and the full test suite
-without live credentials. The badge above shows the latest `master` push result. See
-[CI details](docs/local-development.md#github-actions) and
-[context ownership and test commands](docs/ci-testing.md).
+The [Tests workflow](.github/workflows/tests.yml) runs on pushes to `master`, pull requests, merge
+queue groups, and published GitHub Releases. It uses Ubuntu, Node 24, and Chromium to check formatting,
+lint, types, build, and the full test suite without live credentials. After the `tests` gate, a
+`master` push deploys staging; a published non-prerelease `v*` release deploys production. The badge
+above shows the latest `master` push result. See
+[CI details](docs/local-development.md#github-actions),
+[context ownership and test commands](docs/ci-testing.md), and
+[deployment](docs/deployment.md).
 
 ## Stack and code map
 
@@ -132,19 +137,20 @@ current product workflows.
 
 ## Documentation and roadmap
 
-| Document                                                          | Read it for                                                                               |
-| ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| [Pilot specification](docs/pilot.md)                              | Audience, workflows, operating defaults, evaluation, and exclusions.                      |
-| [Architecture and data model](docs/architecture.md)               | Design direction, authorization, storage, email reliability, and recovery.                |
-| [CI testing](docs/ci-testing.md)                                  | Parallel stages, context ownership, fixture dependencies and the required gate.           |
-| [Local development](docs/local-development.md)                    | Setup, mailbox, testing, formatting, CI, and deployment boundaries.                       |
-| [Administrator bootstrap](docs/administrator-bootstrap.md)        | Private appointments, role isolation, and audit procedure.                                |
-| [Membership manual review](docs/membership-review.md)             | Application/status screens, independent checks, decision history, and local verification. |
-| [Ticket 1 specification](docs/ticket-1-spec.md)                   | Agreed membership/reference scope and browser/HTTP testing seam.                          |
-| [Ticket 1 implementation issues](docs/ticket-1-implementation.md) | Published vertical slices and their dependencies.                                         |
-| [Pilot implementation tickets](docs/tickets.md)                   | Broader foundation → membership → directory → initiatives → finance → engagement plan.    |
-| [Session handoff](docs/handoff.md)                                | Implementation history, validation, limitations, and next work.                           |
-| [Document index](docs/README.md)                                  | Planning-document provenance and historical references.                                   |
+| Document                                                          | Read it for                                                                                |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| [Pilot specification](docs/pilot.md)                              | Audience, workflows, operating defaults, evaluation, and exclusions.                       |
+| [Architecture and data model](docs/architecture.md)               | Design direction, authorization, storage, email reliability, and recovery.                 |
+| [CI testing](docs/ci-testing.md)                                  | Parallel stages, context ownership, fixture dependencies and the required gate.            |
+| [Cloudflare deployment](docs/deployment.md)                       | Staging/production triggers, resources, migrations, smoke checks, rollback, and bootstrap. |
+| [Local development](docs/local-development.md)                    | Setup, mailbox, testing, formatting, CI, and deployment boundaries.                        |
+| [Administrator bootstrap](docs/administrator-bootstrap.md)        | Private appointments, role isolation, and audit procedure.                                 |
+| [Membership manual review](docs/membership-review.md)             | Application/status screens, independent checks, decision history, and local verification.  |
+| [Ticket 1 specification](docs/ticket-1-spec.md)                   | Agreed membership/reference scope and browser/HTTP testing seam.                           |
+| [Ticket 1 implementation issues](docs/ticket-1-implementation.md) | Published vertical slices and their dependencies.                                          |
+| [Pilot implementation tickets](docs/tickets.md)                   | Broader foundation → membership → directory → initiatives → finance → engagement plan.     |
+| [Session handoff](docs/handoff.md)                                | Implementation history, validation, limitations, and next work.                            |
+| [Document index](docs/README.md)                                  | Planning-document provenance and historical references.                                    |
 
 The membership parent specification is [issue #1](https://github.com/akbarsahata/alumni-platform/issues/1).
 Login, administrator bootstrap/roles, membership applications/manual review, references, house
@@ -164,10 +170,12 @@ Read [AGENTS.md](AGENTS.md) and the current specifications before implementing t
 
 Development and automated tests use synthetic data and captured email. A built Worker with
 `ENVIRONMENT=development` still fails closed; staging/production use Resend only when the secret and
-sender configuration are present. Staging/production resource provisioning, deploy workflows,
-domains, retention, and recovery remain follow-up work; the presence of a `deploy` script does not
-mean deployment is ready. Keep local secrets, state, build-local secrets, and test artifacts private.
-See [deployment boundaries](docs/local-development.md#build-and-deployment-boundary) and
+sender configuration are present. Staging is deployed automatically after `master` passes the `tests`
+gate; production is release-gated and remains unprovisioned. The first staging deploy, live email
+checks, remote administrator bootstrap, retention, and restore drill remain human-verified
+prerequisites. Keep local secrets, state, build-local secrets, and test artifacts private. See the
+[deployment runbook](docs/deployment.md),
+[deployment boundaries](docs/local-development.md#build-and-deployment-boundary), and
 [recovery planning](docs/architecture.md#environments-and-recovery).
 
 The [recovered overview](docs/recovered-readme.md) and
@@ -177,7 +185,8 @@ statuses.
 
 ## Remote database seeding
 
-Changing [seeds/seed.sql](seeds/seed.sql) triggers the seeding workflow: `master` targets
-production and other branches target the default environment. Database writes are
-currently disabled through the workflow feature flag. See the [seeding guide](docs/seeding.md)
-for environment secrets, prerequisites, retries and administrator appointment.
+Changing [seeds/seed.sql](seeds/seed.sql) on `master` targets staging, and a published
+non-prerelease `v*` release targets production. Feature branches cannot select a seed
+target. Database writes are currently disabled through the workflow feature flag. See
+the [seeding guide](docs/seeding.md) for environment secrets, prerequisites, retries and
+administrator appointment.
