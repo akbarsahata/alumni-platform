@@ -1,10 +1,11 @@
 # PR 3 deployment automation — 2026-10-26
 
 Implemented on branch `feat/cloudflare-deploy-ci` in worktree
-`/Users/akbar/.local/share/opencode/worktree/7d1130/cloudflare-deploy-ci`. No commit,
-push, merge, remote migration, deployment, live email send or administrator
-appointment was performed. Issue [#34](https://github.com/akbarsahata/alumni-platform/issues/34)
-remains open until the first staging deploy and bootstrap evidence exist.
+`/Users/akbar/.local/share/opencode/worktree/7d1130/cloudflare-deploy-ci`. Delivery PR:
+[#40](https://github.com/akbarsahata/alumni-platform/pull/40). No merge, remote
+migration, deployment, live email send or administrator appointment was performed.
+Issue [#34](https://github.com/akbarsahata/alumni-platform/issues/34) remains open until
+the first staging deploy and bootstrap evidence exist.
 
 ## Workflow and runner changes
 
@@ -55,9 +56,11 @@ requires live email/verified account IDs first.
 - `npm run test:unit` passes all 16 helper tests.
 
 The full `npm test` suite was not run in this worktree because port `5173` is occupied
-by the main-repository development server. The workflow still runs the full gate on
-the PR and after merge. No live Resend request, Cloudflare API call, remote migration
-or deployment was made.
+by the main-repository development server. Hosted PR
+[#40](https://github.com/akbarsahata/alumni-platform/pull/40) checks pass: static
+checks/build, all four integration contexts and the stable `tests` gate. The deploy
+jobs skipped as expected on a pull request. No live Resend request, Cloudflare API
+call, remote migration or deployment was made.
 
 ## Remaining human checks
 
