@@ -2,6 +2,8 @@
 
 Issue [#3](https://github.com/akbarsahata/alumni-platform/issues/3) establishes the primary administrator and initial trusted alumni. Membership applications, school invitations, directory records and financial records remain later slices.
 
+For agent-driven local or remote appointments, use the [role-bootstrap skill](../.agents/skills/role-bootstrap/SKILL.md). This document remains the authoritative human runbook.
+
 ## Local organization appointment
 
 1. Run `npm run db:migrate` and start the local app. The organization independently appoints one primary administrator and checks each initial trusted alumnus's school identity and house through trusted alumni or school staff. Do not collect identity-document uploads.
