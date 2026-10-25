@@ -3,10 +3,10 @@
 - [CI testing and parallel integration contexts](ci-testing.md): stage graph, exact context ownership, fixture isolation, local commands, required gate and timing/diagnostic limits.
 - [Local development](local-development.md): setup, mailbox, verification and CI operations.
 
-- [Remote D1 seeding](seeding.md): branch-selected GitHub Actions, disabled write flag,
-  environment secrets and administrator appointment prerequisites.
+- [Remote D1 seeding](seeding.md): `master`-to-staging and release-to-production
+  targets, disabled write flag, environment secrets and administrator appointment.
 - [Cloudflare deployment](deployment.md): staging-on-master, release-gated production,
-  live Resend email, remote D1 migrations, rollback and administrator bootstrap.
+  live Resend email, remote D1 migrations, smoke checks, rollback and remote bootstrap.
 
 Recovered planning documents from the “Move attach session results” chat, with current local verification recorded in the handoff.
 

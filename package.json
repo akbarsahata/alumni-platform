@@ -12,6 +12,7 @@
     "deploy": "node scripts/deploy.mjs",
     "deploy:staging": "node scripts/deploy.mjs staging",
     "deploy:production": "node scripts/deploy.mjs production",
+    "smoke": "node scripts/smoke.mjs",
     "preview": "npm run build && vite preview",
     "precf-typegen": "node scripts/clean-wrangler-redirect.mjs",
     "cf-typegen": "wrangler types",

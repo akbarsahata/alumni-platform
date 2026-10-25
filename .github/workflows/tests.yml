@@ -6,6 +6,8 @@ on:
       - master
   pull_request:
   merge_group:
+  release:
+    types: [published]
 
 permissions:
   contents: read
@@ -98,3 +100,110 @@ jobs:
           CHECKS_RESULT: ${{ needs.checks.result }}
           INTEGRATION_RESULT: ${{ needs.integration.result }}
         run: test "$CHECKS_RESULT" = success && test "$INTEGRATION_RESULT" = success
+
+  deploy-staging:
+    name: Deploy staging
+    needs: tests
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    environment: staging
+    concurrency:
+      group: deploy-staging
+      cancel-in-progress: false
+    env:
+      HUSKY: "0"
+      CLOUDFLARE_SEND_METRICS: "false"
+      CLOUDFLARE_ENV: staging
+    steps:
+      - name: Check out the commit under test
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Deploy staging
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+        run: npm run deploy:staging
+
+  verify-release:
+    name: Verify production release
+    needs: tests
+    if: github.event_name == 'release' && github.event.action == 'published' && github.event.release.prerelease == false && startsWith(github.event.release.tag_name, 'v')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out master history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: master
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Require a non-prerelease v* tag on master
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          RELEASE_PRERELEASE: ${{ github.event.release.prerelease }}
+        run: |
+          set -euo pipefail
+          test "$RELEASE_PRERELEASE" = "false"
+          case "$RELEASE_TAG" in
+            v*) ;;
+            *)
+              echo "Release tag must match v*." >&2
+              exit 1
+              ;;
+          esac
+          git cat-file -e "$GITHUB_SHA^{commit}"
+          git merge-base --is-ancestor "$GITHUB_SHA" HEAD
+          echo "Release $RELEASE_TAG is a non-prerelease tag on master."
+
+  deploy-production:
+    name: Deploy production
+    needs: [tests, verify-release]
+    if: github.event_name == 'release' && github.event.action == 'published' && github.event.release.prerelease == false && startsWith(github.event.release.tag_name, 'v')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    environment: production
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    env:
+      HUSKY: "0"
+      CLOUDFLARE_SEND_METRICS: "false"
+      CLOUDFLARE_ENV: production
+      PRODUCTION_URL: ${{ vars.PRODUCTION_URL }}
+    steps:
+      - name: Check out the release commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Deploy production
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+        run: npm run deploy:production

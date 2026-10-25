@@ -1,7 +1,8 @@
 # Cloudflare deployment
 
-Status: agreed 2026-10-24. Staging is the current delivery; production is a later
-release-gated phase.
+Status: agreed 2026-10-24; deployment automation implemented 2026-10-26. Staging is
+the current delivery; production is a later release-gated phase. The first staging
+deploy is pending merge of the deployment workflow.
 
 ## Decisions
 
@@ -32,17 +33,64 @@ namespace, secrets and hostname.
 
 Provisioned on 2026-10-24 in the Cloudflare account that owns `akbarsahata.id`:
 
-| Item            | Value                                                                 |
-| --------------- | --------------------------------------------------------------------- |
-| D1 database     | `alumni_staging` (`3cebe648-9065-4be8-ab8f-48958e9d36be`, APAC)       |
-| KV namespace    | `alumni-staging-local-mail` (`72a57fe4e83c4029a2ada4e5a84ddd80`)      |
-| Migrations      | 25 applied; a repeat list reports no migrations                       |
-| Worker          | `alumni-platform-staging` configured, not yet deployed                |
-| Custom domain   | `kasmanss.akbarsahata.id` configured, created by the first deploy     |
-| Deployment type | Normal production deployment; preview URLs and `workers_dev` disabled |
+| Item            | Value                                                                                           |
+| --------------- | ----------------------------------------------------------------------------------------------- |
+| D1 database     | `alumni_staging` (`3cebe648-9065-4be8-ab8f-48958e9d36be`, APAC)                                 |
+| KV namespace    | `alumni-staging-local-mail` (`72a57fe4e83c4029a2ada4e5a84ddd80`)                                |
+| Migrations      | 25 applied; a repeat list reports no migrations                                                 |
+| Worker          | `alumni-platform-staging` configured; first deploy by `Tests` workflow                          |
+| Custom domain   | `kasmanss.akbarsahata.id` configured, created by the first deploy                               |
+| Deployment type | Normal production deployment; preview URLs and `workers_dev` disabled                           |
+| GitHub          | `staging` environment with the Cloudflare and Worker secrets, plus `D1_DATABASE_ID` for seeding |
 
-The Worker, custom domain and Worker secrets require `BETTER_AUTH_SECRET` and
-`RESEND_API_KEY` and are created by the first deploy.
+The staging environment has `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`,
+`BETTER_AUTH_SECRET`, `RESEND_API_KEY` and `D1_DATABASE_ID`. The Worker secrets are
+uploaded by the first deploy. The `production` environment now requires reviewer
+approval; its secrets, `PRODUCTION_URL`, resources and hostname remain unset.
+
+## Deployment workflow
+
+The [Tests workflow](../.github/workflows/tests.yml) is the automated deployment path.
+It now also runs for published GitHub Releases. The stable `tests` job remains the
+required check:
+
+- `deploy-staging` starts after `tests` only for a push on `master`, uses the
+  `staging` GitHub environment, and runs in the `deploy-staging` concurrency group.
+- `verify-release` starts after `tests` only for a published non-prerelease release
+  whose tag matches `v*`. It checks out full `master` history and proves the release
+  commit is an ancestor of `master`.
+- `deploy-production` needs both `tests` and `verify-release`, uses the `production`
+  GitHub environment, and runs in the separate `deploy-production` concurrency group.
+  It cannot run for `master` pushes, pull requests, merge queues or prereleases.
+
+Both deploy jobs build and deploy with the same `CLOUDFLARE_ENV` value. The deploy
+script (`scripts/deploy.mjs`) performs the same steps locally and in CI:
+
+1. Build the selected environment and validate the flattened
+   `build/server/wrangler.json`: Worker name, route, bindings, required secrets,
+   variables, observability, disabled previews and disabled `workers_dev`.
+2. Delete `build/server/.dev.vars` and reject any other `.dev.vars*` file in the
+   build output.
+3. Capture a D1 Time Travel bookmark for production.
+4. Apply remote D1 migrations before uploading the Worker.
+5. Upload the Worker with a temporary `--secrets-file`, then delete the temporary
+   directory immediately.
+6. Record the deployment ID and Worker version in the job summary.
+7. Fetch `https://<origin>/login` and fail unless it returns the application shell.
+   Staging must also return `X-Robots-Tag: noindex`.
+
+Manual equivalents:
+
+```sh
+npm run deploy:staging -- --check
+npm run deploy:production -- --check
+npm run deploy:staging
+npm run deploy:production
+```
+
+`--check` validates the build without credentials, migrations or deployment. A real
+production deploy also requires the `PRODUCTION_URL` environment variable and the
+production environment's resources and secrets.
 
 ## Goals
 
@@ -173,6 +221,68 @@ Extend the existing [Tests workflow](../.github/workflows/tests.yml) so the stab
 - Document that D1 Time Travel may retain deleted rows for its retention window and
   that R2 evidence storage remains deferred.
 
+## Operations
+
+### First staging deploy
+
+1. Confirm the `staging` environment has the five secrets listed above and that the
+   owner has approved the first deployment.
+2. Merge the deployment workflow to `master`. The push runs the complete `tests` gate
+   and then `deploy-staging`.
+3. Confirm the job summary records the deployment ID, Worker version, origin, commit
+   and smoke check.
+4. Verify TLS and `/login` at `https://kasmanss.akbarsahata.id`, and confirm the
+   response carries `X-Robots-Tag: noindex`.
+5. Send a real login code through Resend, then exercise the transactional email and
+   introduction paths with synthetic or appointed accounts.
+6. Confirm `wrangler d1 migrations list DB --remote --env staging` reports no
+   unapplied migrations, and repeat to prove idempotence.
+7. Complete the [remote administrator bootstrap](administrator-bootstrap.md#remote-appointment)
+   with the appointed account and verify `/admin/audit`.
+
+### Rollback
+
+A Worker rollback changes code only; it does not undo a D1 migration. Prefer a
+forward fix for a bad migration. If a code rollback is required:
+
+```sh
+npx wrangler deployments list --env staging
+npx wrangler rollback <version-id> --env staging --message "Reason for rollback" -y
+```
+
+Use the `alumni-platform-production` Worker name and `--env production` for
+production. Record the rollback reason and affected migration/version in the handoff.
+
+### D1 restore
+
+Time Travel is an undo window, not a backup. It is 7 days on Free and 30 days on Paid,
+and restore is destructive. Capture a bookmark or export before production migrations
+and get explicit approval before restoring.
+
+```sh
+npx wrangler d1 time-travel info DB --env staging --json
+npx wrangler d1 time-travel restore DB --env staging --bookmark <bookmark>
+npx wrangler d1 export DB --remote --env staging --output /private/path/staging.sql
+```
+
+Keep exports outside the repository, private and access-controlled. Do not treat a
+Time Travel window as a long-term retention policy.
+
+### Remote administrator bootstrap
+
+Live email must work before appointment so the administrator can sign in and obtain a
+verified account ID. Follow the [remote appointment procedure](administrator-bootstrap.md#remote-appointment).
+The insertion uses a private, reviewed SQL file through
+`wrangler d1 execute DB --remote --env <environment> --file <private-file>`. The local
+`npm run bootstrap` command remains local-only.
+
+### Seeding
+
+`master` seeds staging and a published `v*` release seeds production. Feature branches
+cannot select a seed target. Writes remain disabled by `SEEDING_ENABLED: "false"`
+until the production resources and a repeatable seed are proven. See
+[seeding](seeding.md).
+
 ## Acceptance criteria
 
 - [ ] A push or merged pull request on `master` runs the full `tests` gate and then
@@ -202,17 +312,20 @@ Extend the existing [Tests workflow](../.github/workflows/tests.yml) so the stab
 The implementation can be prepared without credentials, but the first deployment
 requires the owner to:
 
-1. Create the staging D1 database and KV namespace in the Cloudflare account that
-   owns `akbarsahata.id`, or provide the IDs for review.
+1. Staging D1 and KV resources are provisioned (table above); confirm their IDs still
+   match `wrangler.jsonc`.
 2. Confirm `kasmanss.akbarsahata.id` is available in that zone and that the deploy
    token can create Workers routes and DNS records.
-3. Create a Resend API key scoped to the verified domain and sending only.
-4. Configure the `staging` GitHub environment with `CLOUDFLARE_API_TOKEN`,
-   `CLOUDFLARE_ACCOUNT_ID`, `BETTER_AUTH_SECRET` and `RESEND_API_KEY`.
-5. Approve the first staging deploy and complete the administrator appointment.
+3. Create a Resend API key scoped to the verified domain and sending only, and verify
+   SPF, DKIM and DMARC. Send test messages to at least two major mailbox providers.
+4. The `staging` GitHub environment currently has `CLOUDFLARE_API_TOKEN`,
+   `CLOUDFLARE_ACCOUNT_ID`, `BETTER_AUTH_SECRET`, `RESEND_API_KEY` and
+   `D1_DATABASE_ID`; re-check the values before merging.
+5. Approve the first staging deploy and complete the remote administrator appointment.
 6. Before production: choose the production hostname, create separate production
-   resources and environment secrets, protect `v*` tags, and configure required
-   reviewers on the `production` environment.
+   resources and environment secrets, set the production `PRODUCTION_URL` variable,
+   protect `v*` tags, and confirm the existing required reviewer on the `production`
+   environment.
 
 ## Risks
 
@@ -226,3 +339,9 @@ requires the owner to:
   compatibility before production.
 - Time Travel is an undo window, not a long-term backup. A production export policy
   and restore drill remain follow-ups.
+- The smoke check proves only that `/login` serves the application and that staging
+  carries `noindex`. It does not prove Email delivery, every notification path or the
+  introduction evidence path; those remain separate checks.
+- The seed workflow is independent of the deployment workflow. Keep seeding disabled
+  until the target database has the committed migrations and the release/deploy path
+  is proven.
