@@ -29,6 +29,16 @@ the first staging deploy and bootstrap evidence exist.
   release, rejects mismatched event/target combinations, and keeps
   `SEEDING_ENABLED: "false"`.
 
+## PR #40 review follow-up
+
+The P2 review finding noted that the staging concurrency group does not preserve push
+order: an older push with slower tests can start after a newer push and overwrite it.
+`deploy-staging` now acquires the staging concurrency group, queries the current
+`master` head with the workflow token, and skips all remote mutations when
+`GITHUB_SHA` is no longer that head. A newer push that arrives after the check still
+deploys afterward through the same group, so the final successful deployment follows
+the newest tested `master` commit. In-progress migrations remain uncancelled.
+
 ## Documentation
 
 Updated `docs/deployment.md`, `docs/local-development.md`, `docs/seeding.md`,

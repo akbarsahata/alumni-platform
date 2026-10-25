@@ -109,9 +109,11 @@ change repository rules.
 Events are pushes to `master`, pull requests, merge queue groups and published
 GitHub Releases. Feature pushes without a PR and raw tag pushes do not run it. After
 the `tests` gate, a `master` push deploys staging, and a published non-prerelease
-`v*` release verifies ancestry and deploys production. Pull requests and merge queue
-runs never deploy. Newer runs do not cancel older runs; deploy jobs use separate
-staging/production concurrency groups and never cancel an in-progress migration. See
+`v*` release verifies ancestry and deploys production. A staging run that waited
+behind a newer deployment checks the current `master` head and exits without
+mutations when superseded. Pull requests and merge queue runs never deploy. Newer runs
+do not cancel older runs; deploy jobs use separate staging/production concurrency
+groups and never cancel an in-progress migration. See
 [local development](local-development.md#github-actions) and
 [Cloudflare deployment](deployment.md) for setup, secrets and rollback.
 

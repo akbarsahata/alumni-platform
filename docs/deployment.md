@@ -56,6 +56,9 @@ required check:
 
 - `deploy-staging` starts after `tests` only for a push on `master`, uses the
   `staging` GitHub environment, and runs in the `deploy-staging` concurrency group.
+  After acquiring that group it confirms `GITHUB_SHA` is still the current `master`
+  head. A superseded run exits without migrations or deployment, so an older push
+  cannot overwrite a newer staging revision after waiting behind it.
 - `verify-release` starts after `tests` only for a published non-prerelease release
   whose tag matches `v*`. It checks out full `master` history and proves the release
   commit is an ancestor of `master`.
