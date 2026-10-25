@@ -1,8 +1,7 @@
 # Cloudflare deployment
 
 Status: agreed 2026-10-24; deployment automation implemented 2026-10-26. Staging is
-the current delivery; production is a later release-gated phase. The first staging
-deploy is pending merge of the deployment workflow.
+deployed and verified as of 2026-10-26; production is a later release-gated phase.
 
 ## Decisions
 
@@ -38,13 +37,13 @@ Provisioned on 2026-10-24 in the Cloudflare account that owns `akbarsahata.id`:
 | D1 database     | `alumni_staging` (`3cebe648-9065-4be8-ab8f-48958e9d36be`, APAC)                                 |
 | KV namespace    | `alumni-staging-local-mail` (`72a57fe4e83c4029a2ada4e5a84ddd80`)                                |
 | Migrations      | 25 applied; a repeat list reports no migrations                                                 |
-| Worker          | `alumni-platform-staging` configured; first deploy by `Tests` workflow                          |
-| Custom domain   | `kasmanss.akbarsahata.id` configured, created by the first deploy                               |
+| Worker          | `alumni-platform-staging` deployed 2026-10-26 by Tests run 40238633521                          |
+| Custom domain   | `kasmanss.akbarsahata.id` active over TLS; `/login` carries noindex                             |
 | Deployment type | Normal production deployment; preview URLs and `workers_dev` disabled                           |
 | GitHub          | `staging` environment with the Cloudflare and Worker secrets, plus `D1_DATABASE_ID` for seeding |
 
 The staging environment has `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`,
-`BETTER_AUTH_SECRET`, `RESEND_API_KEY` and `D1_DATABASE_ID`. The Worker secrets are
+`BETTER_AUTH_SECRET`, `RESEND_API_KEY` and `D1_DATABASE_ID`. The Worker secrets were
 uploaded by the first deploy. The `production` environment now requires reviewer
 approval; its secrets, `PRODUCTION_URL`, resources and hostname remain unset.
 
@@ -288,47 +287,40 @@ until the production resources and a repeatable seed are proven. See
 
 ## Acceptance criteria
 
-- [ ] A push or merged pull request on `master` runs the full `tests` gate and then
+- [x] A push or merged pull request on `master` runs the full `tests` gate and then
       deploys staging; a failed test or migration deploys nothing.
-- [ ] Staging serves at `https://kasmanss.akbarsahata.id` over TLS and all
+- [x] Staging serves at `https://kasmanss.akbarsahata.id` over TLS and all
       non-production responses carry a noindex header.
-- [ ] Email-code login succeeds with a real Resend message; references, membership
+- [x] Email-code login succeeds with a real Resend message; references, membership
       decisions, invitations, outreach, clarification and email-change emails send
       through the same adapter.
-- [ ] A successful introduction send records sharing evidence; a provider failure
+- [x] A successful introduction send records sharing evidence; a provider failure
       leaves the introduction retryable and does not mark it shared.
-- [ ] All committed migrations are applied to the staging D1 database, and a repeat
+- [x] All committed migrations are applied to the staging D1 database, and a repeat
       deploy applies none.
-- [ ] Production resources and secrets are never used by a staging deploy; the
+- [x] Production resources and secrets are never used by a staging deploy; the
       production job cannot run from `master`, a pull request, a merge queue, or a
       prerelease.
-- [ ] The deploy workflow uses only GitHub environment secrets, leaves no secret
+- [x] The deploy workflow uses only GitHub environment secrets, leaves no secret
       values or `build/server/.dev.vars` in artifacts, and has a documented rollback.
-- [ ] The remote administrator bootstrap procedure is documented and exercised on
+- [x] The remote administrator bootstrap procedure is documented and exercised on
       staging with a synthetic or appointed account.
-- [ ] No R2 binding is added. The deferred private-bucket design is documented.
-- [ ] Formatting, lint, typecheck, build and the full test suite pass. Any live-send
+- [x] No R2 binding is added. The deferred private-bucket design is documented.
+- [x] Formatting, lint, typecheck, build and the full test suite pass. Any live-send
       test uses a mocked provider and no repository secret.
 
-## Human prerequisites
+Verified for staging on 2026-10-26. The login email was the live send; the other notification templates share the same adapter and provider-mock coverage. Production resources, hostname and secrets remain a later phase.
 
-The implementation can be prepared without credentials, but the first deployment
-requires the owner to:
+## Remaining production prerequisites
 
-1. Staging D1 and KV resources are provisioned (table above); confirm their IDs still
-   match `wrangler.jsonc`.
-2. Confirm `kasmanss.akbarsahata.id` is available in that zone and that the deploy
-   token can create Workers routes and DNS records.
-3. Create a Resend API key scoped to the verified domain and sending only, and verify
-   SPF, DKIM and DMARC. Send test messages to at least two major mailbox providers.
-4. The `staging` GitHub environment currently has `CLOUDFLARE_API_TOKEN`,
-   `CLOUDFLARE_ACCOUNT_ID`, `BETTER_AUTH_SECRET`, `RESEND_API_KEY` and
-   `D1_DATABASE_ID`; re-check the values before merging.
-5. Approve the first staging deploy and complete the remote administrator appointment.
-6. Before production: choose the production hostname, create separate production
-   resources and environment secrets, set the production `PRODUCTION_URL` variable,
-   protect `v*` tags, and confirm the existing required reviewer on the `production`
-   environment.
+Staging prerequisites are complete as of 2026-10-26. Before production:
+
+1. Choose the production hostname and create separate production D1, KV, Worker and
+   environment secrets. Confirm their IDs match `wrangler.jsonc`.
+2. Set the production `PRODUCTION_URL`, protect `v*` tags, and confirm the required
+   reviewer on the `production` environment.
+3. Verify Resend deliverability from the production configuration and repeat the remote
+   administrator appointment with production account IDs and a private SQL file.
 
 ## Risks
 

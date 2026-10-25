@@ -1,11 +1,40 @@
+# Staging verified and issue #34 closed — 2026-10-26
+
+Post-merge [Tests run 40238633521](https://github.com/akbarsahata/alumni-platform/actions/runs/40238633521)
+passed the stable gate and deployed `alumni-platform-staging` (deployment
+`43f8db3d-b08e-4438-8037-c7d61f75118a`, version
+`3815fa21-5068-4f76-9cc3-0731140cb472`). Remote D1 has 25 applied migrations and none
+pending. `https://kasmanss.akbarsahata.id/login` returns TLS HTTP/2 200 with
+`X-Robots-Tag: noindex`.
+
+Live Resend login succeeded for the appointed primary. DMARC was missing and was added at
+`_dmarc.akbarsahata.id` (`p=none`, reports to `iam@akbarsahata.id`) and verified against
+the authoritative nameservers and public DoH; SPF and Resend DKIM were already present.
+The remote administrator bootstrap was applied once at `2026-10-25T22:20:47.731Z`. The
+`organization_bootstrap` row and one `bootstrap-primary` audit event are present, and the
+owner confirmed `/admin/audit`. Issue
+[#34](https://github.com/akbarsahata/alumni-platform/issues/34) is closed.
+
+The reproducible appointment and role-grant procedure now lives in the
+[role-bootstrap skill](../.agents/skills/role-bootstrap/SKILL.md), linked from
+[administrator bootstrap](administrator-bootstrap.md). The skill commit `0ba9a20` used
+`[skip ci]`, so no workflow ran for the documentation change.
+
+Remaining boundary: the login email was the live send; the other notification templates
+share the same Resend adapter and provider-mock coverage but were not each live-triggered.
+Production resources, hostname and secrets remain unprovisioned.
+
+---
+
 # PR 3 deployment automation — 2026-10-26
 
 Implemented on branch `feat/cloudflare-deploy-ci` in worktree
 `/Users/akbar/.local/share/opencode/worktree/7d1130/cloudflare-deploy-ci`. Delivery PR:
-[#40](https://github.com/akbarsahata/alumni-platform/pull/40). No merge, remote
-migration, deployment, live email send or administrator appointment was performed.
-Issue [#34](https://github.com/akbarsahata/alumni-platform/issues/34) remains open until
-the first staging deploy and bootstrap evidence exist.
+[#40](https://github.com/akbarsahata/alumni-platform/pull/40). PR #40 merged on
+2026-10-25. The work below was prepared without a remote migration, deployment, live email
+send or administrator appointment; those operations were completed after merge and are
+recorded in the verification section at the top. Issue
+[#34](https://github.com/akbarsahata/alumni-platform/issues/34) is closed.
 
 ## Workflow and runner changes
 
