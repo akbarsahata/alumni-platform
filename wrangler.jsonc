@@ -4,6 +4,7 @@
   "compatibility_date": "2026-10-01",
   "compatibility_flags": ["nodejs_compat"],
   "main": "./workers/app.ts",
+  "vars": {},
   "d1_databases": [
     {
       "binding": "DB",
