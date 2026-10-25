@@ -16,6 +16,7 @@ describe("main Workers authentication", () => {
   test("email-code login is available in Bahasa Indonesia", async () => {
     const response = await fetch(`${base}/login`);
     assert.equal(response.status, 200);
+    assert.equal(response.headers.get("x-robots-tag"), "noindex");
     assert.match(await response.text(), /Kirim kode/);
   });
 
@@ -213,6 +214,7 @@ describe("main Workers authentication", () => {
               }),
         });
         assert.equal(response.status, 403, path);
+        assert.equal(response.headers.get("x-robots-tag"), "noindex", path);
       }
     }
   });

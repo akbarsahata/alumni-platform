@@ -23,6 +23,27 @@ writers cannot move or delete them, restrict the `production` environment to tho
 tags, and require reviewers on that environment. Reject prereleases and verify the
 release commit is on `master` before deploying.
 
+Staging is a normal production deployment of the `alumni-platform-staging` Worker,
+not a preview version. Preview URLs and `workers_dev` are disabled. Real production
+uses a separate `alumni-platform-production` Worker with its own D1 database, KV
+namespace, secrets and hostname.
+
+## Current staging resources
+
+Provisioned on 2026-10-24 in the Cloudflare account that owns `akbarsahata.id`:
+
+| Item            | Value                                                                 |
+| --------------- | --------------------------------------------------------------------- |
+| D1 database     | `alumni_staging` (`3cebe648-9065-4be8-ab8f-48958e9d36be`, APAC)       |
+| KV namespace    | `alumni-staging-local-mail` (`72a57fe4e83c4029a2ada4e5a84ddd80`)      |
+| Migrations      | 25 applied; a repeat list reports no migrations                       |
+| Worker          | `alumni-platform-staging` configured, not yet deployed                |
+| Custom domain   | `kasmanss.akbarsahata.id` configured, created by the first deploy     |
+| Deployment type | Normal production deployment; preview URLs and `workers_dev` disabled |
+
+The Worker, custom domain and Worker secrets require `BETTER_AUTH_SECRET` and
+`RESEND_API_KEY` and are created by the first deploy.
+
 ## Goals
 
 - Deploy the React Router Worker to Cloudflare staging whenever `master` changes,
@@ -163,8 +184,8 @@ Extend the existing [Tests workflow](../.github/workflows/tests.yml) so the stab
       through the same adapter.
 - [ ] A successful introduction send records sharing evidence; a provider failure
       leaves the introduction retryable and does not mark it shared.
-- [ ] All 23 migrations are applied to the staging D1 database, and a repeat deploy
-      applies none.
+- [ ] All committed migrations are applied to the staging D1 database, and a repeat
+      deploy applies none.
 - [ ] Production resources and secrets are never used by a staging deploy; the
       production job cannot run from `master`, a pull request, a merge queue, or a
       prerelease.
