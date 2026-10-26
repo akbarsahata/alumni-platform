@@ -19,6 +19,8 @@ export default defineConfig({
     include: [
       "react-select",
       "sonner",
+      "@bprogress/react",
+      "@bprogress/core",
       "lucide-react",
       "radix-ui",
       "class-variance-authority",

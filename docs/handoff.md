@@ -37,9 +37,15 @@ migration, environment, deployment or email behavior changed.
 - Chromium smoke against the local dev server: the progress bar appeared at 6px with
   `rgb(23, 102, 94)` during a deliberately delayed client navigation, completed and
   was removed; `/`, `/login` and the 404 route hydrated without console errors.
-- Full `npm test` was not run in this checkout because the ordinary local dev server
-  occupies port 5173, which the browser runner requires. Hosted CI is the full-suite
-  gate for this push.
+- Hosted run `40242056584` initially failed the first outreach browser journey
+  (`clarification.spec.ts`) on its 30-second hydration wait while all other contexts
+  passed and a retry reproduced it. `@bprogress/react` and `@bprogress/core` are now
+  pre-optimized in `vite.config.ts`, matching the existing cold-start guard for lazy
+  browser routes.
+- Focused `node scripts/test.mjs --context outreach` passes all HTTP suites and all
+  eight Chromium journeys after clearing `node_modules/.vite`.
+- Full `npm test` was not run in this checkout. Hosted CI is the full-suite gate for
+  this push.
 
 ---
 
